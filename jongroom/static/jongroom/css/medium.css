@@ -1,0 +1,281 @@
+
+.tile-yoko{
+  display: block;
+  transform-origin: top left;
+  transform: rotate(-90deg) translate(-100%);
+  margin-bottom: -50%;
+  white-space: nowrap;
+}
+
+.kasane{
+  height: 22px;
+  width: 30px;
+}
+.kasane > img {
+  float:left;
+}
+.apkong-box{
+  align-items:flex-end;
+  display: inline-flex;
+}
+
+.my-discarded{
+  height:100px;
+  width:210px;
+  margin:auto;
+}
+.discarded-item{
+  float: left;
+  display: block;
+}
+.discarded-item img {
+  width:22px;
+  height:30px;
+  display: block;
+  border: 1px transparent solid;
+}
+
+.discarded-tsumogiri img{
+  border: 1px blue solid;
+}
+
+.pullout-item{
+  float: left;
+}
+.exposed-item{
+  float: left;
+  direction: rtl;
+}
+.pullout-area{
+  margin-right: auto;
+  float: left;
+  width:20%;
+  height:33px;
+  border: 1px pink dotted;
+}
+.exposed-area{
+	display: flex;
+	flex-wrap: nowrap;
+  margin-left: auto;
+  width:75%;
+  height:33px;
+}
+.tile{
+	flex-wrap: nowrap;
+  margin:1px;
+  position:relative;
+}
+
+.exposed-group{
+	flex-wrap: nowrap;
+  margin-left: 5px;
+  border: 1px red dotted;
+  display: flex;
+}
+
+.player-field{
+  width:400px;
+  height:200px;
+  /*border: 2px blue solid;*/
+}
+
+#hand0{
+  position:absolute;
+  left:100px;
+  top:400px;
+}
+
+#hand1{
+  position:absolute;
+  left:300px;
+  top:200px;
+  transform:rotate(-90deg);
+}
+
+#hand2{
+  position:absolute;
+  left:100px;
+  top:0px;
+  transform:rotate(180deg);
+}
+
+#hand3{
+  position:absolute;
+  left:-100px;
+  top:200px;
+  transform:rotate(90deg);
+}
+
+#info{
+  position:absolute;
+  left:232px;
+  top:232px;
+  width:133px;
+  height:133px;
+  margin:auto;
+  border: 1px orange solid;
+}
+
+#sideinfo{
+  position:absolute;
+  left:650px;
+  top:50px;
+  width:200px;
+  height:400px;
+  margin:auto;
+  padding:15px;
+  border: 1px orange solid;
+}
+
+.group-clickable:hover{
+  background: orange;
+}
+
+.clearfix:after{
+	content: "";
+	clear: both;
+	display: block;
+}
+
+@keyframes up {
+  0% {top: 1500px;display:none;opacity:0;}
+  0.1% {top: 1500px;opacity:0;}
+  100% {display:block;}
+}
+@keyframes down {
+  0% {display:block;}
+  99.9% {top: 1500px;opacity:0;}
+  100% {top: 1500px;opacity:0;display:none;}
+}
+.anim-show {
+    height: 14px;
+    transition-property: height;
+    transition-duration: 0.6s;
+    transition-delay: 0s;
+    transition-timing-function: ease;
+}
+
+.border-discard-hand{
+	outline:1px orange solid;
+	animation: blinkborder 0.7s ease 0.4s infinite alternate;
+}
+
+@keyframes blinkborder {
+	0% {outline-color: rgba(255,128,0,1);}
+	100% {outline-color: rgba(255,128,0,0.2);}
+}
+
+.anim-hide {
+    height: 0px;
+    display:none;
+    transition-property: height;
+    transition-duration: 0.6s;
+    transition-delay: 0s;
+    transition-timing-function: ease;
+}
+
+.command-bar{
+  display: flex;
+  flex-wrap: nowrap;
+}
+
+.command{
+  background-color: white;
+  border:1px black solid;
+  width:60px;
+  font-size: 14px;
+  height: 14px;
+}
+.command-enter-active{
+  transition: height 0.6s 0s ease;
+}
+.command-leave-active{
+  transition: height 0.6s 0s ease;
+}
+
+.command-enter , .command-leave-to{
+  height: 0px;
+}
+
+.anim-up{
+  animation: up 0.6s ease-out 1;
+  animation-fill-mode:forwards;
+}
+.anim-down{
+  animation: down 0.6s ease-out 1;
+  animation-fill-mode:forwards;
+}
+.anim-init-down{
+}
+
+#board-root{
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+	width: 600px;
+	height: 600px;
+	margin:auto;
+	border: red solid 1px;
+  position:absolute;
+  display:inline-block;
+}
+
+
+.meld-select-box{
+  border: solid 2px orange;
+  background: lightgray;
+  opacity: 0.6;
+  position: absolute;
+  width: 400px;
+  height: 250px;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+	margin:auto;
+  padding:8px;
+}
+
+.meld-select-enter-active{
+  transition: top 0.6s 0s ease;
+}
+.meld-select-leave-active{
+  transition: top 0.6s 0s ease;
+}
+
+.meld-select-enter , .meld-select-leave-to{
+  top: 500px !important;
+  display:none;
+}
+
+.eff-tgt{
+  border: solid 2px orange;
+  border-radius: 50%;
+  width:32px;
+  height:32px;
+  position:absolute;
+  left:calc(50% - 16px);
+  top:calc(50% - 16px);
+  animation: spin 1.5s linear infinite;
+}
+.eff-tgt2{
+  z-index:-1;
+  position:relative;
+  float:left;
+  left:calc( 50% - 1px );
+  top:-8px;
+  width:2px;
+  height:15px;
+  background:red;
+}
+@keyframes spin {
+  0% {transform: rotate(0deg);}
+	100% {transform: rotate(360deg);}
+}
+
+body{
+  margin:auto;
+  overflow: hidden;
+  font-size: 13px;
+}

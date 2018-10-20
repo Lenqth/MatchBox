@@ -1,0 +1,8 @@
+__pycache__/
+build/
+.ipynb_checkpoints
+.~lock*
+ignore/
+*.h5f
+*.log
+db.sqlite3

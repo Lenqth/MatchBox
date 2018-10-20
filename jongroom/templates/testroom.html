@@ -1,0 +1,152 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<title></title>
+<meta charset="utf-8">
+<meta name="description" content="">
+<meta name="author" content="">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="">
+<!--[if lt IE 9]>
+<script src="//cdn.jsdelivr.net/html5shiv/3.7.2/html5shiv.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/respond.js/1.4.2/respond.min.js"></script>
+<![endif]-->
+<script>
+socket = new WebSocket("ws://localhost:8000/jong/room/nyan");
+
+class AsyncConnection{
+  constructor(href){
+    this.socket = new WebSocket(href);;
+    var bf = this.buffer = [];
+    var cb = this.callbacks = [] ;
+    socket.addeventlistener("message" , function(e) {
+      var o = JSON.parse(e.data);
+      bf.push(o);
+      var rem = [];
+      for(var x in cb){
+        if(bf.length>0){
+          (cb[x])(o);
+          rem.push(x);
+        }
+      }
+      take_positions(cb,rem);
+    });
+  }
+}
+
+AsyncConnection.prototype.send = function(obj){
+  socket.send(JSON.stringify(obj));
+}
+
+AsyncConnection.prototype.receiveAsync = async function(){
+  if(this.buffer.length>0){return this.buffer.shift();}
+  return new Promise(function(resolve, reject) {
+    this.callbacks.push(resolve);
+  });
+}
+
+function writeln(x){
+  document.getElementById("output").value += x + "\n" ;
+}
+function send(s){
+  var obj={message:s};
+  socket.send(JSON.stringify(obj));
+}
+
+socket.onmessage = function(e) {
+
+}
+
+socket.onerror = function(e) {console.log("error:",e);}
+socket.onclose = function(e) {
+  console.log("closed");
+}
+
+socket.onopen = function() {
+  console.log("open");
+}
+</script>
+<link rel="shortcut icon" href="">
+<style>
+.flexbox{
+  display: flex;
+
+}
+.col1{
+  width:60%;
+}
+.col2{
+
+}
+#output{
+  width:80%;
+  height:40%
+
+
+}
+.group-detail{
+  display: flex;
+  flex-flow: row wrap;
+  width:300px;
+  height:200px;
+  border: 2px blue solid;
+}
+.group-content{
+  box-sizing: border-box;
+  flex-basis:50%;
+  flex-shrink:1;
+}
+
+.group-content-you{
+  border-width:3px;
+  border-style: solid;
+  animation: blinkborder 0.7s ease 0.4s infinite alternate;
+}
+
+@keyframes blinkborder {
+  0% {border-color: rgba(255,255,255,1);}
+  100% {border-color: rgba(255,255,255,0.2);}
+}
+
+.group-content:nth-child(2n) {
+  /*flex-basis: 100%;*/
+}
+
+#grp1.joined {background-color: #ffcccc;}
+#grp2.joined {background-color: #ccccff;}
+#grp3.joined {background-color: #ccffcc;}
+#grp4.joined {background-color: #ffccff;}
+#grp1:not(.joined){background-color: #886666;}
+#grp2:not(.joined){background-color: #666688;}
+#grp3:not(.joined){background-color: #668866;}
+#grp4:not(.joined){background-color: #886688;}
+
+
+</style>
+</head>
+<body>
+<!-- Place your content here -->
+<!-- SCRIPTS -->
+<!-- Example: <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script> -->
+
+<audio id="sound1" preload="auto">
+  <source src="{% static 'jongroom/sound/puu79_a.wav' %}" type="audio/wav">
+</audio>
+<div class="flexbox">
+  <div class="col1">
+    <textarea id="output" rows="40"></textarea>
+    <input type="text" id="txbox"><input type="button" value="send" id="sendbutton">
+  </div>
+  <div class="col2">
+    <div class="group-detail">
+      <div id="grp1" class="group-content"></div>
+      <div id="grp2" class="group-content"></div>
+      <div id="grp3" class="group-content"></div>
+      <div id="grp4" class="group-content"></div>
+    </div?
+  </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,229 @@
+
+.tile-yoko{
+  display: block;
+  transform-origin: top left;
+  transform: rotate(-90deg) translate(-100%);
+  margin-bottom: -50%;
+  white-space: nowrap;
+}
+
+.kasane{
+  height: 33px;
+  width: 45px;
+}
+.kasane > img {
+  float:left;
+}
+.apkong-box{
+  align-items:flex-end;
+  display: inline-flex;
+}
+
+.my-discarded{
+  height:180px;
+  width:320px;
+  margin:auto;
+}
+.discarded-item{
+  float: left;
+  display: block;
+}
+.discarded-item img {
+  width:33px;
+  height:45px;
+  display: block;
+  border: 1px transparent solid;
+}
+
+.discarded-tsumogiri img{
+  border: 1px blue solid;
+}
+
+.pullout-item{
+  float: left;
+}
+.exposed-item{
+  float: left;
+  direction: rtl;
+}
+.pullout-area{
+  margin-right: auto;
+  float: left;
+  width:30%;
+  height:50px;
+  border: 1px pink dotted;
+}
+.exposed-area{
+  margin-left: auto;
+  width:60%;
+  height:50px;
+}
+.tile{
+  margin:3px;
+  position:relative;
+}
+.exposed-group{
+  white-space:nowrap;
+  margin-left: 8px;
+  border: 1px red dotted;
+  display: inline-block;
+}
+
+.player-field{
+  width:600px;
+  height:320px;
+/*  border: 1px blue solid;*/
+}
+
+#myhand{
+  position:absolute;
+  left:150px;
+  top:600px;
+}
+
+#hand1{
+  position:absolute;
+  left:450px;
+  top:300px;
+  transform:rotate(-90deg);
+}
+
+#hand2{
+  position:absolute;
+  left:150px;
+  top:0px;
+  transform:rotate(180deg);
+}
+
+#hand3{
+  position:absolute;
+  left:-150px;
+  top:300px;
+  transform:rotate(90deg);
+}
+
+#info{
+  position:absolute;
+  left:350px;
+  top:350px;
+  width:200px;
+  height:200px;
+  margin:auto;
+  border: 1px orange solid;
+}
+
+#sideinfo{
+  position:absolute;
+  left:950px;
+  top:50px;
+  width:300px;
+  height:600px;
+  margin:auto;
+  padding:15px;
+  border: 1px orange solid;
+}
+
+
+#movingbox{
+  border: solid 2px orange;
+  background: lightgray;
+  opacity: 0.6;
+  position: absolute;
+  width: 400px;
+  height: 250px;
+  left: 250px;
+  top: 500px;
+  padding:8px;
+}
+
+.group-clickable:hover{
+  background: orange;
+}
+
+.clearfix:after{
+	content: "";
+	clear: both;
+	display: block;
+}
+
+.command-bar{
+  display: flex;
+  flex-wrap: nowrap;
+
+}
+
+.command{
+  background-color: white;
+  border:1px black solid;
+  width:100px;
+}
+.anim-up{
+  animation: up 0.6s ease-out 1;
+  animation-fill-mode:forwards;
+}
+.anim-down{
+  animation: down 0.6s ease-out 1;
+  animation-fill-mode:forwards;
+}
+.anim-init-down{
+  top: 1000px !important;
+  display:none;
+}
+@keyframes up {
+  0% {top: 1500px;display:none;opacity:0;}
+  0.1% {top: 1500px;opacity:0;}
+  100% {display:block;}
+}
+@keyframes down {
+  0% {display:block;}
+  99.9% {top: 1500px;opacity:0;}
+  100% {top: 1500px;opacity:0;display:none;}
+}
+.anim-show {
+    height: 20px;
+    font-size: 20px;
+    transition-property: height;
+    transition-duration: 0.6s;
+    transition-delay: 0s;
+    transition-timing-function: ease;
+}
+
+.anim-hide {
+    height: 0px;
+    display:none;
+    font-size: 20px;
+    transition-property: height;
+    transition-duration: 0.6s;
+    transition-delay: 0s;
+    transition-timing-function: ease;
+}
+
+.eff-tgt{
+  border: solid 2px orange;
+  border-radius: 50%;
+  width:32px;
+  height:32px;
+  position:absolute;
+  left:calc(50% - 16px);
+  top:calc(50% - 16px);
+  animation: spin 1.5s linear infinite;
+}
+.eff-tgt2{
+  z-index:-1;
+  position:relative;
+  float:left;
+  left:calc( 50% - 1px );
+  top:-8px;
+  width:2px;
+  height:15px;
+  background:red;
+}
+@keyframes spin {
+  0% {transform: rotate(0deg);}
+	100% {transform: rotate(360deg);}
+}
+
+body{
+  margin:auto;
+  overflow: hidden;
+}
