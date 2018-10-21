@@ -17,7 +17,7 @@
 <![endif]-->
 <script>
 Vue.config.delimiters = ['$${', '}'];
-socket = new WebSocket("ws://localhost:8000/jong/lobby");
+socket = new WebSocket("ws://"+location.host+"/jong/lobby");
 
 var root = {rlist:[] };
 socket.onmessage = function(e) {

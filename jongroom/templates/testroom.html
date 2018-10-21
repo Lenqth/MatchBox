@@ -14,7 +14,7 @@
 <script src="//cdnjs.cloudflare.com/ajax/libs/respond.js/1.4.2/respond.min.js"></script>
 <![endif]-->
 <script>
-socket = new WebSocket("ws://localhost:8000/jong/room/nyan");
+socket = new WebSocket("ws://"+location.host+"/jong/room/nyan");
 
 class AsyncConnection{
   constructor(href){

@@ -58,7 +58,7 @@ class Deck{
 }
 
 Deck.prototype.start = async function(){
-  this.conn = new AsyncConnection("ws://localhost:8000/jong/room/nyan");
+  this.conn = new AsyncConnection("ws://"+location.host+"/jong/room/nyan");
   console.log( await this.conn.receiveAsync() );
   this.conn.send(JSON.stringify({"start":""}));
   while(true){
@@ -90,7 +90,7 @@ Deck.prototype.start = async function(){
       }
       this.players[tg_pl].target = null;
     }else if( res.type == "agari" ){
-      
+
     }else if( res.type == "expose" ){
       this.players[res.pid].exposed.push( res.obj );
     }else if( res.type == "apkong" ){
