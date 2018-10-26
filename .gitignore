@@ -6,3 +6,5 @@ ignore/
 *.h5f
 *.log
 db.sqlite3
+
+jong_server/settings.py
