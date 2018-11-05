@@ -107,12 +107,20 @@ class Room:
         await self.on_room_destroyed(roomname)
         print("room destroyed [{0}]".format(roomname))
 
-    def receive(self,channel,data):
+    async def receive(self,channel,data):
         pos = channel.room_pos
         try:
+            message = data['message']
+            print("@%s" % message )
+            await channel_layer.group_send(
+                'chat_%s' % self.name,
+                {
+                    'type': 'chat_broadcast',
+                    'obj' : { "message" : message }
+                }
+            )
             #if data["type"] == "get_all" :
             #    pass
-            pass
         except:
             return {"error":""}
 

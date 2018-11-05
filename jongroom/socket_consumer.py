@@ -99,13 +99,9 @@ class MainConsumer(AsyncWebsocketConsumer):
             print("start")
             await self.room.start()
         elif self.room is not None :
-            self.room.receive(self,data)
+            await self.room.receive(self,data)
         else:
-            message = data['message']
-            await self.channel_layer.group_send(
-                self.room_group_name,
-                {'type': 'chat_message',
-                    'message': message })
+            print("no room")
 
     # Receive message from room group
     async def chat_message(self, event):
@@ -118,4 +114,5 @@ class MainConsumer(AsyncWebsocketConsumer):
 
     async def chat_broadcast(self, event):
         obj = event['obj']
+        print(obj)
         await self.send(text_data=json.dumps(obj))
