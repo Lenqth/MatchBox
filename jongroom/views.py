@@ -19,5 +19,5 @@ class RoomSelect(View):
 
 class Jong(View):
     def get(self, request, *args, **kwargs):
-        d = {}
+        d = {"room_id" : "nyan"}
         return render(request, 'jong.html', d)

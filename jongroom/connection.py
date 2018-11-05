@@ -14,6 +14,7 @@ channel_layer = get_channel_layer()
 
 import secrets,traceback
 import time
+from promise import Promise
 
 
 class myJSONEncoder(json.JSONEncoder):

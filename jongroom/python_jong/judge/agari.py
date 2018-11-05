@@ -212,5 +212,5 @@ class TestAgari(unittest.TestCase):
 if __name__ == "__main__":
 #    print( contain_knit(knithand) )
     from pprint import pprint
-    #pprint( is_agari( string_to_array("123123m345789s55p") ) )
+    pprint( is_agari( string_to_array("123123m345789s55p") )[0]["data"].shape )
     unittest.main()

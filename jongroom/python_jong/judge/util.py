@@ -19,7 +19,7 @@ def list_to_string(li):
     p = ""
     s = ""
     c = ""
-    cname = " ESWNHRG"
+    cname = " ESWNHGR"
     for x in li:
         if 1 <= x <= 9 :
             m = m + str(x)
@@ -42,7 +42,7 @@ def list_to_string(li):
 def string_to_list(s):
     res = []
     buff = []
-    d = { "E":49 , "S" : 50 , "W":51 , "N":52,"H":53,"R":54,"G":55 }
+    d = { "E":49 , "S" : 50 , "W":51 , "N":52,"H":53,"G":54,"R":55 }
     for c in s:
         if '0' <= c <= '9':
             buff.append(int(c))

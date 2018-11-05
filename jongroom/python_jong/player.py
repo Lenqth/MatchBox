@@ -10,10 +10,25 @@ from .structs import *
 
 from .judge.agari import is_agari
 from .judge.shanten import shanten
+from .judge.scoring import ScoreCalculation,ChineseScore
 from .judge.util import *
 
+from .judge.mentu import Mentu
 
 import asyncio
+
+def to_mentu(hand_pattern,exposed):
+    res = []
+    for x in exposed:
+        res.append(Mentu(x.type,x.head))
+    for x in hand_pattern:
+        if len(x) == 2 :
+            res.append(Mentu(Mentu.ATAMA,x[0]))
+        elif x[0] != x[1]:
+            res.append(Mentu(Mentu.CONCCHOW,x[0]))
+        else:
+            res.append(Mentu(Mentu.CONCPUNG,x[0]))
+    return res
 
 
 async def _sleep(n):
@@ -34,6 +49,19 @@ class Player:
         self.agari_tile = None
         self.agari_patterns = res
         return (res is not None)
+
+    def chk_value(self,game,tile,pattern):
+        sc = ScoreCalculation(ChineseScore)
+        total,yaku = sc.calc_score( to_mentu(pattern,self.exposed) , env = {
+                        "prevalent_wind": game.prevalent_wind ,
+                        "seat_wind": game.get_seat_wind(self.id),
+                        "tsumo":tsumo ,
+                        "agari_tile":tile,
+                        "deck_left":game.lefttile(),
+                        "discarded_tiles": [ self.trash for p in game.players ],
+                        "exposed_tiles": [ self.exposed for p in game.players ]
+                     } )
+        return (total,yaku)
 
     def chk_claim(self,game,tile,apkong):
         res = []
@@ -83,7 +111,7 @@ class Player:
 
         #tsumo
         if self.drew != None and self.chk_agari( game , self.drew ):
-            res.append( TurnCommand(TurnCommand.TSUMO ))
+            res.append( TurnCommand(TurnCommand.TSUMO) )
         return res
 
     def reset(self):

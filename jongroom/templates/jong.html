@@ -29,6 +29,9 @@ function __img(x){ return '<img src="{% static 'jongroom/images30_22/'%}'+x+'.pn
 <audio id="sound_dapai" control preload="auto">
   <source src="{% static 'jongroom/sound/clock04.wav' %}" type="audio/wav">
 </audio>
+<form>
+<input type="hidden" name="room_id" id="room_id" value="{{ room_id }}">
+</form>
 <div id="board-root" class="clearfix">
   <div id="info">
     <p>ノコリ：$${ deck_left }</p>

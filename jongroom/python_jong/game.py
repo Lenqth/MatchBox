@@ -19,12 +19,22 @@ async def pure_async(x):
 
 
 class Game:
+    async def send_deck_left(self):
+        obj = {
+            "type" : "deck_left",
+            "deck_left" : self.lefttile()
+            }
+        t = []
+        for i in range(4):
+            pl = self.players[i]
+            t.append( pl.agent.send( obj ) )
+        await Promise.all(t)
 
     async def send_all_state(self,pid):
         pls = [ self.players[i].get_data(pid) for i in range(4) ]
         obj = {
             "type" : "reset",
-            "deck_left" : len(self.pile),
+            "deck_left" : self.lefttile(),
             "player_id" : pid ,
             "seat_wind" : self.get_seat_wind(pid) ,
             "prev_wind" : self.prevalent_wind ,
@@ -54,11 +64,12 @@ class Game:
             t.append( await pl.agent.send({"type":"expose","obj":obj.toDict(),"pid":pid}) )
         await Promise.all(t)
 
-    async def send_command(self,pid,command):
-        pass
-
     async def send_agari(self,pid,tsumo,kousei,yaku):
-        pass
+        t = []
+        for i in range(4):
+            pl = self.players[i]
+            t.append( await pl.agent.send( {"type":"agari","tsumo":tsumo,"kousei":kousei,"yaku":yaku,"pid":pid}) )
+        await Promise.all(t)
 
     def __init__(self):
         self.timeout = 30
@@ -132,6 +143,7 @@ class Game:
         while True:
             if self.skip_draw == False and self.players[self.turn].drew == None :
                 tm = self.draw()
+                await self.send_deck_left()
                 if tm == None:
                     self.is_done = True
                     self.is_ready = False
@@ -234,9 +246,9 @@ class Game:
                     await self.send_expose(command_player_id,ex)
 
             if turn_player.drew is not None :
-                turn_player.hand.append(self.players[self.turn].drew)
+                turn_player.hand.append(turn_player.drew)
                 turn_player.drew = None
                 turn_player.hand.sort()
 
-            if command[command_player_id].type <= 0 :
+            if command[command_player_id].type <= 0 and ( not self.apkong ) :
                 self.turn = ( self.turn + 1 ) % 4

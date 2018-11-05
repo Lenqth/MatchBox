@@ -15,6 +15,7 @@ channel_layer = get_channel_layer()
 import secrets,traceback
 import time
 
+from promise import Promise
 from .connection import GameConnection
 
 class RoomException(Exception):
@@ -39,7 +40,7 @@ class Room:
             try:
                 res = await room.connect(channel,token)
             except RoomException as e:
-                pass
+                continue
             return res
         room = cls()
         await room.on_room_created(room.name)
@@ -51,7 +52,7 @@ class Room:
 
     @property
     def room_size(self):
-        return 1
+        return 2
 
     @property
     def room_population(self):
@@ -91,7 +92,10 @@ class Room:
         for i in range(4):
             game.players[i].agent = AITsumogiri()
         game.players[0].agent = RemotePlayer( conns[0] )
+        if self.room_size >= 2:
+            game.players[2].agent = RemotePlayer( conns[1] )
         try:
+            await Promise.all( map( GameConnection , self.conns ) )
             await game.one_game()
         except Exception as e :
             traceback.print_exc()

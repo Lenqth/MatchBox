@@ -58,7 +58,7 @@ class Deck{
 }
 
 Deck.prototype.start = async function(){
-  this.conn = new AsyncConnection("ws://"+location.host+"/jong/room/nyan");
+  this.conn = new AsyncConnection("ws://"+location.host+"/jong/room/"+document.forms[0].room_id);
   console.log( await this.conn.receiveAsync() );
   this.conn.send(JSON.stringify({"start":""}));
   while(true){
@@ -67,6 +67,8 @@ Deck.prototype.start = async function(){
     if(res.type == "reset"){
       delete res["reset"];
       this.assign(res);
+    }if(res.type == "deck_left" ){
+      this.deck_left = res.deck_left;
     }if(res.type == "claim_command" ){
       //{"commands_available": [{"type": 1, "pos": [[1], [2]]}], "_m_id": 7, "timeout": 1539616054.5650032}
       var tg_pl = res.target.player , tg_apkong = res.target.apkong , tg_tile = res.target.tile ;
@@ -163,8 +165,8 @@ Deck.prototype.resyncdata = async function(conn){
 
 Deck.numtosrc_table =
                    ["back", "man1", "man2", "man3", "man4", "man5", "man6", "man7", "man8", "man9", "back", "back", "back", "back", "back", "back",
-                    "[16]", "sou1", "sou2", "sou3", "sou4", "sou5", "sou6", "sou7", "sou8", "sou9","back", "back", "back", "back", "back", "back",
-                    "[32]", "pin1", "pin2", "pin3", "pin4", "pin5", "pin6", "pin7", "pin8", "pin9","back", "back", "back", "back", "back", "back",
+                    "[16]", "pin1", "pin2", "pin3", "pin4", "pin5", "pin6", "pin7", "pin8", "pin9","back", "back", "back", "back", "back", "back",
+                    "[32]", "sou1", "sou2", "sou3", "sou4", "sou5", "sou6", "sou7", "sou8", "sou9","back", "back", "back", "back", "back", "back",
                     "[48]", "ji1", "ji2", "ji3", "ji4", "ji5", "ji6", "ji7", "[38]","[39]","back", "back", "back", "back", "back", "back",
                     "[64]", "hana", "hana", "hana", "hana", "hana", "hana", "hana", "hana", "all","back", "back", "back", "back", "back", "back"];
 
