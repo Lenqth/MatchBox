@@ -61,8 +61,8 @@ class Room:
     @property
     def room_population(self):
         res = 0
-        for (i,v) in enumerate( self.player_token ) :
-            if v is not None :
+        for (i,pl) in enumerate( self.players ) :
+            if pl["token"] is not None :
                 res += 1
         return res
 
@@ -76,22 +76,21 @@ class Room:
     def __init__(self):
         roomsize = self.room_size
         self.name = secrets.token_hex(16)
-        self.player_connection = [None] * roomsize
-        self.player_token = [None] * roomsize
+        self.players = [ {"token":None , "connection" : None , "ready" : False } for i in range(roomsize) ]
         self.finalized = False
 
     def getplayers(self):
         res = []
-        for (i,v) in enumerate( self.player_token ) :
-            if v is not None :
-                res.append( [i,v] )
+        for (i,pl) in enumerate( self.players ) :
+            if pl["token"] is not None :
+                res.append( [i,pl["token"]] )
         return res
 
 
     async def start(self):
         self.finalized = True
         game = Game()
-        conns = list( map( GameConnection , self.player_connection ) )
+        conns = list( map( lambda pl : GameConnection(pl["connection"]) , self.players ) )
         self.conns = conns
         for i in range(4):
             game.players[i].agent = AITsumogiri()
@@ -112,18 +111,16 @@ class Room:
         print("room destroyed [{0}]".format(roomname))
 
     def get_pos_from_token(self,token):
-        for (i,x) in enumerate(self.player_token):
-            if x == token:
+        for (i,pl) in enumerate(self.players):
+            if pl["token"] == token:
                 return i
         return None
 
-    async def room_broadcast(self,obj):
-        await channel_layer.group_send(
-            'chat_%s' % self.name,
-            {
-                'type': 'chat_broadcast',
-                'obj' : obj
-            })
+    def all_players_ready(self):
+        for (i,pl) in enumerate(self.players):
+            if not pl["ready"] :
+                return False
+        return True
 
     async def receive(self,channel,data):
         pos = channel.room_pos
@@ -134,47 +131,41 @@ class Room:
                 await self.room_broadcast( { "from":str(channel.scope["user"]) ,"message" : message } )
             if "ready" in data :
                 await self.room_broadcast( { "set_state":{ "pos" : self.get_pos_from_token(channel.token) , "ready" :data["ready"] } } )
+                if all_players_ready():
+                    await self.room_broadcast( { "start" : "1" } )
+                    pass #スタート
 
         except Exception as e:
             print(e)
             return {"error":""}
 
+    async def lobby_broadcast(self,obj):
+        await channel_layer.group_send(
+            "lobby_listener",
+            {
+                'type': 'lobby_refresh',
+                'obj' : obj
+            })
 
     async def on_room_created(self,room_id):
-        await channel_layer.group_send(
-            "lobby_listener",
-            {
-                'type': 'lobby_refresh',
-                'obj' : {}
-            }
-        )
+        await self.lobby_broadcast({})
 
     async def on_room_destroyed(self,room_id):
+        await self.lobby_broadcast({})
+
+    async def room_broadcast(self,obj):
         await channel_layer.group_send(
-            "lobby_listener",
+            'chat_%s' % self.name,
             {
-                'type': 'lobby_refresh',
-                'obj' : {}
-            }
-        )
+                'type': 'chat_broadcast',
+                'obj' : obj
+            })
 
     async def on_room_join(self,joined_player,position):
-        await channel_layer.group_send(
-            'chat_%s' % self.name,
-            {
-                'type': 'chat_broadcast',
-                'obj' : {"joined": [ position ,  joined_player] , "message":"joined:{0}".format(joined_player)}
-            }
-        )
+        await self.room_broadcast( {"joined": [ position ,  joined_player] , "message":"joined:{0}".format(joined_player)} )
 
     async def on_room_exit(self,player,position):
-        await channel_layer.group_send(
-            'chat_%s' % self.name,
-            {
-                'type': 'chat_broadcast',
-                'obj' : {"exited": [ position , player] , "message":"exited:{0}".format(player)}
-            }
-        )
+        await self.room_broadcast( {"exited": [ position , player] , "message":"exited:{0}".format(player)} )
 
     async def connect(self,channel,token=None):
         if token is not None :
@@ -184,26 +175,28 @@ class Room:
             except RoomException as e:
                 pass
         i = 0
-        while i < self.room_size and self.player_connection[i] != None :
+        while i < self.room_size and self.players[i]["connection"] != None :
             i+=1
         if i >= self.room_size :
             raise RoomException("room capacity over")
         token = self.name + secrets.token_hex(16)
-        self.player_connection[i] = channel
-        self.player_token[i] = token
+        self.players[i]["connection"] = channel
+        self.players[i]["token"] = token
         await self.on_room_join(token,i)
         return {"room":self,"token":token,"pos":i,"roomsize":self.room_size,"message":"welcome!"}
 
     async def disconnect(self,channel):
         nones = 0
-        for (i,x) in enumerate( self.player_connection ) :
-            if x == channel :
-                self.player_connection[i] = None
+        for (i,pl) in enumerate( self.players ) :
+            conn = pl["connection"]
+            if conn == channel :
+                self.players[i]["connection"] = None
+                self.players[i]["ready"] = False
                 if not self.finalized :
-                    await self.on_room_exit(self.player_token[i],i)
-                    self.player_token[i] = None
+                    await self.on_room_exit(self.players[i]["token"],i)
+                    self.players[i]["token"] = None
                 nones += 1
-            elif x is None:
+            elif conn is None:
                 nones += 1
         if nones == self.room_size:
             await self.destroy_room()
@@ -211,8 +204,8 @@ class Room:
 
     async def reconnect(self,channel,token):
         for i in range(4):
-            if self.player_token[i] == token :
-                self.player_connection[i] = channel
+            if self.players[i]["token"] == token :
+                self.players[i]["connection"] = channel
                 return {"room":self,"token":token,"pos":i,"roomsize":self.room_size}
         raise RoomException("token doesn't match")
 
