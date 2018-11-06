@@ -25,23 +25,27 @@ class Room:
 
     rooms = {}
 
+    token_to_room_id = {}
+
     @classmethod
     async def random_match(cls,channel,token=None):
         room_id = None
         res = None
         if token != None :
             try:
-                room_id = token[0:32]
+                room_id = token_to_room_id[token]
                 res = await cls.rooms[room_id].connect(channel,token)
             except RoomException as e:
                 pass
-            return res
+            else:
+                return res
         for room in cls.rooms.values():
             try:
                 res = await room.connect(channel,token)
             except RoomException as e:
                 continue
-            return res
+            else:
+                return res
         room = cls()
         await room.on_room_created(room.name)
         print("room created [{0}]".format(room.name))
@@ -107,21 +111,32 @@ class Room:
         await self.on_room_destroyed(roomname)
         print("room destroyed [{0}]".format(roomname))
 
+    def get_pos_from_token(self,token):
+        for (i,x) in enumerate(self.player_token):
+            if x == token:
+                return i
+        return None
+
+    async def room_broadcast(self,obj):
+        await channel_layer.group_send(
+            'chat_%s' % self.name,
+            {
+                'type': 'chat_broadcast',
+                'obj' : obj
+            })
+
     async def receive(self,channel,data):
         pos = channel.room_pos
         try:
-            message = data['message']
-            print("@%s" % message )
-            await channel_layer.group_send(
-                'chat_%s' % self.name,
-                {
-                    'type': 'chat_broadcast',
-                    'obj' : { "message" : message }
-                }
-            )
-            #if data["type"] == "get_all" :
-            #    pass
-        except:
+            if "message" in data :
+                message = data['message']
+                print("@%s" % message )
+                await self.room_broadcast( { "from":str(channel.scope["user"]) ,"message" : message } )
+            if "ready" in data :
+                await self.room_broadcast( { "set_state":{ "pos" : self.get_pos_from_token(channel.token) , "ready" :data["ready"] } } )
+
+        except Exception as e:
+            print(e)
             return {"error":""}
 
 

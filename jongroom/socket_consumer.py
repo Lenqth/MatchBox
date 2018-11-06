@@ -44,9 +44,12 @@ class RoomListConsumer(AsyncWebsocketConsumer):
 class MainConsumer(AsyncWebsocketConsumer):
     async def connect(self):
         token = None
-        if "token" in self.scope["session"] :
+        if str(self.scope["user"]) != "" :
+            token = str( self.scope["user"] )
+        elif "token" in self.scope["session"] :
             token = self.scope["session"]["token"]
-        result = await ( Room.random_match(self,token) )
+        print( "@@@ %s : %s " % ( token,str( self.scope["user"] ) ) )
+        result = await ( Room.random_match(self,None) )
         if result == None:
             return
         acc = self.accept()
@@ -94,15 +97,16 @@ class MainConsumer(AsyncWebsocketConsumer):
         data = json.loads(text_data)
         print(data)
         for handler in self.onreceive:
-            print("handler")
             handler(data)
-        if "start" in data :
-            print("start")
-            await self.room.start()
-        elif self.room is not None :
+
+        if self.room is not None :
             await self.room.receive(self,data)
         else:
             print("no room")
+
+        if "start" in data : # special command
+            print("start")
+            await self.room.start()
 
     # Receive message from room group
     async def chat_message(self, event):

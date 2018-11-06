@@ -17,11 +17,16 @@ from django.contrib import admin
 from django.urls import include, path
 from django.conf.urls import url
 from django.contrib.auth.views import login,logout
+import django.contrib.auth.views as auth_views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('jong/', include('jongroom.urls')),
-    path('login/', login, {'template_name': 'accounts/login.html'}, name='login'),
-    path('logout/', logout, name='logout'),
+    path('login/',auth_views.LoginView.as_view(
+        template_name='accounts/login.html',
+        extra_context={
+            'next': '/jong/',
+        }) , name='login'),
+    path('logout/', logout, name='logout'), 
     path('accounts/', include('accounts.urls')),
 ]

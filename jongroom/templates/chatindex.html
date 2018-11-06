@@ -17,8 +17,13 @@
 <script>
 socket = new WebSocket("ws://"+location.host+"/jong/room/nyan");
 
-roominfo = { player_slot : [{},{},{},{}] };
+roominfo = { player_slot : [] };
+you = -1;
 
+
+function send_ready(){
+  socket.send(JSON.stringify({"ready":roominfo.player_slot[you].ready}));
+}
 function writeln(x){
   document.getElementById("output").value += x + "\n" ;
 }
@@ -36,21 +41,30 @@ socket.onmessage = function(e) {
   console.log(o);
   if("roomsize" in o){
     var rsz = o.roomsize ;
-    roominfo.player_slot = new Array( rsz ).map( () => {} );
+    roominfo.player_slot = (new Array( rsz ).fill(0) ).map( function(){return {"joined":false,"ready":false,"you":false,"name":"none"};} );
   }
   if("position" in o){
-    document.getElementsByClassName("group-content")[o.position].classList.add("group-content-you");
+    roominfo.player_slot[o.position].you = true;
+    you = o.position;
     for(var [i,v] in o.room ){
-      document.getElementsByClassName("group-content")[i].classList.add("joined");
+      roominfo.player_slot[i].joined = true;
     }
   }
   if("joined" in o){
     var [pos,id] = o.joined;
-    document.getElementsByClassName("group-content")[pos].classList.add("joined");
+    roominfo.player_slot[pos].joined = true;
   }
   if("exited" in o){
     var [pos,id] = o.exited;
-    document.getElementsByClassName("group-content")[pos].classList.remove("joined");
+    roominfo.player_slot[pos].joined = false;
+  }
+  if("set_state" in o){
+    var stt = o.set_state;
+    var pos = stt.pos;
+    delete stt.pos;
+    for( var key in stt ){
+      roominfo.player_slot[pos][key] = stt[key];
+    }
   }
 }
 
@@ -132,14 +146,14 @@ socket.onopen = function() {
   /*flex-basis: 100%;*/
 }
 
-.group-content:nth-child(1).joined {background-color: #ffcccc;}
-.group-content:nth-child(2).joined {background-color: #ccccff;}
-.group-content:nth-child(3).joined {background-color: #ccffcc;}
-.group-content:nth-child(4).joined {background-color: #ffccff;}
-.group-content:nth-child(1):not(.joined){background-color: #886666;}
-.group-content:nth-child(2):not(.joined){background-color: #666688;}
-.group-content:nth-child(3):not(.joined){background-color: #668866;}
-.group-content:nth-child(4):not(.joined){background-color: #886688;}
+.group-content:nth-child(1).joined.ready{background-color: #ffcccc;}
+.group-content:nth-child(2).joined.ready{background-color: #ccccff;}
+.group-content:nth-child(3).joined.ready{background-color: #ccffcc;}
+.group-content:nth-child(4).joined.ready{background-color: #ffccff;}
+.group-content:nth-child(1).joined:not(.ready){background-color: #886666;}
+.group-content:nth-child(2).joined:not(.ready){background-color: #666688;}
+.group-content:nth-child(3).joined:not(.ready){background-color: #668866;}
+.group-content:nth-child(4).joined:not(.ready){background-color: #886688;}
 
 
 </style>
@@ -169,7 +183,7 @@ socket.onopen = function() {
   </div>
   <div id="player-list" class="col2">
     <div class="group-detail">
-      <div v-for=" (item,index) in player_slot" class="group-content">
+      <div v-for=" (item,index) in player_slot" class="group-content" v-bind:class="{ joined : item.joined , ready : item.ready , 'group-content-you' : item.you }" v-on:click="item.you ? (item.ready=!item.ready,send_ready()) : 0 ;" >
       </div>
     </div>
   </div>
@@ -181,6 +195,7 @@ var root = new Vue({
   el: '#player-list',
   data: roominfo,
   delimiters : ['$${', '}'],
+  methods:{send_ready}
 });
 
 </script>
