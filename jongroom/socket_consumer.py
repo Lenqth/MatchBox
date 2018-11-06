@@ -69,6 +69,7 @@ class MainConsumer(AsyncWebsocketConsumer):
             'room' : self.room_name ,
             'token' : self.token ,
             'position' : self.room_pos ,
+            'roomsize' : self.room.room_size ,
             'room':self.room.getplayers() ,
             'message': "welcome!",
         }))

@@ -9,12 +9,16 @@
 <meta name="author" content="">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="stylesheet" href="">
+<script src="{% static 'jongroom/js/vue.js' %}"></script>
 <!--[if lt IE 9]>
 <script src="//cdn.jsdelivr.net/html5shiv/3.7.2/html5shiv.min.js"></script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/respond.js/1.4.2/respond.min.js"></script>
 <![endif]-->
 <script>
 socket = new WebSocket("ws://"+location.host+"/jong/room/nyan");
+
+roominfo = { player_slot : [{},{},{},{}] };
+
 function writeln(x){
   document.getElementById("output").value += x + "\n" ;
 }
@@ -30,6 +34,10 @@ socket.onmessage = function(e) {
     writeln(o.message);
   }
   console.log(o);
+  if("roomsize" in o){
+    var rsz = o.roomsize ;
+    roominfo.player_slot = new Array( rsz ).map( () => {} );
+  }
   if("position" in o){
     document.getElementsByClassName("group-content")[o.position].classList.add("group-content-you");
     for(var [i,v] in o.room ){
@@ -94,6 +102,7 @@ socket.onopen = function() {
   box-sizing: border-box;
   flex-basis:50%;
   flex-shrink:1;
+  flex-grow: 1;
 }
 
 .group-content-you{
@@ -123,14 +132,14 @@ socket.onopen = function() {
   /*flex-basis: 100%;*/
 }
 
-#grp1.joined {background-color: #ffcccc;}
-#grp2.joined {background-color: #ccccff;}
-#grp3.joined {background-color: #ccffcc;}
-#grp4.joined {background-color: #ffccff;}
-#grp1:not(.joined){background-color: #886666;}
-#grp2:not(.joined){background-color: #666688;}
-#grp3:not(.joined){background-color: #668866;}
-#grp4:not(.joined){background-color: #886688;}
+.group-content:nth-child(1).joined {background-color: #ffcccc;}
+.group-content:nth-child(2).joined {background-color: #ccccff;}
+.group-content:nth-child(3).joined {background-color: #ccffcc;}
+.group-content:nth-child(4).joined {background-color: #ffccff;}
+.group-content:nth-child(1):not(.joined){background-color: #886666;}
+.group-content:nth-child(2):not(.joined){background-color: #666688;}
+.group-content:nth-child(3):not(.joined){background-color: #668866;}
+.group-content:nth-child(4):not(.joined){background-color: #886688;}
 
 
 </style>
@@ -158,14 +167,23 @@ socket.onopen = function() {
     <textarea id="output" rows="40"></textarea>
     <input type="text" id="txbox"><input type="button" value="send" id="sendbutton">
   </div>
-  <div class="col2">
+  <div id="player-list" class="col2">
     <div class="group-detail">
-      <div id="grp1" class="group-content"></div>
-      <div id="grp2" class="group-content"></div>
-      <div id="grp3" class="group-content"></div>
-      <div id="grp4" class="group-content"></div>
-    </div?
+      <div v-for=" (item,index) in player_slot" class="group-content">
+      </div>
+    </div>
   </div>
 </div>
+
+<script>
+
+var root = new Vue({
+  el: '#player-list',
+  data: roominfo,
+  delimiters : ['$${', '}'],
+});
+
+</script>
+
 </body>
 </html>

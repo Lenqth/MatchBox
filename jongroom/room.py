@@ -177,7 +177,7 @@ class Room:
         self.player_connection[i] = channel
         self.player_token[i] = token
         await self.on_room_join(token,i)
-        return {"room":self,"token":token,"pos":i}
+        return {"room":self,"token":token,"pos":i,"roomsize":self.room_size,"message":"welcome!"}
 
     async def disconnect(self,channel):
         nones = 0
@@ -198,7 +198,7 @@ class Room:
         for i in range(4):
             if self.player_token[i] == token :
                 self.player_connection[i] = channel
-                return {"room":self,"token":token,"pos":i}
+                return {"room":self,"token":token,"pos":i,"roomsize":self.room_size}
         raise RoomException("token doesn't match")
 
 
