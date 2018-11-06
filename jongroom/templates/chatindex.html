@@ -102,6 +102,18 @@ socket.onopen = function() {
   animation: blinkborder 0.7s ease 0.4s infinite alternate;
 }
 
+.navbar{
+  width:100%;
+  height:40px;
+  background-color: gray;
+  margin: 0px 0px 20px;
+  color : white;
+}
+.login-disp{
+  text-align:right;
+  margin:10px;
+}
+
 @keyframes blinkborder {
   0% {border-color: rgba(255,255,255,1);}
   100% {border-color: rgba(255,255,255,0.2);}
@@ -127,7 +139,17 @@ socket.onopen = function() {
 <!-- Place your content here -->
 <!-- SCRIPTS -->
 <!-- Example: <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script> -->
-
+<div class="navbar">
+  <div class="login-disp">
+    {% if user.username == "" %}
+      not logined
+      <a href="/login">login</a>
+    {% else %}
+      logined as : {{ user.username }}
+      <a href="/logout">logout</a>
+    {% endif %}
+  </div>
+</div>
 <audio id="sound1" preload="auto">
   <source src="{% static 'jongroom/sound/puu79_a.wav' %}" type="audio/wav">
 </audio>
