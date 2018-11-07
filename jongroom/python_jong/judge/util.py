@@ -9,6 +9,12 @@ from mentu import Mentu
 
 YAOCHU = [1,9,16+1,16+9,32+1,32+9,49,50,51,52,53,54,55]
 
+def id2number(t):
+    return t%16
+
+def id2suit(t):
+    return t//16
+
 def list_to_array(li):
     res = np.zeros(64  ,dtype=np.int16)
     for x in li:

@@ -97,6 +97,10 @@ class ChineseScore:
     def list_yaku(cls,tiles,mentu,env):
         obj = cls()
         obj.mentu = mentu
+        obj.atama = None
+        for m in mentu:
+            if m.type == Mentu.ATAMA :
+                obj.atama = m.head
         obj.chows = np.zeros( (4,16) , dtype = np.int16 )
         obj.pongs = np.zeros( (4,16) , dtype = np.int16 )
         obj.cpongs = np.zeros( (4,16) , dtype = np.int16 )
@@ -131,7 +135,6 @@ class ChineseScore:
     halfflush        = Yaku( "Half Flush" , "混一色" , 6  )
     fullflush        = Yaku( "Full Flush" , "清一色" , 24  )
     alltypes         = Yaku( "All Types" , "五門斉" , 6  )
-    lasttile         = Yaku( "Last Tile" , "和絶張" , 4  )
     four             = Yaku( "Tile Hog" , "四帰一" , 2  )
 
     allevenpong      = Yaku( "All Even Pongs" , "全双刻" ,     24  )
@@ -142,14 +145,33 @@ class ChineseScore:
     knit7 = Yaku( "Greater Honors And Knitted Tiles" , "七星不靠" , 24  )
 
     ninegates = Yaku( "Nine Gates" , "九蓮宝燈" , 88  )
+    @yakuroutine
+    def f_nine_gates(self):
+        pass
 
     termchowsp = Yaku( "Pure Terminal Chows" , "一色双龍会" , 64  )
     termchowsm = Yaku( "Three-Suited Terminal Chows" , "三色双龍会" , 16  )
+    @yakuroutine
+    def termchows(self):
+        atama = self.atama
+        if not ( id2suit <=2 and id2number(atama) == 5 ) :
+            return None
+        if np.all( chows[id2suit(atama),[1,9]] == 2 ) :
+            return ChineseScore.termchowsp
+        for c in range(3):
+            if c == id2suit(atama) :
+                if np.all( chows[c,[1,9]] == 1 ):
+                    pass
+                else:
+                    return None
+        return ChineseScore.termchowsm
 
     sevenpairs  = Yaku( "Seven Pairs" , "七対" , 24  )
     sevenpairsh = Yaku( "Seven Shifted Pairs" , "連七対" , 88  )
-    #######
 
+
+
+    lasttile = Yaku( "Last Tile" , "和絶張" , 4  )
     lastdraw  = Yaku( "Last Tile Draw" , "妙手回春" , 8  ) #
     lastclaim = Yaku( "Last Tile Claim" , "海底撈月" , 8  ) #
     repltile = Yaku( "Out With Replacement Tile" , "槓上開花" , 8  )#
@@ -488,7 +510,7 @@ class ChineseScore:
 """
 
 def fromstr(str):
-    
+
 
 if __name__ == "__main__" :
 #    unittest.main()

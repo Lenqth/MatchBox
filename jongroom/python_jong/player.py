@@ -58,8 +58,8 @@ class Player:
                         "tsumo":tsumo ,
                         "agari_tile":tile,
                         "deck_left":game.lefttile(),
-                        "discarded_tiles": [ self.trash for p in game.players ],
-                        "exposed_tiles": [ self.exposed for p in game.players ]
+                        "discarded_tiles": [ p.trash for p in game.players ],
+                        "exposed_tiles": [ [ Mentu(x.type,x.head) for x in p.exposed ] for p in game.players ]
                      } )
         return (total,yaku)
 
