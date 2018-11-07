@@ -11,6 +11,7 @@ class Mentu:
     CONCPUNG = 7
     ATAMA = 8
     __TYPENAMES__ = ["","chow","pong","minkong","conckong","apkong","concchow","concpung","atama"]
+
     def __init__(self,type,head):
         self.type = type
         self.head = head
@@ -71,7 +72,7 @@ class Mentu:
         return self.head // 16
 
     def get_number(self):
-        return self.head % 16 
+        return self.head % 16
 
     def toJSON(self):
         return self.toDict()

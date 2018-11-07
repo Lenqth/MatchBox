@@ -89,7 +89,34 @@ def yakuroutine(x):
 
 tricolor = list(itertools.permutations([0,1,2]))
 class ChineseScore:
+    # mentu array format
+    #
+    # mentu[chow:0,pong:1][color:man,pin,sou,ji][number:1~9]
+    #
+    @classmethod
+    def list_yaku(cls,tiles,mentu,env):
+        obj = cls()
+        obj.mentu = mentu
+        obj.chows = np.zeros( (4,16) , dtype = np.int16 )
+        obj.pongs = np.zeros( (4,16) , dtype = np.int16 )
+        obj.cpongs = np.zeros( (4,16) , dtype = np.int16 )
+        for x in mentu :
+            if x.is_chow() :
+                obj.chows[x.get_color(),x.get_number()] += 1
+            if x.is_pongorkong() :
+                obj.pongs[x.get_color(),x.get_number()] += 1
+                if x.is_concealed():
+                    obj.cpongs[x.get_color(),x.get_number()] += 1
+        obj.tiles = tiles
+        obj.env["flowers"]
+
     flowerbonus      = Yaku( "Flower" , "花牌" , 1  )
+
+    @yakuroutine
+    def flowers(self):
+        for i in range(safe_get(self.env,"flowers",0)):
+            yield flowerbonus
+
 
     machi_tanki   = Yaku( "Single Wait" , "単調将" ,  1  )
     machi_closed  = Yaku( "Closed Wait" , "坎張" ,  1  )
@@ -127,9 +154,10 @@ class ChineseScore:
     lastclaim = Yaku( "Last Tile Claim" , "海底撈月" , 8  ) #
     repltile = Yaku( "Out With Replacement Tile" , "槓上開花" , 8  )#
     robkong = Yaku( "Robbing The Kongs" , "搶槓和" , 8  )
+
     @yakuroutine
     def state_yaku(self):
-        if env["lefttile"] == 0:
+        if safe_get(self.env,"lefttile",-1) == 0:
             if safe_get(self.env,"tsumo",False) :
                 yield ChineseScore.lastdraw
             else:
@@ -142,25 +170,6 @@ class ChineseScore:
     chicken = Yaku( "Chicken Hand" , "無番和" , 8  )
 
 
-    # mentu array format
-    #
-    # mentu[chow:0,pong:1][color:man,pin,sou,ji][number:1~9]
-    #
-    @classmethod
-    def list_yaku(cls,tiles,mentu,env):
-        obj = cls()
-        obj.mentu = mentu
-        obj.chows = np.zeros( (4,16) , dtype = np.int16 )
-        obj.pongs = np.zeros( (4,16) , dtype = np.int16 )
-        obj.cpongs = np.zeros( (4,16) , dtype = np.int16 )
-        for x in mentu :
-            if x.is_chow() :
-                obj.chows[x.get_color(),x.get_number()] += 1
-            if x.is_pongorkong() :
-                obj.pongs[x.get_color(),x.get_number()] += 1
-                if x.is_concealed():
-                    obj.cpongs[x.get_color(),x.get_number()] += 1
-        obj.tiles = tiles
 
     purest = Yaku("Pure Straight","清龍",16)
     knittedst = Yaku("Knitted Straight","組合龍",12)
@@ -434,16 +443,18 @@ class ChineseScore:
         elif tileset.issubset( set( [ 1,2,3,4,5,6,7,8,9, 17,18,19,20,21,22,23,24,25 , 33,34,35,36,37,38,39,40,41 ] ) ) :
             yield no_honor
 
-        if tileset.issubset( set( [ 1,2,3, 17,18,19 , 33,34,35 ] ) ) :
-            yield low3
+
         if tileset.issubset( set( [ 4,5,6, 20,21,22 , 36,37,38 ] ) ) :
             yield mid3
+
+        if tileset.issubset( set( [ 1,2,3, 17,18,19 , 33,34,35 ] ) ) :
+            yield low3
+        elif tileset.issubset( set( [ 1,2,3,4, 17,18,19,20 , 33,34,35,36 ] ) ) :
+            yield low4
+
         if tileset.issubset( set( [ 7,8,9, 23,24,25 , 39,40,41 ] ) ) :
             yield upp3
-
-        if tileset.issubset( set( [ 1,2,3,4, 17,18,19,20 , 33,34,35,36 ] ) ) :
-            yield low4
-        if tileset.issubset( set( [ 6,7,8,9, 22,23,24,25 , 38,39,40,41 ] ) ) :
+        elif tileset.issubset( set( [ 6,7,8,9, 22,23,24,25 , 38,39,40,41 ] ) ) :
             yield upp4
 
         if tileset.issubset( set( [ 34,35,36,38,40,54 ] ) ) :
@@ -476,6 +487,9 @@ class ChineseScore:
             "exposed_tiles": [ self.exposed for p in game.players ]
 """
 
+def fromstr(str):
+    
+
 if __name__ == "__main__" :
 #    unittest.main()
     import unittest
@@ -489,7 +503,7 @@ if __name__ == "__main__" :
         __sc__ = ScoreCalculation(ChineseScore)
         def test(self):
             pass
-    print(TestScore.__sc__.calc_score(getmentu("678m231s345666pSS") ) )
+    print(TestScore.__sc__.calc_score( getmentu("678m231s345666pSS") ) )
     #print(TestScore.__sc__.calc_score(getmentu("123m234p345sEEESS") ) )
     #print(TestScore.__sc__.calc_score(getmentu("123m456p123789sSS") ) )
     #print(TestScore.__sc__.calc_score(getmentu("123789123789mWW") ) )

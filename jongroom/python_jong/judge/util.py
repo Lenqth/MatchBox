@@ -4,6 +4,8 @@ import numpy as np
 import functools
 import itertools
 
+from mentu import Mentu
+
 
 YAOCHU = [1,9,16+1,16+9,32+1,32+9,49,50,51,52,53,54,55]
 
@@ -37,6 +39,65 @@ def list_to_string(li):
     if s != "" :
         res += s+"s"
     res += c
+    return res
+
+def __parse_string_to_list_ex(s):
+    res = []
+    mentu_res = []
+    tsumo = False
+
+    buff = []
+    mentu_buff = ""
+    mode = 0
+    d = { "E":49 , "S" : 50 , "W":51 , "N":52,"H":53,"G":54,"R":55 }
+    kong_type_tbl = {"k":Mentu.MINKONG,"a":Mentu.APKONG,"c":Mentu.CONCKONG}
+    for c in s:
+        if mode == 0 : # normal
+            if '0' <= c <= '9':
+                buff.append(int(c))
+            elif c == "m" :
+                res.extend( map(lambda x:x,buff) )
+                buff=[]
+            elif c == "p" :
+                res.extend( map(lambda x:x+16,buff) )
+                buff=[]
+            elif c == "s" :
+                res.extend( map(lambda x:x+32,buff) )
+                buff=[]
+            elif c in d :
+                res.append(d[c])
+            elif c == "*":
+                mode = 1
+            elif c == "!":
+                tsumo = True
+            else :
+                pass
+        elif mode == 1 :
+            if c != " " and c != "*" :
+                mentu_buff += c
+            else:
+                if mentu_buff[-1] in ["k","a","c"] :
+                    kong_type = kong_type_tbl[mentu_buff[-1]]
+                    mentu_buff = mentu_buff[0:-1]
+                rm = string_to_list(mentu_buff)
+                tiles = sorted(rm)
+                if len(tiles) == 4 :
+                    if tiles[0] == tiles[1] and tiles[0] == tiles[2] and tiles[0] == tiles[3] :
+                        mentu_obj = Mentu(kong_type,tiles[0])
+                elif len(tiles) == 3 :
+                    if tiles[0] == tiles[1] and tiles[0] == tiles[2] :
+                        mentu_obj = Mentu(Mentu.PUNG,tiles[0])
+                    if tiles[0]+1 == tiles[1] and tiles[0]+2 == tiles[2] :
+                        mentu_obj = Mentu(Mentu.CHOW,tiles[0])
+                else:
+                    raise SyntaxError()
+                mentu_res.append(mentu_obj)
+                mentu_buff = ""
+                mode = 0
+    return res,mentu_res,tsumo
+
+def string_to_list_ex(s):
+    res = __parse_string_to_list_ex(s)
     return res
 
 def string_to_list(s):
@@ -123,6 +184,6 @@ def _init_knit():
 _init_knit()
 
 if __name__ == "__main__" :
-    print( list_to_array([0,1,2,3,6,6,9]) )
-    print( KNITNUMS )
-    print(randomhand())
+    print( string_to_list_ex("67m 123456789s 99p 5m!") )
+    print( string_to_list_ex("*456p *789m *567s 5678p 5p") )
+    print( string_to_list_ex("*SSS *777s *111m 888s H H!") )
