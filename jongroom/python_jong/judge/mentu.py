@@ -12,9 +12,10 @@ class Mentu:
     ATAMA = 8
     __TYPENAMES__ = ["","chow","pong","minkong","conckong","apkong","concchow","concpung","atama"]
 
-    def __init__(self,type,head):
+    def __init__(self,type,head,agari_tile=None):
         self.type = type
         self.head = head
+        self.agari_tile = agari_tile
 
     def __repr__(self):
         if self.type == self.__class__.CHOW :
