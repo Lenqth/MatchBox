@@ -94,6 +94,10 @@ class ChineseScore:
     # mentu[chow:0,pong:1][color:man,pin,sou,ji][number:1~9]
     #
     @classmethod
+    def judge(cls,tiles,mentu,env):
+        pass
+        
+    @classmethod
     def list_yaku(cls,tiles,mentu,env):
         obj = cls()
         obj.mentu = mentu
@@ -508,8 +512,6 @@ class ChineseScore:
             "discarded_tiles": [ self.trash for p in game.players ],
             "exposed_tiles": [ self.exposed for p in game.players ]
 """
-
-def fromstr(str):
 
 
 if __name__ == "__main__" :
