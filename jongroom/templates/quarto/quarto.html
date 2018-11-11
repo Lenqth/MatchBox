@@ -1,0 +1,179 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<title></title>
+<meta charset="utf-8">
+<meta name="description" content="">
+<meta name="author" content="">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="shortcut icon" href="">
+<!-- <link rel="stylesheet" type="text/css" href="{% static 'quarto/css/medium.css' %}" /> -->
+<style type="text/css" rel="stylesheet">
+.circle{
+  border-radius: 50%;
+}
+.square{
+  border-radius: 10%;
+}
+.big{
+  border-width : 14px !important ;
+  width:48px;
+  height:48px;
+}
+.small{
+  width:24px;
+  height:24px;
+}
+.hole.black{
+  border: #110000 7px solid;
+  background:transparent;
+}
+.hole.white{
+  border: #ffffee 7px solid;
+  background:transparent;
+}
+.nohole.black{
+  background : #110000;
+}
+.nohole.white{
+  background : #ffffee;
+}
+.piece{
+  box-sizing: border-box;
+  position:absolute;
+  margin:auto;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+
+}
+.piece-cell{
+  position:relative;
+  width:50px;
+  height:50px;
+  background:lightgray;
+  box-sizing: border-box;
+  flex-basis:25%;
+}
+#leftpieces{
+  width:200px;
+  height:200px;
+  display: flex;
+  flex-flow: row wrap;
+}
+#board{
+  display: flex;
+  flex-flow: row wrap;
+  border:1px black solid;
+  box-sizing: border-box;
+}
+.board-cell{
+  position:relative;
+  width:50px;
+  height:50px;
+  background:lightgray;
+  box-sizing: border-box;
+}
+#board-root{
+  display: flex;
+  flex-flow: row wrap;
+}
+</style>
+<script src="{% static 'common/js/vue.js' %}"></script>
+<script>
+Vue.config.delimiters = ['$${', '}'];
+
+function __img(x){ return '<img src="{% static 'jongroom/images30_22/'%}'+x+'.png" >';}
+
+
+var data = {};
+data.board = (new Array(4).fill(0)).map( () => new Array(4).fill(0).map( () => 16) );
+data.piece = (new Array(16)).fill(true);
+
+function setcell(y,x,c){
+  data.board[y][x] = c;
+  data.board.splice(y,1,data.board[y]);
+}
+
+function item2class(x){
+  res = [];
+  if( x & 1 ){
+    res.push("circle");
+  }else{
+    res.push("square");
+  }
+  if( x & 2 ){
+    res.push("big");
+  }else{
+    res.push("small");
+  }
+  if( x & 4 ){
+    res.push("hole");
+  }else{
+    res.push("nohole");
+  }
+  if( x & 8 ){
+    res.push("black");
+  }else{
+    res.push("white");
+  }
+  return res;
+}
+
+</script>
+
+</head>
+<body>
+<audio id="sound1" preload="auto">
+  <source src="{% static 'jongroom/sound/puu79_a.wav' %}" type="audio/wav">
+</audio>
+<audio id="sound_dapai" control preload="auto">
+  <source src="{% static 'jongroom/sound/clock04.wav' %}" type="audio/wav">
+</audio>
+<form>
+<input type="hidden" name="room_id" id="room_id" value="{{ room_id }}">
+</form>
+<div id="board-root" class="clearfix">
+  <table id="board">
+    <tr v-for=" (row,jndex) in board ">
+      <td v-for=" (item,index) in row " class="board-cell">
+        <div v-if="item<16" class="piece" v-bind:class="item2class(item)"></div>
+      </td>
+    </tr>
+  </table>
+  <div id="leftpieces">
+    <div v-for=" (item,index) in piece " class="piece-cell">
+      <div v-if="item" class="piece" v-bind:class="item2class(index)"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+
+
+Vue.component('spinning-target', {
+  data: function(){return {};} ,
+  template: `<div class="eff-tgt">
+    <div style="transform:rotate(0deg);position:absolute;width:100%;height:100%;top:0px;"><div class="eff-tgt2"></div></div>
+    <div style="transform:rotate(90deg);position:absolute;width:100%;height:100%;top:0px;"><div class="eff-tgt2"></div></div>
+    <div style="transform:rotate(180deg);position:absolute;width:100%;height:100%;top:0px;"><div class="eff-tgt2"></div></div>
+    <div style="transform:rotate(270deg);position:absolute;width:100%;height:100%;top:0px;"><div class="eff-tgt2"></div></div>
+  </div>`
+});
+
+var root = new Vue({
+  el: '#board-root',
+  data: data,
+  delimiters : ['$${', '}'],
+  methods:{
+    item2class:item2class,
+  }
+});
+
+
+</script>
+</body>
+</html>

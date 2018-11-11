@@ -90,15 +90,19 @@ class Room:
     async def start(self):
         self.finalized = True
         game = Game()
-        conns = list( map( lambda pl : GameConnection(pl["connection"]) , self.players ) )
+        active_users = list( filter( lambda x : x is not None , [ pl["connection"] for pl in self.players ]  ) )
+        conns = list( map( lambda conn : GameConnection(conn) , active_users ) )
         self.conns = conns
         for i in range(4):
             game.players[i].agent = AITsumogiri()
         game.players[0].agent = RemotePlayer( conns[0] )
-        if self.room_size >= 2:
+        if len(active_users) >= 2:
             game.players[2].agent = RemotePlayer( conns[1] )
+        if len(active_users) >= 3:
+            game.players[1].agent = RemotePlayer( conns[2] )
+        if len(active_users) >= 4:
+            game.players[3].agent = RemotePlayer( conns[3] )
         try:
-            await Promise.all( map( GameConnection , self.conns ) )
             await game.one_game()
         except Exception as e :
             traceback.print_exc()

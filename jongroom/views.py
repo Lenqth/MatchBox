@@ -21,3 +21,8 @@ class Jong(View):
     def get(self, request, *args, **kwargs):
         d = {"room_id" : "nyan"}
         return render(request, 'jong.html', d)
+
+class Quarto(View):
+    def get(self, request, *args, **kwargs):
+        d = {"room_id" : "nyan"}
+        return render(request, 'quarto/quarto.html', d)

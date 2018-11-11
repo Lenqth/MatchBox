@@ -4,7 +4,10 @@ import numpy as np
 import functools
 import itertools
 
-from mentu import Mentu
+try:
+    from .mentu import Mentu
+except:
+    from mentu import Mentu
 
 
 YAOCHU = [1,9,16+1,16+9,32+1,32+9,49,50,51,52,53,54,55]

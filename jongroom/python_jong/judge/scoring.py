@@ -96,11 +96,12 @@ class ChineseScore:
     @classmethod
     def judge(cls,tiles,mentu,env):
         pass
-        
+
     @classmethod
     def list_yaku(cls,tiles,mentu,env):
         obj = cls()
         obj.mentu = mentu
+        obj.conc_mentu = []
         obj.atama = None
         for m in mentu:
             if m.type == Mentu.ATAMA :
@@ -109,6 +110,8 @@ class ChineseScore:
         obj.pongs = np.zeros( (4,16) , dtype = np.int16 )
         obj.cpongs = np.zeros( (4,16) , dtype = np.int16 )
         for x in mentu :
+            if x.is_concealed():
+                conc_mentu.append(mentu)
             if x.is_chow() :
                 obj.chows[x.get_color(),x.get_number()] += 1
             if x.is_pongorkong() :
@@ -139,6 +142,10 @@ class ChineseScore:
     halfflush        = Yaku( "Half Flush" , "混一色" , 6  )
     fullflush        = Yaku( "Full Flush" , "清一色" , 24  )
     alltypes         = Yaku( "All Types" , "五門斉" , 6  )
+    @yakuroutine
+    def types(self):
+        map(id2suit,self.tiles)
+
     four             = Yaku( "Tile Hog" , "四帰一" , 2  )
 
     allevenpong      = Yaku( "All Even Pongs" , "全双刻" ,     24  )
@@ -149,9 +156,15 @@ class ChineseScore:
     knit7 = Yaku( "Greater Honors And Knitted Tiles" , "七星不靠" , 24  )
 
     ninegates = Yaku( "Nine Gates" , "九蓮宝燈" , 88  )
+
     @yakuroutine
     def f_nine_gates(self):
-        pass
+        if len(self.conc_mentu)==0 :
+            suit = id2suit( self.tiles[0] )
+            if np.all( map(id2suit,self.tiles) == suit ):
+                 nums = map(id2number,self.tiles)
+                 if np.all( nums - [0,3,1,1,1,1,1,1,1,3] >= 0 ):
+                     return ninegates
 
     termchowsp = Yaku( "Pure Terminal Chows" , "一色双龍会" , 64  )
     termchowsm = Yaku( "Three-Suited Terminal Chows" , "三色双龍会" , 16  )
@@ -531,3 +544,6 @@ if __name__ == "__main__" :
     #print(TestScore.__sc__.calc_score(getmentu("123m234p345sEEESS") ) )
     #print(TestScore.__sc__.calc_score(getmentu("123m456p123789sSS") ) )
     #print(TestScore.__sc__.calc_score(getmentu("123789123789mWW") ) )
+    print( string_to_list_ex("67m 123456789s 99p 5m!") )
+    print( string_to_list_ex("*456p *789m *567s 5678p 5p") )
+    print( string_to_list_ex("*SSS *777s *111m 888s H H!") )

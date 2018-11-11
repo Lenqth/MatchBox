@@ -17,6 +17,26 @@ function play_sound(url){
   document.body.appendChild(audio);
 }
 
+function loadJSasync(path){
+  return new Promise( (res,rej) => {
+    let screl = document.createElement('script')
+    let done = false;
+    screl.onload = screl.onreadystatechange = function() {
+        if ( !done && (!this.readyState ||
+                this.readyState === "loaded" || this.readyState === "complete") ) {
+            done = true;
+            callback();
+            screl.onload = screl.onreadystatechange = null;
+            if ( head && screl.parentNode ) {
+                head.removeChild( screl );
+            }
+        }
+    };
+    screl.setAttribute('src', path);
+    document.head.appendChild(screl)
+
+  } );
+}
 
 function taskSleep(ms) {
   return new Promise((resolve) =>

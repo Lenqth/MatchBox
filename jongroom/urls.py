@@ -16,10 +16,11 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 
-from .views import RoomSelect,Room,Jong
+from .views import *
 
 urlpatterns = [
     path('', RoomSelect.as_view(), name='home') ,
     path('room', Room.as_view(), name='room') ,
     path('jong', Jong.as_view(), name='jong') ,
+    path('quarto', Quarto.as_view(), name='quarto') ,
 ]
