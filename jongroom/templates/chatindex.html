@@ -10,6 +10,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="stylesheet" href="">
 <script src="{% static 'jongroom/js/vue.js' %}"></script>
+<script src="{% static 'jongroom/js/utils.js' %}"></script>
 <!--[if lt IE 9]>
 <script src="//cdn.jsdelivr.net/html5shiv/3.7.2/html5shiv.min.js"></script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/respond.js/1.4.2/respond.min.js"></script>
@@ -32,6 +33,8 @@ function send(s){
   socket.send(JSON.stringify(obj));
 }
 
+// loadJSasync(path)
+
 socket.onmessage = function(e) {
   var o = JSON.parse(e.data);
   if("message" in o){
@@ -40,8 +43,7 @@ socket.onmessage = function(e) {
   }
   console.log(o);
   if("roomsize" in o){
-    var rsz = o.roomsize ;
-    roominfo.player_slot = (new Array( rsz ).fill(0) ).map( function(){return {"joined":false,"ready":false,"you":false,"name":"none"};} );
+    roominfo.player_slot = (new Array( o.roomsize ).fill(0) ).map( function(){return {"joined":false,"ready":false,"you":false,"name":"none"};} );
   }
   if("position" in o){
     roominfo.player_slot[o.position].you = true;
@@ -50,13 +52,20 @@ socket.onmessage = function(e) {
       roominfo.player_slot[i].joined = true;
     }
   }
+  if("room" in o){
+    for( var v of o.room ){
+      roominfo.player_slot[v.position].joined = true;
+      roominfo.player_slot[v.position].ready = v.ready;
+    }
+  }
   if("joined" in o){
-    var [pos,id] = o.joined;
-    roominfo.player_slot[pos].joined = true;
+    var dat = o.joined ;
+    roominfo.player_slot[dat.position].joined = true;
+    roominfo.player_slot[dat.position].ready = dat.ready;
   }
   if("exited" in o){
-    var [pos,id] = o.exited;
-    roominfo.player_slot[pos].joined = false;
+    var dat = o.exited ;
+    roominfo.player_slot[dat.position].joined = false;
   }
   if("set_state" in o){
     var stt = o.set_state;
@@ -176,7 +185,9 @@ socket.onopen = function() {
 <audio id="sound1" preload="auto">
   <source src="{% static 'jongroom/sound/puu79_a.wav' %}" type="audio/wav">
 </audio>
-<div class="flexbox">
+<div id="loader-root">
+</div>
+<div id="room-root" class="flexbox">
   <div class="col1">
     <textarea id="output" rows="40"></textarea>
     <input type="text" id="txbox"><input type="button" value="send" id="sendbutton">

@@ -43,39 +43,18 @@ class RoomListConsumer(AsyncWebsocketConsumer):
 
 class MainConsumer(AsyncWebsocketConsumer):
     async def connect(self):
+        self.onreceive = []
         token = None
         if str(self.scope["user"]) != "" :
             token = str( self.scope["user"] )
         elif "token" in self.scope["session"] :
             token = self.scope["session"]["token"]
-        print( "@@@ %s : %s " % ( token,str( self.scope["user"] ) ) )
+        await self.accept()
         result = await ( Room.random_match(self,None) )
         if result == None:
             return
-        acc = self.accept()
-        self.room = result["room"]
-        self.token = result["token"]
-        self.room_pos = result["pos"]
-        self.room_name = self.room.name
-        self.room_group_name = 'chat_%s' % self.room_name
-
-        self.onreceive = []
-
         # Join room group
-        await self.channel_layer.group_add(
-            self.room_group_name,
-            self.channel_name
-        )
-        await acc
-        self.scope["session"]["token"] = result["token"]
-        await self.send(text_data=json.dumps({
-            'room' : self.room_name ,
-            'token' : self.token ,
-            'position' : self.room_pos ,
-            'roomsize' : self.room.room_size ,
-            'room':self.room.getplayers() ,
-            'message': "welcome!",
-        }))
+        self.scope["session"]["token"] = self.token
         self.loop = asyncio.get_event_loop()
 
     async def disconnect(self, close_code):

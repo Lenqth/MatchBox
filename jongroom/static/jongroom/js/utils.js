@@ -25,15 +25,15 @@ function loadJSasync(path){
         if ( !done && (!this.readyState ||
                 this.readyState === "loaded" || this.readyState === "complete") ) {
             done = true;
-            callback();
+            res();
             screl.onload = screl.onreadystatechange = null;
-            if ( head && screl.parentNode ) {
-                head.removeChild( screl );
+            if ( screl.parentNode ) {
+                document.head.removeChild( screl );
             }
         }
     };
     screl.setAttribute('src', path);
-    document.head.appendChild(screl)
+    document.head.appendChild(screl);
 
   } );
 }

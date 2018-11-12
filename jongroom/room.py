@@ -83,7 +83,7 @@ class Room:
         res = []
         for (i,pl) in enumerate( self.players ) :
             if pl["token"] is not None :
-                res.append( [i,pl["token"]] )
+                res.append( {"position":i,"token":pl["token"],"ready":pl["ready"]} )
         return res
 
 
@@ -134,7 +134,10 @@ class Room:
                 print("@%s" % message )
                 await self.room_broadcast( { "from":str(channel.scope["user"]) ,"message" : message } )
             if "ready" in data :
-                await self.room_broadcast( { "set_state":{ "pos" : self.get_pos_from_token(channel.token) , "ready" :data["ready"] } } )
+                pos = self.get_pos_from_token(channel.token)
+                ready = data["ready"]
+                self.players[pos]["ready"] = ready
+                await self.room_broadcast( { "set_state":{ "pos" : pos , "ready" : ready  } } )
                 if all_players_ready():
                     await self.room_broadcast( { "start" : "1" } )
                     pass #スタート
@@ -166,11 +169,13 @@ class Room:
             })
 
     async def on_room_join(self,joined_player,position):
-        await self.room_broadcast( {"joined": [ position ,  joined_player] , "message":"joined:{0}".format(joined_player)} )
+        await self.room_broadcast( {"joined": {"position":position,"name":joined_player,"ready":False} , "message":"joined:{0}".format(joined_player)} )
 
     async def on_room_exit(self,player,position):
-        await self.room_broadcast( {"exited": [ position , player] , "message":"exited:{0}".format(player)} )
+        await self.room_broadcast( {"exited": {"position":position,"name":player} , "message":"exited:{0}".format(player)} )
 
+
+    # connect to room
     async def connect(self,channel,token=None):
         if token is not None :
             try:
@@ -186,8 +191,26 @@ class Room:
         token = self.name + secrets.token_hex(16)
         self.players[i]["connection"] = channel
         self.players[i]["token"] = token
+        channel.room = self
+        channel.token = token
+        channel.room_pos = i
+        channel.room_name = self.name
+        channel.room_group_name = 'chat_%s' % self.name
+        await channel.channel_layer.group_add(
+            channel.room_group_name,
+            channel.channel_name
+        )
         await self.on_room_join(token,i)
-        return {"room":self,"token":token,"pos":i,"roomsize":self.room_size,"message":"welcome!"}
+        await channel.send(text_data=json.dumps({
+            'roomname' : self.name ,
+            'token' : token ,
+            'position' : i ,
+            'roomsize' : self.room_size ,
+            'room':self.getplayers() ,
+            'message': "welcome!",
+        }))
+        return True
+        # return {"room":self,"token":token,"pos":i,"roomsize":self.room_size,"message":"welcome!"}
 
     async def disconnect(self,channel):
         nones = 0
