@@ -9,4 +9,7 @@ db.sqlite3
 migrations/
 /static/
 
+package-lock.json
+node_modules/
+
 jong_server/settings.py

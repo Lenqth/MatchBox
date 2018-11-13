@@ -1,0 +1,22 @@
+{
+  "name": "jong_server",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://bitbucket.org/Lenqth/jongserver.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "homepage": "https://bitbucket.org/Lenqth/jongserver#readme",
+  "dependencies": {},
+  "devDependencies": {
+    "vue": "^2.5.17",
+    "webpack": "^4.25.1",
+    "webpack-bundle-tracker": "^0.4.2-beta"
+  }
+}
