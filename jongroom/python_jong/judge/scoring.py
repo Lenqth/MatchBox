@@ -1,9 +1,11 @@
 # -*- coding : uft8 -*-
 
 try:
+    from .agari import *
     from .util import *
     from .config import *
 except:
+    from agari import *
     from util import *
     from config import *
 
@@ -95,6 +97,7 @@ class ChineseScore:
     #
     @classmethod
     def judge(cls,tiles,mentu,env):
+        nyan = is_agari(tiles)
         pass
 
     @classmethod
