@@ -1,5 +1,4 @@
 __pycache__/
-build/
 .ipynb_checkpoints
 .~lock*
 ignore/
@@ -8,6 +7,9 @@ ignore/
 db.sqlite3
 migrations/
 /static/
+
+build/
+!/build/
 
 jong_server/settings.py
 
