@@ -1,1 +1,21 @@
-<!DOCTYPE html><html><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>jong_server</title><link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Material+Icons" rel=stylesheet><link href=/static/build/css/app.15e7d900687d612b2f69f9913abcdc59.css rel=stylesheet></head><body><div id=app></div><script type=text/javascript src=/static/build/js/manifest.8ad97ff44980ae905d14.js></script><script type=text/javascript src=/static/build/js/vendor.631576064fafd9e9384c.js></script><script type=text/javascript src=/static/build/js/app.f868681fe31e7a008aaa.js></script></body></html>
+{% load render_bundle from webpack_loader %}
+<!DOCTYPE html>
+<html>
+ <head>
+ <meta charset="UTF-8">
+ <title>Example</title>
+ {% render_bundle 'manifest' %}
+ {% render_bundle 'vendor' %}
+ </head>
+
+ <body>
+ {% verbatim %}
+ <div id="app">
+ {{ message }}
+ </div>
+ {% endverbatim %}
+ 
+ {% render_bundle 'app' %}
+
+ </body>
+</html>
