@@ -2,10 +2,10 @@
 
 <div id="board-root" class="clearfix">
   <div id="info">
-    <p>ノコリ：$${ deck_left }</p>
-    <p> $${ get_wind_name( prev_wind ) }場 $${ get_wind_name(seat_wind) }風 </p>
-    <p v-if="time_left!=null">入力待機 残り：$${ time_left.toFixed(1) }秒</p>
-    <p>$${ message }</p>
+    <p>ノコリ：{{ deck_left }}</p>
+    <p> {{  get_wind_name( prev_wind )  }}場 {{  get_wind_name(seat_wind)  }}風 </p>
+    <p v-if="time_left!=null">入力待機 残り：{{  time_left.toFixed(1)  }}秒</p>
+    <p>{{  message  }}</p>
   </div>
   <player-area id="hand1" v-bind:player="players[1]" class="player-field"></player-area>
   <player-area id="hand2" v-bind:player="players[2]" class="player-field"></player-area>
@@ -14,11 +14,11 @@
   <div id="sideinfo">
     <table>
       <tr v-for="(y,i) in yakulist">
-        <td>$${y.title}</td>
-        <td>$${y.score}</td>
+        <td>{{ y.title }}</td>
+        <td>{{ y.score }}</td>
       </tr>
     </table>
-    <p style="">計 : $${calculated_score}</p>
+    <p style="">計 : {{ calculated_score }}</p>
   </div>
   <div id="meld-select">
     <transition name="meld-select">
@@ -36,11 +36,40 @@
 </template>
 
 <script>
+import Vue from 'vue';
+import {Deck,get_wind_name} from './components/jong_network.js';
+import * as utils from './components/utils.js' ;
+var deck = new Deck();
+
+function __last_target(t){
+  return deck.last_target == t;
+}
+
+function numtosrc(x){
+  if( x in Deck.numtosrc_table ){
+    return "./jongroom/images30_22/" + Deck.numtosrc_table[x]+".png"; 
+  }else{ 
+    return "";
+  }
+}
+
+function __img(x){ return '<img src="'+numtosrc(x)+'" >';}
+
 import PlayerArea from './components/player.vue'
 Vue.component('player-area',PlayerArea);
 
+window.deck = deck;
+
 export default {
-  name: 'App'
+  name: 'Loader',
+  data(){
+    return deck;    
+  },
+  methods:{
+    numtosrc,
+    get_wind_name : get_wind_name
+  }
+  
 }
 </script>
 

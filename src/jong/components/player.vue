@@ -33,7 +33,7 @@
   </div>
 </template>
 <script>
-
+import Vue from 'vue';
 import exposedset from './exposedset.vue'
 Vue.component('exposed-set',exposedset);
 import pullout from './pullout.vue'

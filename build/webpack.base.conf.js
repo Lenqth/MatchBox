@@ -23,7 +23,7 @@ module.exports = {
   context: path.resolve(__dirname, '../'),
   entry: {
     app: './src/main.js',
-    app2: './src/jong/jong.vue'
+    app2: './src/jong/index.vue'
   },
   output: {
     path: config.build.assetsRoot,

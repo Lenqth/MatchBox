@@ -30,6 +30,7 @@
   </div>
 </template>
 <script>
+import Vue from 'vue';
 import spinningtarget from './target.vue'
 Vue.component('spinning-target',spinningtarget);
 
