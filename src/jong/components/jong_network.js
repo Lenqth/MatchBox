@@ -65,7 +65,7 @@ export class Deck{
 }
 
 Deck.prototype.start = async function(){
-  this.conn = new AsyncConnection("ws://"+location.host+"/jong/room/"+document.forms[0].room_id);
+  this.conn = new AsyncConnection("ws://"+(location.hostname + ":" + "8000")+"/jong/room/"+document.forms[0].room_id.value);
   console.log( await this.conn.receiveAsync() );
   this.conn.send(JSON.stringify({"start":""}));
   while(true){
@@ -241,7 +241,7 @@ export function tile_click(x){
 export async function click_meld_popup(pos){
   console.log("meld-select:"+pos.toString());
   if(input_resolve != null){
-    deck.meld_selection.meld_selection = [] ;
+    deck.meld_selection.tiles = [] ;
     input_resolve(deck.meld_selection.type , deck.meld_selection.pos[pos] );
   }
 }
@@ -259,7 +259,7 @@ export function command(type){
     var selections = fil.map( x => x.pos );
     var tiles = selections.map( x => x.map( y => y >= 0 ? pl.hand[y] : ( y == -1 ? pl.drawed : deck.claim_target ) ) );
     deck.meld_selection.type = type ;
-    deck.meld_selection.meld_selection = tiles ;
+    deck.meld_selection.tiles = tiles ;
     deck.meld_selection.pos = selections ;
   }
 }
@@ -321,3 +321,14 @@ export async function timer(timeout,cancelObj){
 }
 // timer( (new Date()).getTime() + 10000 );
 
+export function __last_target(t){
+  return deck.last_target == t;
+}
+
+export function numtosrc(x){
+  if( x in Deck.numtosrc_table ){
+    return "./assets/images30_22/" + Deck.numtosrc_table[x]+".png"; 
+  }else{ 
+    return "";
+  }
+}

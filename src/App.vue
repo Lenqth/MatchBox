@@ -1,5 +1,8 @@
 <template>
   <div id="app">
+    <form>
+    <input type="hidden" name="room_id" id="room_id" value="132">
+    </form>
     <router-view/>
   </div>
 </template>

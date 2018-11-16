@@ -20,43 +20,24 @@
     </table>
     <p style="">計 : {{ calculated_score }}</p>
   </div>
-  <div id="meld-select">
-    <transition name="meld-select">
-      <div v-if="meld_selection.meld_selection.length > 0" class="meld-select-box">
-        <div v-for="(grp,index) in meld_selection.meld_selection" class="exposed-group group-clickable" v-bind:pos="index" onclick="click_meld_popup(this.getAttribute('pos'));">
-          <div v-for="(item,jndex) in grp" class="exposed-item tile">
-            <img v-bind:src="numtosrc(item)" >
-          </div>
-        </div>
-      </div>
-    </transition>
-  </div>
+	<meld-selection v-bind:meld-selection="meld_selection"></meld-selection>
 </div>
 
 </template>
 
 <script>
 import Vue from 'vue';
-import {Deck,get_wind_name} from './components/jong_network.js';
+import {Deck,get_wind_name,numtosrc} from './components/jong_network.js';
 import * as utils from './components/utils.js' ;
 var deck = new Deck();
-
-function __last_target(t){
-  return deck.last_target == t;
-}
-
-function numtosrc(x){
-  if( x in Deck.numtosrc_table ){
-    return "./jongroom/images30_22/" + Deck.numtosrc_table[x]+".png"; 
-  }else{ 
-    return "";
-  }
-}
 
 function __img(x){ return '<img src="'+numtosrc(x)+'" >';}
 
 import PlayerArea from './components/player.vue'
 Vue.component('player-area',PlayerArea);
+
+import meld_selection from './components/meld_selection.vue'
+Vue.component('meld-selection',meld_selection);
 
 window.deck = deck;
 
@@ -69,10 +50,87 @@ export default {
     numtosrc,
     get_wind_name : get_wind_name
   }
-  
 }
 </script>
 
 <style>
+
+.clearfix:after{
+	content: "";
+	clear: both;
+	display: block;
+}
+
+.player-field{
+  width:400px;
+  height:200px;
+  /* border: 2px blue solid; */
+}
+
+#hand0{
+  position:absolute;
+  left:100px;
+  top:400px;
+}
+
+#hand1{
+  position:absolute;
+  left:300px;
+  top:200px;
+  transform:rotate(-90deg);
+}
+
+#hand2{
+  position:absolute;
+  left:100px;
+  top:0px;
+  transform:rotate(180deg);
+}
+
+#hand3{
+  position:absolute;
+  left:-100px;
+  top:200px;
+  transform:rotate(90deg);
+}
+
+#info{
+  position:absolute;
+  left:232px;
+  top:232px;
+  width:133px;
+  height:133px;
+  margin:auto;
+  border: 1px orange solid;
+}
+
+#sideinfo{
+  position:absolute;
+  left:650px;
+  top:50px;
+  width:200px;
+  height:400px;
+  margin:auto;
+  padding:15px;
+  border: 1px orange solid;
+}
+#board-root{
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+	width: 600px;
+	height: 600px;
+	margin:auto;
+	border: red solid 1px;
+  position:absolute;
+  display:inline-block;
+}
+body{
+  margin:auto;
+  overflow: hidden;
+  font-size: 13px;
+}
+
 
 </style>
