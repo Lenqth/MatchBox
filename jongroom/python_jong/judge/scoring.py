@@ -90,15 +90,56 @@ def yakuroutine(x):
     return x
 
 tricolor = list(itertools.permutations([0,1,2]))
+
 class ChineseScore:
     # mentu array format
     #
     # mentu[chow:0,pong:1][color:man,pin,sou,ji][number:1~9]
     #
+    #
+    #
     @classmethod
-    def judge(cls,tiles,mentu,env):
-        nyan = is_agari(tiles)
-        pass
+    def judge(cls,tiles,exposed,env,agari_tile=None):
+        if agari_tile == None :
+            agari_tile = tiles[-1]
+        agaris = is_agari(list_to_array(tiles),exposed_mentu=len(exposed))
+        all_tiles = list(tiles)
+        for ex in exposed :
+            all_tiles.extend( ex.get_tiles() )
+        res = []
+        env["__noothermachi__"] = True
+        __tmp_tiles = list_to_array(tiles)
+        __tmp_tiles[agari_tile] -= 1
+        for x in MAIN_TILES :
+            if x == agari_tile :
+                continue
+            __tmp_tiles[x] += 1
+            if is_agari(__tmp_tiles,exposed_mentu=len(exposed)) is not None :
+                env["__noothermachi__"] = False
+                break
+            __tmp_tiles[x] -= 1
+
+        for ag in agaris:
+            env["agari_form"] = ag["type"]
+            if ag["type"] == "normal":
+                parts = Mentu.from_mentu_array( ag["data"] , atama=ag["atama"] )
+                for part in parts:
+                    if part.contains(agari_tile) :
+                        part.agari_tile = agari_tile
+                        mentu = list(exposed) + list(parts)
+                        res.append( cls.list_yaku(all_tiles,mentu,env) )
+                        part.agari_tile = None
+            elif ag["type"] == "knitted_normal":
+                parts = Mentu.from_mentu_array( ag["data"] , atama=ag["atama"])
+                for part in parts:
+                    if part.contains(agari_tile) :
+                        part.agari_tile = agari_tile
+                        mentu = list(exposed) + list(parts)
+                        res.append( cls.list_yaku(all_tiles,mentu,env) )
+                        part.agari_tile = None
+            else:
+                mentu = list(exposed) + list(parts)
+                res.append( cls.list_yaku(all_tiles,[],env) )
 
     @classmethod
     def list_yaku(cls,tiles,mentu,env):
@@ -114,7 +155,7 @@ class ChineseScore:
         obj.cpongs = np.zeros( (4,16) , dtype = np.int16 )
         for x in mentu :
             if x.is_concealed():
-                conc_mentu.append(mentu)
+                obj.conc_mentu.append(mentu)
             if x.is_chow() :
                 obj.chows[x.get_color(),x.get_number()] += 1
             if x.is_pongorkong() :
@@ -122,7 +163,22 @@ class ChineseScore:
                 if x.is_concealed():
                     obj.cpongs[x.get_color(),x.get_number()] += 1
         obj.tiles = tiles
-        obj.env["flowers"]
+        obj.env = env
+
+        result = []
+        li = list( filter( lambda x: len(x)>0 and x[0]!="_" , dir(cls) ))
+        for x in li:
+            q = getattr(obj,x)
+            if hasattr(q,"__yakuroutine__"):
+                res = q()
+                if res is None:
+                    continue
+                if isinstance(res, collections.Iterable) :
+                    result.extend(res)
+                else:
+                    result.append(res)
+        total = 0
+        return (total,result)
 
     flowerbonus      = Yaku( "Flower" , "花牌" , 1  )
 
@@ -135,6 +191,21 @@ class ChineseScore:
     machi_tanki   = Yaku( "Single Wait" , "単調将" ,  1  )
     machi_closed  = Yaku( "Closed Wait" , "坎張" ,  1  )
     machi_edge    = Yaku( "Edge Wait" , "辺張" ,  1  )
+    @yakuroutine
+    def machi(self):
+        if not safe_get(self.env,"__noothermachi__",False):
+            return None
+        for part in self.mentu:
+            q = part.machi()
+            if q is not None :
+                if q == "KANCHAN":
+                    return ChineseScore.machi_closed
+                elif q == "PENCHAN":
+                    return ChineseScore.machi_edge
+                elif q == "TANKI":
+                    return ChineseScore.machi_tanki
+                else:
+                    return None
 
     pong_t_or_h      = Yaku( "Pong Of Terminals/Honors" , "么九刻" , 1  )
 
@@ -204,9 +275,9 @@ class ChineseScore:
                 yield ChineseScore.lastdraw
             else:
                 yield ChineseScore.lastclaim
-        if "konged_tile" in env and env["konged_tile"] == True :
+        if safe_get(self.env,"konged_tile",False) :
             yield ChineseScore.repltile
-        if "robbed_tile" in env and env["robbed_tile"] == True :
+        if safe_get(self.env,"robbed_tile",False) :
             yield ChineseScore.robkong
 
     chicken = Yaku( "Chicken Hand" , "無番和" , 8  )
@@ -218,10 +289,10 @@ class ChineseScore:
     mixedst = Yaku("Mixed Straight","花龍",8)
     @yakuroutine
     def straight(self):
-        if mentu["type"] != "normal":
-            if mentu["type"] == "knitted_normal":
+        if self.env["agari_form"] != "normal":
+            if self.env["agari_form"] == "knitted_normal":
                 return ChineseScore.knittedst
-            elif mentu["type"] == "knitted" :
+            elif self.env["agari_form"] == "knitted" and self.tiles :
                 return ChineseScore.knittedst
             return None
         chows = self.chow
@@ -241,36 +312,36 @@ class ChineseScore:
 
     @yakuroutine
     def kongs(self):
-        kongs = filter( lambda x:x.is_kong(), self.mentu )
-        conckongs = filter( lambda x:x. x.is_concealed(), kongs )
+        kongs = list( filter( lambda x:x.is_kong(), self.mentu ) )
+        conckongs = list( filter( lambda x:x.is_concealed(), kongs ) )
         kl = len(kongs)
         ckl = len(conckongs)
         res = []
         if kl >= 4:
             if ckl >= 2:
-                res.append(kong2c)
+                res.append(ChineseScore.kong2c)
             elif ckl >= 1:
-                res.append(kong1c)
+                res.append(ChineseScore.kong1c)
             res.append(kong4)
         elif kl >= 3 :
             if ckl >= 2:
-                res.append(kong2c)
+                res.append(ChineseScore.kong2c)
             elif ckl >= 1:
-                res.append(kong1c)
+                res.append(ChineseScore.kong1c)
             res.append(kong3)
         elif kl >= 2 :
             if ckl >= 2:
-                res.append(kong2c)
+                res.append(ChineseScore.kong2c)
             elif ckl >= 1:
-                res.append(kong2)
-                res.append(kong1c)
+                res.append(ChineseScore.kong2)
+                res.append(ChineseScore.kong1c)
             else:
-                res.append(kong2)
+                res.append(ChineseScore.kong2)
         elif kl >= 1 :
             if ckl >= 1:
-                res.append(kong1c)
+                res.append(ChineseScore.kong1c)
             else:
-                res.append(kong1)
+                res.append(ChineseScore.kong1)
         return res
 
     menzen           = Yaku( "Concealed Hand" , "門前清" ,  2  )
@@ -279,17 +350,17 @@ class ChineseScore:
     allmeld          = Yaku( "Melded Hand" , "全求人" ,  6  )
     @yakuroutine
     def melds(self):
-        meldcnt = len(filter(lambda x:not x.is_concealed() , self.mentu ))
+        meldcnt = len(list(filter(lambda x:not x.is_concealed() , self.mentu )))
         if safe_get(self.env,"tsumo",False) :
             if meldcnt == 0:
-                return menzentsumo
+                return ChineseScore.menzentsumo
             else:
-                return selfdrawn
+                return ChineseScore.selfdrawn
         else:
             if meldcnt == 4:
-                return allmeld
+                return ChineseScore.allmeld
             elif meldcnt == 0:
-                return menzen
+                return ChineseScore.menzen
 
     allpong = Yaku("All Pongs","碰碰和",6)#
     pong4c = Yaku( "4 Concealed Pongs" , "四暗刻" , 64  )#
@@ -300,11 +371,7 @@ class ChineseScore:
     def pongs(self):
         pongs = self.pongs
         cpongs = self.cpongs
-        if not safe_get(self.env,"tsumo",False) :
-            a = player.agari_tile
-            fq = player.hand_freq_array()
-            if fq[a] == 3 and cpongs[a//16,a%16] >= 1 :
-                cpongs[a//16][a%16] -= 1
+
         s = np.sum( cpongs )
         if np.sum(pongs) >= 4 :
             yield ChineseScore.allpong
@@ -380,13 +447,13 @@ class ChineseScore:
     chow3ms  = Yaku( "Mixed Triple Chow" , "三色三同順" , 8  )#
     @yakuroutine
     def samechow(self):
-        cnt = np.sum( self.chows > 0 , axis = 0 )
-        if ( q >= 4 ).any():
+        cnt = np.sum( self.chows > 0 )
+        if ( cnt >= 4 ).any():
             return ChineseScore.chow4s
-        if ( q >= 3 ).any():
+        if ( cnt >= 3 ).any():
             return ChineseScore.chow3s
-        cnt = np.sum( q > 0 , axis = 0 )
-        if ( cnt >= 3 ).any() :
+        mcnt = np.all( self.chows > 0 , axis = 1 )
+        if ( mcnt ).any() :
             return ChineseScore.chow3ms
 
     wind4  = Yaku("Big Four Kongs","大四喜",88)
@@ -519,6 +586,18 @@ class ChineseScore:
 # print(len( sc.yaku ))
 # print( ",".join( map( lambda x: x.chinese_name , sc.yaku ) ) )
 
+def test(str):
+    handtiles,exposed,tsumo = string_to_list_ex(str)
+    env = {
+        "prevalent_wind": -1 ,
+        "seat_wind": -1,
+        "tsumo":tsumo ,
+        "deck_left":11,
+        "discarded_tiles": [],
+        "exposed_tiles": []
+    }
+    ChineseScore.judge( handtiles,exposed,env )
+
 """
             "prevalent_wind": game.prevalent_wind ,
             "seat_wind": game.get_seat_wind(self.id),
@@ -534,19 +613,16 @@ if __name__ == "__main__" :
 #    unittest.main()
     import unittest
     import agari
-    def getmentu(str):
-        m = string_to_array(str)
-        return agari.is_agari(m)
-
 
     class TestScore(unittest.TestCase):
         __sc__ = ScoreCalculation(ChineseScore)
         def test(self):
             pass
-    print(TestScore.__sc__.calc_score( getmentu("678m231s345666pSS") ) )
+
     #print(TestScore.__sc__.calc_score(getmentu("123m234p345sEEESS") ) )
     #print(TestScore.__sc__.calc_score(getmentu("123m456p123789sSS") ) )
     #print(TestScore.__sc__.calc_score(getmentu("123789123789mWW") ) )
-    print( string_to_list_ex("67m 123456789s 99p 5m!") )
-    print( string_to_list_ex("*456p *789m *567s 5678p 5p") )
-    print( string_to_list_ex("*SSS *777s *111m 888s H H!") )
+    #print( string_to_list_ex("67m 123456789s 99p 5m!") )
+    #print( string_to_list_ex("*456p *789m *567s 5678p 5p") )
+    #print( string_to_list_ex("*SSS *777s *111m 888s H H!") )
+    print( test( "*SSS *777s *111m 888s H H!"  ) )

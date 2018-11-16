@@ -74,12 +74,22 @@ def expect_mentu(ary,expect=4):
         cnt = np.sum(m[1:3,:])+np.sum(p[1:3,:])+np.sum(s[1:3,:])+np.sum(c[1:3,:])
         if cnt < expect :
             continue
-        if ( ( m[0] == 2 ).any() or ( p[0] == 2 ).any() or ( s[0] == 2 ).any() or ( c[0] == 2 ).any() ) :
-            buff[:,0,:] = m[1:3]
-            buff[:,1,:] = p[1:3]
-            buff[:,2,:] = s[1:3]
-            buff[:,3,:] = c[1:3]
-            res.append( buff.copy() )
+        if  ( m[0] == 2 ).any() :
+            buff[:,0,:] = m[1:3];buff[:,1,:] = p[1:3];buff[:,2,:] = s[1:3];buff[:,3,:] = c[1:3]
+            atama = np.where( m[0] == 2 )[0]
+            res.append( ( buff.copy() , atama ) )
+        elif ( p[0] == 2 ).any() :
+            buff[:,0,:] = m[1:3];buff[:,1,:] = p[1:3];buff[:,2,:] = s[1:3];buff[:,3,:] = c[1:3]
+            atama = np.where( p[0] == 2 )[0] + 16
+            res.append( ( buff.copy() , atama ) )
+        elif ( s[0] == 2 ).any() :
+            buff[:,0,:] = m[1:3];buff[:,1,:] = p[1:3];buff[:,2,:] = s[1:3];buff[:,3,:] = c[1:3]
+            atama = np.where( s[0] == 2 )[0] + 32
+            res.append( ( buff.copy() , atama ) )
+        elif ( c[0] == 2 ).any() :
+            buff[:,0,:] = m[1:3];buff[:,1,:] = p[1:3];buff[:,2,:] = s[1:3];buff[:,3,:] = c[1:3]
+            atama = np.where( c[0] == 2 )[0] + 48
+            res.append( ( buff.copy() , atama ) )
     if len(res) == 0:
         return None
     return res
@@ -107,8 +117,9 @@ def agari_knitted_normal(ary,exposed_mentu=0):
     for i in range(6):
         left = ary - KNITS[i]
         if (left >= 0).all() :
-            if expect_mentu(left,expect=1-exposed_mentu) is not None :
-                return True
+            r = expect_mentu(left,expect=1-exposed_mentu)
+            if r is not None :
+                return r
     return None
 
 def agari_knitted(ary,exposed_mentu=0):
@@ -129,23 +140,23 @@ def agari_normal(ary,exposed_mentu=0):
 
 def is_agari(ary,exposed_mentu=0):
     assert( 0 <= exposed_mentu <= 4 )
-    r = agari_kokushi(ary,exposed_mentu)
-    if r is not None:
-        return [{"type":"kokushi","data":r}]
-    r = agari_knitted(ary,exposed_mentu)
-    if r is not None:
-        return [{"type":"knitted","data":r}]
-
     res = []
-    r = agari_7pairs(ary,exposed_mentu)
-    if r is not None:
-        res.append( {"type":"7pairs","data":r} )
+    if exposed_mentu == 0 :
+        r = agari_kokushi(ary,exposed_mentu)
+        if r is not None:
+            return [{"type":"kokushi","data":r}]
+        r = agari_knitted(ary,exposed_mentu)
+        if r is not None:
+            return [{"type":"knitted","data":r}]
+        r = agari_7pairs(ary,exposed_mentu)
+        if r is not None:
+            res.append( {"type":"7pairs","data":r} )
     r = agari_knitted_normal(ary,exposed_mentu)
     if r is not None:
-        res.append( {"type":"knitted_normal","data":r} )
+        res.extend( map( lambda x:{"type":"knitted_normal","data":x[0],"atama":x[1]} , r ) )
     r = agari_normal(ary,exposed_mentu)
     if r is not None:
-        res.extend( map( lambda x:{"type":"normal","data":x} , r ) )
+        res.extend( map( lambda x:{"type":"normal","data":x[0],"atama":x[1]} , r ) )
     if len(res) == 0:
         return None
     return res

@@ -1,5 +1,6 @@
 # -*- coding : uft8 -*-
 
+from util import *
 
 class Mentu:
     CHOW = 1
@@ -44,6 +45,43 @@ class Mentu:
             return (self.head,self.head,self.head,self.head)
         elif self.type == self.__class__.ATAMA :
             return (self.head,self.head,self.head,self.head)
+
+    def contains(self,x):
+        if self.type == self.__class__.CHOW or self.type == self.__class__.CONCCHOW :
+            return self.head <= x <= self.head+2
+        else:
+            return x == self.head
+
+    def machi(self): # machi type for 1 pts hands
+        if self.agari_tile is None :
+            return None
+        if self.type == self.__class__.CONCCHOW :
+            if self.agari_tile == self.head + 1 :
+                return "KANCHAN"
+            elif self.agari_tile == self.head and id2number(self.head) == 7 :
+                return "PENCHAN"
+            elif self.agari_tile == self.head + 2 and id2number(self.head) == 1 :
+                return "PENCHAN"
+            else:
+                return "OTHER"
+        elif self.type == self.__class__.ATAMA :
+            return "TANKI"
+        else:
+            return "OTHER"
+
+    @classmethod
+    def from_mentu_array(cls,data,atama=None):
+        nzs = data.nonzero()
+        res = []
+        if atama is not None:
+            res.append( cls( cls.ATAMA , atama ) )
+        types , suits , nums = nzs
+        for j in range(len(nums)) :
+            type , suit , num = types[j] , suits[j] , nums[j]
+            for i in range( data[type,suit,num] ):
+                res.append( cls( 7 - type  , suit * 16 + num ) )
+        return res
+
 
     def toDict(self):
         return {"type":self.__class__.__TYPENAMES__[self.type] , "tiles":self.get_tiles() }
