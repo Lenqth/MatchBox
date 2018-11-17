@@ -3,8 +3,8 @@ import * as utils from './utils.js' ;
 
 
 class AsyncConnection{
-  constructor(href){
-    this.socket = new WebSocket(href);;
+  constructor(sock){
+    this.socket = sock;
     var bf = this.buffer = [];
     var cb = this.callbacks = [] ;
     this.socket.addEventListener("message" , function(e) {
@@ -64,10 +64,10 @@ export class Deck{
 
 }
 
-Deck.prototype.start = async function(){
-  this.conn = new AsyncConnection("ws://"+(location.hostname + ":" + "8000")+"/jong/room/"+document.forms[0].room_id.value);
-  console.log( await this.conn.receiveAsync() );
-  this.conn.send(JSON.stringify({"start":""}));
+Deck.prototype.start = async function(sock){
+  this.conn = new AsyncConnection(sock);
+  this.conn.send(JSON.stringify({"stand_by":""}));
+  var res = null;
   while(true){
     res = await this.conn.receiveAsync();
     var pl = deck.players[deck.player_id];
@@ -89,7 +89,7 @@ Deck.prototype.start = async function(){
 
       var timeout = res.timeout * 1000 ;
       var cancelObj = {cancel:false};
-      play_sound("puu79_a.wav");
+      utils.play_sound("puu79_a.wav");
       var input_res = await Promise.race( [claim_input(cancelObj) , timer(timeout,cancelObj)] );
       cancelObj.cancel = true;
       if( input_res != null ){
@@ -112,7 +112,7 @@ Deck.prototype.start = async function(){
         }
       }
     }else if( res.type == "discard" ){
-      play_sound("clock04.wav");
+      utils.play_sound("clock04.wav");
       this.players[res.pid].trash.push(res.tile);
     }else if( res.type == "your_turn" ){
       // {"hand_tiles": [2, 4, 5, 6, 19, 22, 24, 34, 34, 38, 49, 52, 53], "draw": 22, "turn_commands_available": null, "_m_id": 4, "timeout": 1539603590.1542008}
@@ -124,7 +124,7 @@ Deck.prototype.start = async function(){
 
       var timeout = res.timeout * 1000 ;
       var cancelObj = {cancel:false};
-      play_sound("puu79_a.wav");
+      utils.play_sound("puu79_a.wav");
       var input_res = await Promise.race( [turn_input(cancelObj) , timer(timeout,cancelObj)] );
       cancelObj.cancel = true;
       console.log(input_res);
@@ -232,7 +232,7 @@ export function get_wind_name(id){
 
 export function tile_click(x){
   var pl = deck.players[deck.player_id];
-  var pos = parseInt( x.getAttribute("pos") );
+  var pos = x;
   if(input_resolve != null && pl.allow_discard ){
     input_resolve("discard",pos);
   }
@@ -325,9 +325,15 @@ export function __last_target(t){
   return deck.last_target == t;
 }
 
+function importAll(r) {
+  return r.keys().map(r);
+}
+
+const images = importAll(require.context('../assets/', false, /\.(png|jpe?g|svg)$/));
+
 export function numtosrc(x){
   if( x in Deck.numtosrc_table ){
-    return "./assets/images30_22/" + Deck.numtosrc_table[x]+".png"; 
+    return require("@/jong/assets/images30_22/" + Deck.numtosrc_table[x]+".png"); 
   }else{ 
     return "";
   }

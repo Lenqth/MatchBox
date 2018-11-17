@@ -6,6 +6,7 @@
     <p> {{  get_wind_name( prev_wind )  }}場 {{  get_wind_name(seat_wind)  }}風 </p>
     <p v-if="time_left!=null">入力待機 残り：{{  time_left.toFixed(1)  }}秒</p>
     <p>{{  message  }}</p>
+		<img v-bind:src="numtosrc(17)">
   </div>
   <player-area id="hand1" v-bind:player="players[1]" class="player-field"></player-area>
   <player-area id="hand2" v-bind:player="players[2]" class="player-field"></player-area>
@@ -49,7 +50,16 @@ export default {
   methods:{
     numtosrc,
     get_wind_name : get_wind_name
-  }
+  },
+	beforeRouteEnter (route, redirect, next) {
+		next( vm => {
+			if(window.socket==null){
+				vm.$router.push("/room");
+			}else{
+				deck.start(window.socket);
+			}
+		} );
+	},
 }
 </script>
 

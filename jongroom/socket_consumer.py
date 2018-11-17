@@ -74,7 +74,7 @@ class MainConsumer(AsyncWebsocketConsumer):
     # Receive message from WebSocket
     async def receive_async(self, text_data):
         data = json.loads(text_data)
-        print(data)
+        #print(data)
         for handler in self.onreceive:
             handler(data)
 
@@ -82,10 +82,6 @@ class MainConsumer(AsyncWebsocketConsumer):
             await self.room.receive(self,data)
         else:
             print("no room")
-
-        if "start" in data : # special command
-            print("start")
-            await self.room.start()
 
     # Receive message from room group
     async def chat_message(self, event):
