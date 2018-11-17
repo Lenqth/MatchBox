@@ -8,10 +8,10 @@
     <p>{{  message  }}</p>
 		<img v-bind:src="numtosrc(17)">
   </div>
-  <player-area id="hand1" v-bind:player="players[1]" class="player-field"></player-area>
-  <player-area id="hand2" v-bind:player="players[2]" class="player-field"></player-area>
-  <player-area id="hand3" v-bind:player="players[3]" class="player-field"></player-area>
-  <player-area id="hand0" v-bind:player="players[0]" main=1 class="player-field"></player-area>
+  <player-area id="hand1" v-bind:player="players[(player_id+1)%4]" class="player-field"></player-area>
+  <player-area id="hand2" v-bind:player="players[(player_id+2)%4]" class="player-field"></player-area>
+  <player-area id="hand3" v-bind:player="players[(player_id+3)%4]" class="player-field"></player-area>
+  <player-area id="hand0" v-bind:player="players[player_id]" main=1 class="player-field"></player-area>
   <div id="sideinfo">
     <table>
       <tr v-for="(y,i) in yakulist">
