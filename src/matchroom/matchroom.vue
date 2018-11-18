@@ -1,5 +1,8 @@
 <template>
   <div id="room-root" class="flexbox">
+    <audio id="sound1" preload="auto">
+      <source src="../assets/puu79_a.wav" type="audio/wav">
+    </audio>
     <div class="col1">
       <textarea id="output" rows="40"></textarea>
       <input type="text" id="txbox"><input type="button" value="send" id="sendbutton">
@@ -23,13 +26,15 @@ function send_ready(){
   socket.send(JSON.stringify({"ready":roominfo.player_slot[you].ready}));
 }
 function writeln(x){
-  document.getElementById("output").value += x + "\n" ;
+  var el = document.getElementById("output") ;
+  if(!el)return;
+  el.value += x + "\n" ;
 }
 function send(s){
   var obj={message:s};
   socket.send(JSON.stringify(obj));
 }
-
+var __vm = null;
 export default {
   name: 'MatchRoom',
   data(){
@@ -37,15 +42,26 @@ export default {
   },
   methods:{
     send_ready
-  }
+  },
+  beforeRouteEnter (route, redirect, next) {
+    next( vm => {
+      __vm = vm;
+      console.log( __vm );
+      console.log(arguments);
+    } );
+  },
 }
-window.socket = new WebSocket("ws://"+(location.hostname + ":" + "8000")+"/jong/room/nyan");
 
-
+if(!window.socket){
+  window.socket = new WebSocket("ws://"+(location.hostname + ":" + "8000")+"/jong/room/nyan");
+}
+ 
 socket.onmessage = function(e) {
   var o = JSON.parse(e.data);
   if("message" in o){
-    utils.play_sound("../assets/puu79_a.wav");
+//    utils.play_sound("../assets/puu79_a.wav");
+    var s1 = document.getElementById("sound1");
+    if(s1){ s1.play() };
     writeln(o.message);
   }
   console.log(o);
@@ -82,6 +98,9 @@ socket.onmessage = function(e) {
       roominfo.player_slot[pos][key] = stt[key];
     }
   }
+  if( "start" in o ){
+    game_start(o.start);
+  }
 }
 
 socket.onerror = function(e) {console.log("error:",e);}
@@ -100,6 +119,10 @@ function send_click(e){
   console.log(x);
 }
 socket.onopen = function() {
+}
+
+function game_start(arg){
+  __vm.$router.push("/jong"); 
 }
 
 </script>

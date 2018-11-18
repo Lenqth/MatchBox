@@ -59,22 +59,41 @@ class GameConnection:
                 res = f(obj)
                 if res == True :
                     rem.append(f)
-                    break
             except SkipHandler:
                 pass
-        for x in rem:
-            self.remove_receive_handler(x)
-
+                
     async def send(self,obj):
         txt = json.dumps(obj,cls = myJSONEncoder)
         await self.conn.send(text_data=txt)
-        print("{0}".format(txt))
+        print("send : {0}".format(txt))
 
     def add_receive_handler(self,f):
         self.__receive_handlers.add(f)
 
     def remove_receive_handler(self,f):
         self.__receive_handlers.remove(f)
+
+    async def receive_any(self,timeout=30):
+        __handler_v = None
+        def __promf(res,rej):
+            nonlocal __handler_v
+            def __handler(obj):
+                res(obj)
+                return True
+            __handler_v = __handler
+            self.add_receive_handler(__handler)
+        t = Promise( __promf )
+        # self.wait_for_reply[ m_id ] = sobj
+        try:
+            res = await asyncio.wait_for(t,timeout=timeout)
+        except Exception as e:
+            raise e
+            #await self.send( { "timeout":m_id } )
+        finally:
+            self.remove_receive_handler(__handler_v)
+            pass
+#            del self.wait_for_reply[ m_id ]
+        return res
 
     async def send_and_receive_reply(self,obj,timeout=30):
         sobj = json.loads( json.dumps(obj , cls = myJSONEncoder ) )
@@ -99,10 +118,9 @@ class GameConnection:
         try:
             res = await asyncio.wait_for(t,timeout=timeout)
         except Exception as e:
-            print("timeout")
-            self.remove_receive_handler(__handler_v)
             raise e
             #await self.send( { "timeout":m_id } )
         finally:
+            self.remove_receive_handler(__handler_v)
             del self.wait_for_reply[ m_id ]
         return res

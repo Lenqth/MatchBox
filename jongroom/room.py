@@ -96,12 +96,20 @@ class Room:
         for i in range(4):
             game.players[i].agent = AITsumogiri()
         game.players[0].agent = RemotePlayer( conns[0] )
-        if len(active_users) >= 2:
+        if len(conns) >= 2:
             game.players[2].agent = RemotePlayer( conns[1] )
-        if len(active_users) >= 3:
+        if len(conns) >= 3:
             game.players[1].agent = RemotePlayer( conns[2] )
-        if len(active_users) >= 4:
+        if len(conns) >= 4:
             game.players[3].agent = RemotePlayer( conns[3] )
+        
+        print("waiting standby ... ")
+        tasks = [ c.receive_any(timeout=60) for c in conns ]
+        tasks2 = [ c.send( { "start" : "1" } ) for c in conns ]
+        await Promise.all(tasks2)
+        await Promise.all(tasks)
+        print("waiting standby finished ")
+
         try:
             await game.one_game()
         except Exception as e :
@@ -138,8 +146,8 @@ class Room:
                 ready = data["ready"]
                 self.players[pos]["ready"] = ready
                 await self.room_broadcast( { "set_state":{ "pos" : pos , "ready" : ready  } } )
-                if all_players_ready():
-                    await self.room_broadcast( { "start" : "1" } )
+                if self.all_players_ready():
+                    await self.start()
                     pass #スタート
 
         except Exception as e:
