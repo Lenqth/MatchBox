@@ -27,7 +27,7 @@ class Quarto(View):
         d = {"room_id" : "nyan"}
         return render(request, 'quarto/quarto.html', d)
 
-class TestIndex(View):
+class WebPackIndex(View):
     def get(self, request, *args, **kwargs):
         d = {"room_id" : "nyan"}
         return render(request, 'index.html', d)
