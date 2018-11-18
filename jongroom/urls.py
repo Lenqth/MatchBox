@@ -19,9 +19,10 @@ from django.urls import path
 from .views import *
 
 urlpatterns = [
-    path('', RoomSelect.as_view(), name='home') ,
-    path('room', Room.as_view(), name='room') ,
-    path('jong', Jong.as_view(), name='jong') ,
-    path('quarto', Quarto.as_view(), name='quarto') ,
-    path('testindex', TestIndex.as_view(), name='quarto') ,
+    path('testindex', TestIndex.as_view(), name='home') ,
+    #path('', RoomSelect.as_view(), name='home') ,
+    #path('room', Room.as_view(), name='room') ,
+    #path('jong', Jong.as_view(), name='jong') ,
+    #path('quarto', Quarto.as_view(), name='quarto') ,
+    #path('testindex', TestIndex.as_view(), name='quarto') ,
 ]
