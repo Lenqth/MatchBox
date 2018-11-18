@@ -13,8 +13,6 @@ from .judge.shanten import shanten
 from .judge.scoring import ScoreCalculation,ChineseScore
 from .judge.util import *
 
-from .judge.mentu import Mentu
-
 import asyncio
 
 def to_mentu(hand_pattern,exposed):
