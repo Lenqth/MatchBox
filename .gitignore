@@ -30,3 +30,5 @@ selenium-debug.log
 *.ntvs*
 *.njsproj
 *.sln
+
+webpack-stats.json
