@@ -53,7 +53,7 @@ export default {
 }
 
 if(!window.socket){
-  window.socket = new WebSocket("ws://"+(location.hostname + ":" + "8000")+"/jong/room/nyan");
+  window.socket = new WebSocket("ws://"+(location.host)+"/jong/room/nyan");
 }
  
 socket.onmessage = function(e) {
