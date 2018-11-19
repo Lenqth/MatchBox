@@ -51,7 +51,7 @@ class Player:
                         "exposed_tiles": [ [ Mentu(x.type,x.head) for x in p.exposed ] for p in game.players ],
                         "robbed_tile":False,
                         "konged_tile":False,
-                     } 
+                     }
         res = ChineseScore.judge( self.hand+[tile] ,self.exposed,env=env,agari_tile=tile)
         self.agari_infos = res
         return (res is not None)
@@ -139,7 +139,9 @@ class Player:
         return res
 
     async def subturn_async(self,game,tile,apkong): # opponent's turn Claim
+        print("BEFORE CHECK CLAIM : %d " % self.id )
         comm = self.chk_claim(game,tile,apkong)
+        print("AFTER CHECK CLAIM : %d " % self.id )
         if len(comm) > 0:
             res = await self.agent.command_async(self,game,comm)
             return res

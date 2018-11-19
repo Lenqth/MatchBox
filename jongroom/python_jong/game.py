@@ -196,7 +196,7 @@ class Game:
                 return tuple(score_li)
             # print(tile)
             self.target_tile = tile
-
+            print("DEBUG:BEFORE SUBTURN")
             subturn_tasks = [ None for i in range(4) ]
             for i in range(1,4): # 鳴き
                 pi = ( self.turn + i ) % 4

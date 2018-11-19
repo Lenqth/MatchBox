@@ -52,7 +52,7 @@ def _colorwise_mentsu(ary,is_number=True):
             _colorwise_mentsu_internal(k,dat)
             mc[k] -= 1
             left[k:k+3] += 1
-            
+
         _colorwise_mentsu_internal(k+1,dat)
 
     defdat = np.zeros( (3,16) ,dtype=np.int16)

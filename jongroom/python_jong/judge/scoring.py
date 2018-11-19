@@ -135,7 +135,7 @@ class ChineseScore:
                     if part.contains(agari_tile) :
                         part.agari_tile = agari_tile
                         old_type = part.type
-                        if not self.env["tsumo"] :
+                        if not env["tsumo"] :
                             part.type = part.get_melded_type()
                         mentu = list(exposed) + list(parts)
                         res.append( cls.list_yaku(ag["type"],all_tiles,mentu,env) )
@@ -147,7 +147,7 @@ class ChineseScore:
                     if part.contains(agari_tile) :
                         part.agari_tile = agari_tile
                         old_type = part.type
-                        if not self.env["tsumo"] :
+                        if not env["tsumo"] :
                             part.type = part.get_melded_type()
                         mentu = list(exposed) + list(parts)
                         res.append( cls.list_yaku(ag["type"],all_tiles,mentu,env) )
@@ -683,3 +683,4 @@ if __name__ == "__main__" :
     print( testyaku( "*SSS *777s *111m 888s H H!"  ) )
     print( testyaku( "*456p 1123478889p 1p!"  ) )
     print( testyaku( "123456m 34566s 45p 6p!"  ) )
+    print( testyaku( "22255m 345p 34s *GGG 2s!"  ) )
