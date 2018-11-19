@@ -16,6 +16,14 @@ class Mentu:
     ATAMA = 8
     __TYPENAMES__ = ["","chow","pong","minkong","conckong","apkong","concchow","concpung","atama"]
 
+    def get_melded_type(self):
+        if self.type == self.__class__.CONCCHOW :
+            return Mentu.CHOW
+        elif self.type == self.__class__.CONCPUNG :
+            return Mentu.PUNG
+        else:
+            return self.type
+
     def __init__(self,type,head,agari_tile=None):
         self.type = type
         self.head = head

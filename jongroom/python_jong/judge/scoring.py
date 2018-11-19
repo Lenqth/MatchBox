@@ -109,7 +109,7 @@ class ChineseScore:
             agari_tile = tiles[-1]
         agaris = is_agari(list_to_array(tiles),exposed_mentu=len(exposed))
         if agaris == None :
-            print(tiles,len(exposed))
+            #print(tiles,len(exposed))
             return None
         all_tiles = list(tiles)
         for ex in exposed :
@@ -134,16 +134,24 @@ class ChineseScore:
                 for part in parts:
                     if part.contains(agari_tile) :
                         part.agari_tile = agari_tile
+                        old_type = part.type
+                        if not self.env["tsumo"] :
+                            part.type = part.get_melded_type()
                         mentu = list(exposed) + list(parts)
                         res.append( cls.list_yaku(ag["type"],all_tiles,mentu,env) )
+                        part.type = old_type
                         part.agari_tile = None
             elif ag["type"] == "knitted_normal":
                 parts = Mentu.from_mentu_array( ag["data"] , atama=ag["atama"])
                 for part in parts:
                     if part.contains(agari_tile) :
                         part.agari_tile = agari_tile
+                        old_type = part.type
+                        if not self.env["tsumo"] :
+                            part.type = part.get_melded_type()
                         mentu = list(exposed) + list(parts)
                         res.append( cls.list_yaku(ag["type"],all_tiles,mentu,env) )
+                        part.type = old_type
                         part.agari_tile = None
             else:
                 res.append( cls.list_yaku(ag["type"],all_tiles,[],env) )
