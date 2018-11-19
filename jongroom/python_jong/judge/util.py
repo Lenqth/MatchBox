@@ -35,15 +35,15 @@ class Mentu:
         elif self.type == self.__class__.PUNG :
             return "PUNG( %d,%d,%d )" % (self.head,self.head,self.head)
         elif self.type == self.__class__.MINKONG :
-            return "MINKONG( %d,%d,%d,%d )" % (self.head,self.head,self.head)
+            return "MINKONG( %d,%d,%d,%d )" % (self.head,self.head,self.head,self.head)
         elif self.type == self.__class__.APKONG :
             return "APKONG( %d,%d,%d,%d )" % (self.head,self.head,self.head,self.head)
         elif self.type == self.__class__.CONCKONG :
             return "CONCKONG( %d,%d,%d,%d )" % (self.head,self.head,self.head,self.head)
         elif self.type == self.__class__.CONCCHOW :
-            return "CONCCHOW( %d,%d,%d,%d )" % (self.head,self.head+1,self.head+2)
+            return "CONCCHOW( %d,%d,%d )" % (self.head,self.head+1,self.head+2)
         elif self.type == self.__class__.CONCPUNG :
-            return "CONCPUNG( %d,%d,%d,%d )" % (self.head,self.head,self.head)
+            return "CONCPUNG( %d,%d,%d )" % (self.head,self.head,self.head)
         elif self.type == self.__class__.ATAMA :
             return "ATAMA( %d,%d )" % (self.head,self.head)
 
@@ -55,7 +55,7 @@ class Mentu:
         elif self.type == self.__class__.MINKONG or self.type == self.__class__.APKONG or self.type == self.__class__.CONCKONG :
             return (self.head,self.head,self.head,self.head)
         elif self.type == self.__class__.ATAMA :
-            return (self.head,self.head,self.head,self.head)
+            return (self.head,self.head)
 
     def contains(self,x):
         if self.type == self.__class__.CHOW or self.type == self.__class__.CONCCHOW :
@@ -130,6 +130,7 @@ class Mentu:
 
 
 YAOCHU = [1,9,16+1,16+9,32+1,32+9,49,50,51,52,53,54,55]
+YAOCHU_NUM = [1,9,16+1,16+9,32+1,32+9]
 
 MAIN_TILES = [1,2,3,4,5,6,7,8,9,
         17,18,19,20,21,22,23,24,25,

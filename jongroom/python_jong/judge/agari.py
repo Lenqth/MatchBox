@@ -74,19 +74,19 @@ def expect_mentu(ary,expect=4):
             continue
         if  ( m[0] == 2 ).any() :
             buff[:,0,:] = m[1:3];buff[:,1,:] = p[1:3];buff[:,2,:] = s[1:3];buff[:,3,:] = c[1:3]
-            atama = np.where( m[0] == 2 )[0]
+            atama = np.where( m[0] == 2 )[0][0]
             res.append( ( buff.copy() , atama ) )
         elif ( p[0] == 2 ).any() :
             buff[:,0,:] = m[1:3];buff[:,1,:] = p[1:3];buff[:,2,:] = s[1:3];buff[:,3,:] = c[1:3]
-            atama = np.where( p[0] == 2 )[0] + 16
+            atama = np.where( p[0] == 2 )[0][0] + 16
             res.append( ( buff.copy() , atama ) )
         elif ( s[0] == 2 ).any() :
             buff[:,0,:] = m[1:3];buff[:,1,:] = p[1:3];buff[:,2,:] = s[1:3];buff[:,3,:] = c[1:3]
-            atama = np.where( s[0] == 2 )[0] + 32
+            atama = np.where( s[0] == 2 )[0][0] + 32
             res.append( ( buff.copy() , atama ) )
         elif ( c[0] == 2 ).any() :
             buff[:,0,:] = m[1:3];buff[:,1,:] = p[1:3];buff[:,2,:] = s[1:3];buff[:,3,:] = c[1:3]
-            atama = np.where( c[0] == 2 )[0] + 48
+            atama = np.where( c[0] == 2 )[0][0] + 48
             res.append( ( buff.copy() , atama ) )
     if len(res) == 0:
         return None
@@ -226,4 +226,3 @@ if __name__ == "__main__":
     #print( expect_mentu(string_to_array("55678s455667p"),expect=3) )
     #pprint( is_agari( string_to_array("123123m345789s55p") )[0]["data"].shape )
     #unittest.main()
-    

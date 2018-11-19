@@ -126,7 +126,7 @@ class ChineseScore:
                 env["__noothermachi__"] = False
                 break
             __tmp_tiles[x] -= 1
-
+        env["agari_tile"] = agari_tile
         for ag in agaris:
             env["agari_form"] = ag["type"]
             if ag["type"] == "normal":
@@ -158,6 +158,7 @@ class ChineseScore:
         res.sort( key = lambda dat:dat[0] , reverse=True )
         return res[0]
 
+    chicken = Yaku( "Chicken Hand" , "無番和" , 8  )
     @classmethod
     def list_yaku(cls,type,tiles,mentu,env):
         obj = cls()
@@ -171,6 +172,7 @@ class ChineseScore:
         for x in mentu :
             if x.type == Mentu.ATAMA :
                 obj.atama = x.head
+                continue
             if x.is_concealed():
                 obj.conc_mentu.append(mentu)
             if x.is_chow() :
@@ -181,6 +183,7 @@ class ChineseScore:
                     obj.cpongs[x.get_color(),x.get_number()] += 1
         obj.tiles = tiles
         obj.env = env
+        obj.agari_tile = env["agari_tile"]
 
         result = []
         li = list( filter( lambda x: len(x)>0 and x[0]!="_" , dir(cls) ))
@@ -194,6 +197,8 @@ class ChineseScore:
                     result.extend(res)
                 else:
                     result.append(res)
+        if len(result) == 0:
+            result.append(ChineseScore.chicken)
         total = np.sum( list(map(lambda x:x.score,result)) )
         return (total,result)
 
@@ -225,16 +230,48 @@ class ChineseScore:
                     return None
 
     pong_t_or_h      = Yaku( "Pong Of Terminals/Honors" , "么九刻" , 1  )
+    @yakuroutine
+    def f_pong_t_or_h(self):
+        c = np.sum( self.pongs[0:3,[1,9]] ) +  np.sum( self.pongs[3,1:5] )
+        pw = safe_get(self.env,"prevalent_wind",-1)
+        sw = safe_get(self.env,"seat_wind",-1)
+        chpongs = self.pongs[3,1:]
+        if chpongs[pw] > 0 :
+            c-=1
+        if chpongs[sw] > 0 :
+            c-=1
+        for i in range(c):
+            yield ChineseScore.pong_t_or_h
 
     outside          = Yaku( "Outside Hand" , "全帯么" , 4  )
     all_fives        = Yaku( "All Fives" , "全帯五" , 16  )
+    @yakuroutine
+    def f_have(self):
+        if self.type != "normal" :
+            return None
+        yaoset = set( list(YAOCHU) )
+        fiveset = set([5,16+5,32+5])
+        f5,fy = True,True
+        for x in self.mentu:
+            t = set( x.get_tiles() )
+            if len( t & yaoset ) == 0 :
+                fy = False
+            if len( t & fiveset ) == 0:
+                f5 = False
+        if f5 :
+            return ChineseScore.all_fives
+        if fy :
+            return ChineseScore.outside
+
+
+
 
     onevoid          = Yaku( "One Voided Suit" , "缺一門" , 1  )
     halfflush        = Yaku( "Half Flush" , "混一色" , 6  )
     fullflush        = Yaku( "Full Flush" , "清一色" , 24  )
     alltypes         = Yaku( "All Types" , "五門斉" , 6  )
     @yakuroutine
-    def types(self):
+    def f_types(self):
         typelist = np.zeros(5,dtype=np.bool)
         for t in self.tiles:
             s = id2suit(t)
@@ -255,16 +292,32 @@ class ChineseScore:
 
 
     four             = Yaku( "Tile Hog" , "四帰一" , 2  )
+    @yakuroutine
+    def f_four(self):
+        fq = list_to_array(self.tiles)
+        kongs = list( map( lambda x:x.head , filter( lambda x:x.is_kong(), self.mentu ) ) )
+        fours = ( fq >= 4 )
+        fours[kongs] = False
+        for i in range(np.sum(fours)):
+            yield ChineseScore.four
+
 
     allevenpong      = Yaku( "All Even Pongs" , "全双刻" ,     24  )
 
-    allchow = Yaku("All Chows","平和",2)
+
 
     knit = Yaku( "Lesser Honors And Knitted Tiles" , "全不靠" , 12  )
     knit7 = Yaku( "Greater Honors And Knitted Tiles" , "七星不靠" , 24  )
+    @yakuroutine
+    def f_knit(self):
+        if self.type == "knitted" :
+            fq = list_to_array(self.tiles)
+            if fq[49:49+7] == 1 :
+                return knit7
+            else:
+                return knit
 
     ninegates = Yaku( "Nine Gates" , "九蓮宝燈" , 88  )
-
     @yakuroutine
     def f_nine_gates(self):
         if len(self.conc_mentu)==0 :
@@ -296,6 +349,16 @@ class ChineseScore:
     sevenpairs  = Yaku( "Seven Pairs" , "七対" , 24  )
     sevenpairsh = Yaku( "Seven Shifted Pairs" , "連七対" , 88  )
 
+    @yakuroutine
+    def f_sevenpairs(self):
+        if self.type == "7pairs" :
+            fq = list_to_array(self.tiles)
+            ini = [1,2,3,17,18,19,33,34,35]
+            for x in ini:
+                if np.all( fq[ini:ini+7] == 2 ) :
+                    return ChineseScore.sevenpairsh
+            return Chin.sevenpairs
+
 
 
     lasttile = Yaku( "Last Tile" , "和絶張" , 4  )
@@ -306,6 +369,13 @@ class ChineseScore:
 
     @yakuroutine
     def state_yaku(self):
+        open_tiles = []
+        open_tiles.extend( safe_get(self.env,"discarded_tiles",[]) )
+        open_tiles.extend( safe_get(self.env,"exposed_tiles",[]) )
+        open_tiles = np.array(open_tiles)
+        if np.sum( open_tiles == self.agari_tile ) >= 3 :
+            yield ChineseScore.lasttile
+
         if safe_get(self.env,"lefttile",-1) == 0:
             if safe_get(self.env,"tsumo",False) :
                 yield ChineseScore.lastdraw
@@ -315,9 +385,6 @@ class ChineseScore:
             yield ChineseScore.repltile
         if safe_get(self.env,"robbed_tile",False) :
             yield ChineseScore.robkong
-
-    chicken = Yaku( "Chicken Hand" , "無番和" , 8  )
-
 
 
     purest = Yaku("Pure Straight","清龍",16)
@@ -385,15 +452,17 @@ class ChineseScore:
     menzentsumo      = Yaku( "Fully Concealed" , "不求人" ,  4  )
     allmeld          = Yaku( "Melded Hand" , "全求人" ,  6  )
     @yakuroutine
-    def melds(self):
-        meldcnt = len(list(filter(lambda x:not x.is_concealed() , self.mentu )))
+    def f_melds(self):
+        melded_m = list(filter(lambda x:(not x.is_concealed() and x.agari_tile == None ) and not x.type==Mentu.ATAMA , self.mentu ))
+        meldcnt = len(melded_m)
+        meldcnt2 = len(list(filter(lambda x:not x.is_concealed() and not x.type==Mentu.ATAMA and x.agari_tile == None , self.mentu )))
         if safe_get(self.env,"tsumo",False) :
             if meldcnt == 0:
                 return ChineseScore.menzentsumo
             else:
                 return ChineseScore.selfdrawn
         else:
-            if meldcnt == 4:
+            if meldcnt2 == 4:
                 return ChineseScore.allmeld
             elif meldcnt == 0:
                 return ChineseScore.menzen
@@ -404,10 +473,9 @@ class ChineseScore:
     pong2c = Yaku( "2 Concealed Pongs" , "双暗刻" , 2  )#
 
     @yakuroutine
-    def pongs(self):
+    def f_pongs(self):
         pongs = self.pongs
         cpongs = self.cpongs
-
         s = np.sum( cpongs )
         if np.sum(pongs) >= 4 :
             yield ChineseScore.allpong
@@ -422,7 +490,7 @@ class ChineseScore:
     step3p   = Yaku( "Three Shifted Chows" , "一色三歩高" , 16  )#
     step3mp  = Yaku( "Mixed Shifted Chows" , "三色三歩高" , 6  )#
     @yakuroutine
-    def steps(self):
+    def f_steps(self):
         chows = self.chows
         for c in range(3):
             for i in range(1,6):
@@ -503,7 +571,7 @@ class ChineseScore:
     dragon1  = Yaku("Dragon Pong","箭刻",2)
     @yakuroutine
     def winds_and_dragons(self):
-        chpongs = self.pongs[3]
+        chpongs = self.pongs[3,1:]
         pw = safe_get(self.env,"prevalent_wind",-1)
         sw = safe_get(self.env,"seat_wind",-1)
         atama = list(filter( lambda x:x.type == Mentu.ATAMA , self.mentu ))
@@ -567,6 +635,7 @@ class ChineseScore:
                 doubled = True
                 yield ChineseScore.six
 
+    allchow = Yaku("All Chows","平和",2)
     no_honor         = Yaku( "No Honor" , "無字" , 1  )
     all_simples      = Yaku( "All Simples" , "断么" ,  2  )
     upp4 = Yaku( "Upper Four" , "大于五" ,      12  )
@@ -586,7 +655,11 @@ class ChineseScore:
         if tileset.issubset( set( [ 2,3,4,5,6,7,8, 18,19,20,21,22,23,24 , 34,35,36,37,38,39,40 ] ) ) :
             yield ChineseScore.all_simples
         elif tileset.issubset( set( [ 1,2,3,4,5,6,7,8,9, 17,18,19,20,21,22,23,24,25 , 33,34,35,36,37,38,39,40,41 ] ) ) :
-            yield ChineseScore.no_honor
+            if np.sum(self.chows) == 4:
+                yield ChineseScore.allchow
+            else:
+                yield ChineseScore.no_honor
+
 
 
         if tileset.issubset( set( [ 4,5,6, 20,21,22 , 36,37,38 ] ) ) :
@@ -661,7 +734,7 @@ if __name__ == "__main__" :
     #print( string_to_list_ex("67m 123456789s 99p 5m!") )
     #print( string_to_list_ex("*456p *789m *567s 5678p 5p") )
     #print( string_to_list_ex("*SSS *777s *111m 888s H H!") )
-
+    """
     print( testyaku( "*678m *123s 44678s SS 4s!"  ) )
     print( testyaku( "6m 147s 28p ESWNRGH 9m!"  ) )
     print( testyaku( "*567m 55678s 45667p 5p"  ) )
@@ -684,3 +757,11 @@ if __name__ == "__main__" :
     print( testyaku( "*456p 1123478889p 1p!"  ) )
     print( testyaku( "123456m 34566s 45p 6p!"  ) )
     print( testyaku( "22255m 345p 34s *GGG 2s!"  ) )
+
+    print( testyaku( "*123s *567s 88s 55789p 5p"  ) )
+    """
+    print( testyaku( "*5555pk *111p *999s 3377m 3m"  ) )
+    print( testyaku( "*5555pc 111p 999s 3377m 3m!"  ) )
+    print( testyaku( "*5555pc 111p 999s 3377m 3m"  ) )
+    print( testyaku( "*5555pa *111p *999s *777m 3m 3m"  ) )
+    print( testyaku( "*5555pa *111p *999s 3377m 3m"  ) )

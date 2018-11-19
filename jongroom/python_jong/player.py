@@ -35,13 +35,15 @@ class Player:
         self.reset()
 
     def chk_agari(self,game,tile,tsumo):
+        discarded_tiles = np.hstack( [ filter(lambda x:not x.claimed ,p.trash) for p in game.players ] )
+        exposed_tiles = np.ravel( [ [ Mentu(x.type,x.head).get_tiles() for x in p.exposed ] for p in game.players ] , "C" )
         env = {
                         "prevalent_wind": game.prevalent_wind ,
                         "seat_wind": game.get_seat_wind(self.id),
                         "tsumo":tsumo ,
                         "deck_left":game.lefttile(),
-                        "discarded_tiles": [ p.trash for p in game.players ],
-                        "exposed_tiles": [ [ Mentu(x.type,x.head) for x in p.exposed ] for p in game.players ],
+                        "discarded_tiles": discarded_tiles ,
+                        "exposed_tiles": exposed_tiles ,
                         "robbed_tile":False,
                         "konged_tile":False,
                      }

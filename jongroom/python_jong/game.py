@@ -227,6 +227,7 @@ class Game:
                     self.players[command_player_id].exposed.append(ex)
                     self.turn = command_player_id
                     self.konged_tile = True
+                    tile.claimed = True
                     await self.send_expose(command_player_id,ex)
                 elif command[command_player_id].type == Claim.PUNG :
                     a,b = filter( lambda x:x>=0 , command[command_player_id].pos  )
@@ -236,6 +237,7 @@ class Game:
                     self.players[command_player_id].exposed.append(ex)
                     self.turn = command_player_id
                     self.skip_draw = True
+                    tile.claimed = True
                     await self.send_expose(command_player_id,ex)
                 elif command[command_player_id].type == Claim.CHOW :
                     a,b = filter( lambda x:x>=0 , command[command_player_id].pos  )
@@ -246,6 +248,7 @@ class Game:
                     self.players[command_player_id].exposed.append(ex)
                     self.turn = command_player_id
                     self.skip_draw = True
+                    tile.claimed = True
                     await self.send_expose(command_player_id,ex)
 
             if self.apkong :
