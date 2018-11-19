@@ -74,7 +74,7 @@ class Game:
         await Promise.all(t)
 
     def __init__(self):
-        self.timeout = 30
+        self.timeout = 300
         self.is_ready = False
         self.players = [ Player(self,i) for i in range(4)]
         for i,p in enumerate( self.players ):

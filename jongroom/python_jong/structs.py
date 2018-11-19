@@ -125,7 +125,7 @@ class Exposed:
         elif self.type == Exposed.PUNG :
             return (self.head,self.head,self.head)
         elif self.type == Exposed.MINKONG :
-            return (self.head,self.head,self.head)
+            return (self.head,self.head,self.head,self.head)
         elif self.type == Exposed.APKONG :
             return (self.head,self.head,self.head,self.head)
         elif self.type == Exposed.CONCKONG :
