@@ -15,17 +15,10 @@ from .judge.util import *
 
 import asyncio
 
-def to_mentu(hand_pattern,exposed):
+def to_mentu(exposed):
     res = []
     for x in exposed:
         res.append(Mentu(x.type,x.head))
-    for x in hand_pattern:
-        if len(x) == 2 :
-            res.append(Mentu(Mentu.ATAMA,x[0]))
-        elif x[0] != x[1]:
-            res.append(Mentu(Mentu.CONCCHOW,x[0]))
-        else:
-            res.append(Mentu(Mentu.CONCPUNG,x[0]))
     return res
 
 
@@ -52,7 +45,7 @@ class Player:
                         "robbed_tile":False,
                         "konged_tile":False,
                      }
-        res = ChineseScore.judge( self.hand+[tile] ,self.exposed,env=env,agari_tile=tile)
+        res = ChineseScore.judge( self.hand+[tile] ,to_mentu(self.exposed),env=env,agari_tile=tile)
         self.agari_infos = res
         return (res is not None)
 
@@ -139,9 +132,7 @@ class Player:
         return res
 
     async def subturn_async(self,game,tile,apkong): # opponent's turn Claim
-        print("BEFORE CHECK CLAIM : %d " % self.id )
         comm = self.chk_claim(game,tile,apkong)
-        print("AFTER CHECK CLAIM : %d " % self.id )
         if len(comm) > 0:
             res = await self.agent.command_async(self,game,comm)
             return res
