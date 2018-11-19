@@ -45,7 +45,6 @@ def _colorwise_mentsu(ary,is_number=True):
             _colorwise_mentsu_internal(k,dat)
             mp[k] -= 1
             left[k] += 3
-            f = False
 
         if is_number and (left[k:k+3] > 0).all():
             mc[k] += 1
@@ -53,9 +52,8 @@ def _colorwise_mentsu(ary,is_number=True):
             _colorwise_mentsu_internal(k,dat)
             mc[k] -= 1
             left[k:k+3] += 1
-            f = False
-        if f:
-            _colorwise_mentsu_internal(k+1,dat)
+            
+        _colorwise_mentsu_internal(k+1,dat)
 
     defdat = np.zeros( (3,16) ,dtype=np.int16)
     defdat[0,:] = ary
@@ -219,9 +217,13 @@ class TestAgari(unittest.TestCase):
         self.assertIsNotNone( is_agari( to_array(man="147",pin="28",sou="369",ji="1234567") ))
         self.assertIsNone( is_agari( string_to_array("147m3469p1258sSSG") ))
         self.assertIsNotNone( is_agari( string_to_array("123234345m67888p") ))
+        self.assertIsNotNone( is_agari( string_to_array("55678s45667p5p") , exposed_mentu = 1 ))
 
 if __name__ == "__main__":
 #    print( contain_knit(knithand) )
     from pprint import pprint
-    pprint( is_agari( string_to_array("123123m345789s55p") )[0]["data"].shape )
-    unittest.main()
+    #print( _colorwise_mentsu( [0, 0, 0, 0, 0, 2, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0] ) )
+    #print( expect_mentu(string_to_array("55678s455667p"),expect=3) )
+    #pprint( is_agari( string_to_array("123123m345789s55p") )[0]["data"].shape )
+    #unittest.main()
+    

@@ -13,6 +13,8 @@ import numpy as np
 import functools,itertools
 import collections
 
+YAKU_CHINESE = False
+
 class Yaku:
     def __init__(self,name,cname,score,override=[],bonus=False,multiple=False):
         self.name = name
@@ -22,7 +24,10 @@ class Yaku:
         self.bonus = bonus
         self.multiple = multiple
     def __repr__(self):
-        return "( {0} : {1} pts. )".format(self.chinese_name,self.score)
+        if YAKU_CHINESE :
+            return "( {0} : {1} pts. )".format(self.chinese_name,self.score)
+        else:
+            return "( {0} : {1} pts. )".format(self.name,self.score)
     def toJSON(self):
         return {"name":name,"chinese_name":chinese_name,"score":score}
 
@@ -103,6 +108,9 @@ class ChineseScore:
         if agari_tile == None :
             agari_tile = tiles[-1]
         agaris = is_agari(list_to_array(tiles),exposed_mentu=len(exposed))
+        if agaris == None :
+            print(tiles,len(exposed))
+            return None
         all_tiles = list(tiles)
         for ex in exposed :
             all_tiles.extend( ex.get_tiles() )
@@ -138,8 +146,9 @@ class ChineseScore:
                         res.append( cls.list_yaku(all_tiles,mentu,env) )
                         part.agari_tile = None
             else:
-                mentu = list(exposed) + list(parts)
                 res.append( cls.list_yaku(all_tiles,[],env) )
+        res.sort( key = lambda dat:dat[0] , reverse=True )
+        return res[0]
 
     @classmethod
     def list_yaku(cls,tiles,mentu,env):
@@ -147,13 +156,12 @@ class ChineseScore:
         obj.mentu = mentu
         obj.conc_mentu = []
         obj.atama = None
-        for m in mentu:
-            if m.type == Mentu.ATAMA :
-                obj.atama = m.head
         obj.chows = np.zeros( (4,16) , dtype = np.int16 )
         obj.pongs = np.zeros( (4,16) , dtype = np.int16 )
         obj.cpongs = np.zeros( (4,16) , dtype = np.int16 )
         for x in mentu :
+            if x.type == Mentu.ATAMA :
+                obj.atama = x.head
             if x.is_concealed():
                 obj.conc_mentu.append(mentu)
             if x.is_chow() :
@@ -245,13 +253,15 @@ class ChineseScore:
     @yakuroutine
     def termchows(self):
         atama = self.atama
-        if not ( id2suit <=2 and id2number(atama) == 5 ) :
+        if atama is None :
+            return None 
+        if not ( id2suit(atama) <=2 and id2number(atama) == 5 ) :
             return None
-        if np.all( chows[id2suit(atama),[1,9]] == 2 ) :
+        if np.all( self.chows[id2suit(atama),[1,9]] == 2 ) :
             return ChineseScore.termchowsp
         for c in range(3):
             if c == id2suit(atama) :
-                if np.all( chows[c,[1,9]] == 1 ):
+                if np.all( self.chows[c,[1,9]] == 1 ):
                     pass
                 else:
                     return None
@@ -295,7 +305,7 @@ class ChineseScore:
             elif self.env["agari_form"] == "knitted" and self.tiles :
                 return ChineseScore.knittedst
             return None
-        chows = self.chow
+        chows = self.chows
         pure = np.all( chows[:,[1,4,7]]>0 , axis=1).any()
         if pure :
             return ChineseScore.purest
@@ -322,13 +332,13 @@ class ChineseScore:
                 res.append(ChineseScore.kong2c)
             elif ckl >= 1:
                 res.append(ChineseScore.kong1c)
-            res.append(kong4)
+            res.append(ChineseScore.kong4)
         elif kl >= 3 :
             if ckl >= 2:
                 res.append(ChineseScore.kong2c)
             elif ckl >= 1:
                 res.append(ChineseScore.kong1c)
-            res.append(kong3)
+            res.append(ChineseScore.kong3)
         elif kl >= 2 :
             if ckl >= 2:
                 res.append(ChineseScore.kong2c)
@@ -470,7 +480,7 @@ class ChineseScore:
         chpongs = self.pongs[3]
         pw = safe_get(self.env,"prevalent_wind",-1)
         sw = safe_get(self.env,"seat_wind",-1)
-        atama = filter( lambda x:x.type == Mentu.ATAMA , self.mentu )
+        atama = list(filter( lambda x:x.type == Mentu.ATAMA , self.mentu ))
         if len(atama) > 0:
             atama = atama[0].head
         else:
@@ -548,35 +558,35 @@ class ChineseScore:
     def contain(self):
         tileset = set(self.tiles)
         if tileset.issubset( set( [ 2,3,4,5,6,7,8, 18,19,20,21,22,23,24 , 34,35,36,37,38,39,40 ] ) ) :
-            yield all_simples
+            yield ChineseScore.all_simples
         elif tileset.issubset( set( [ 1,2,3,4,5,6,7,8,9, 17,18,19,20,21,22,23,24,25 , 33,34,35,36,37,38,39,40,41 ] ) ) :
-            yield no_honor
+            yield ChineseScore.no_honor
 
 
         if tileset.issubset( set( [ 4,5,6, 20,21,22 , 36,37,38 ] ) ) :
-            yield mid3
+            yield ChineseScore.mid3
 
         if tileset.issubset( set( [ 1,2,3, 17,18,19 , 33,34,35 ] ) ) :
-            yield low3
+            yield ChineseScore.low3
         elif tileset.issubset( set( [ 1,2,3,4, 17,18,19,20 , 33,34,35,36 ] ) ) :
-            yield low4
+            yield ChineseScore.low4
 
         if tileset.issubset( set( [ 7,8,9, 23,24,25 , 39,40,41 ] ) ) :
-            yield upp3
+            yield ChineseScore.upp3
         elif tileset.issubset( set( [ 6,7,8,9, 22,23,24,25 , 38,39,40,41 ] ) ) :
-            yield upp4
+            yield ChineseScore.upp4
 
         if tileset.issubset( set( [ 34,35,36,38,40,54 ] ) ) :
-            yield allgreen
+            yield ChineseScore.allgreen
 
         if tileset.issubset( set( [ 49,50,51,52,53,54,55 ] ) ) :
-            yield allhonor
+            yield ChineseScore.allhonor
 
         if tileset.issubset( set( [ 1,9,16+1,16+9,32+1,32+9 ] ) ) :
-            yield allterm
+            yield ChineseScore.allterm
 
         if tileset.issubset( set( [ 1,9,16+1,16+9,32+1,32+9,49,50,51,52,53,54,55 ] ) ) :
-            yield all_t_or_h
+            yield ChineseScore.all_t_or_h
 
 
 
@@ -586,7 +596,7 @@ class ChineseScore:
 # print(len( sc.yaku ))
 # print( ",".join( map( lambda x: x.chinese_name , sc.yaku ) ) )
 
-def test(str):
+def testyaku(str):
     handtiles,exposed,tsumo = string_to_list_ex(str)
     env = {
         "prevalent_wind": -1 ,
@@ -596,7 +606,7 @@ def test(str):
         "discarded_tiles": [],
         "exposed_tiles": []
     }
-    ChineseScore.judge( handtiles,exposed,env )
+    return ChineseScore.judge( handtiles,exposed,env )
 
 """
             "prevalent_wind": game.prevalent_wind ,
@@ -625,4 +635,25 @@ if __name__ == "__main__" :
     #print( string_to_list_ex("67m 123456789s 99p 5m!") )
     #print( string_to_list_ex("*456p *789m *567s 5678p 5p") )
     #print( string_to_list_ex("*SSS *777s *111m 888s H H!") )
-    print( test( "*SSS *777s *111m 888s H H!"  ) )
+
+    print( testyaku( "*678m *123s 44678s SS 4s!"  ) )
+    print( testyaku( "6m 147s 28p ESWNRGH 9m!"  ) )
+    print( testyaku( "*567m 55678s 45667p 5p"  ) )
+    print( testyaku( "*222p *333p 11199m 13s 2s"  ) )
+    print( testyaku( "*123s *RRR 78s 123p WW 9s"  ) )
+    print( testyaku( "*123m *123s *444p 11m 22s 1m"  ) )
+    print( testyaku( "*678p *EEE *WWWWk 4456p 4p"  ) )
+    print( testyaku( "*RRR 23s 123789p HH 4s"  ) )
+    print( testyaku( "*567s 234s 2355789p 1p"  ) )
+    print( testyaku( "*789m *123s 78899s RR 7s"  ) )
+    print( testyaku( "*456m *234p *456s 2288m 8m!"  ) )
+    print( testyaku( "*NNN *999m 67m 44s 678p 8m"  ) )
+    print( testyaku( "*678p 234s 1134445p 1p!"  ) )
+    print( testyaku( "*456p *789m *567s 5678p 5p"  ) )
+    print( testyaku( "*HHH *123m *RRRRk 78m EE 6m!"  ) )
+    print( testyaku( "67m 123456789s 99p 5m!"  ) )
+    print( testyaku( "12345679m 567s 77p 8m!"  ) )
+    print( testyaku( "*HHH *345p 57m 11456s 6m!"  ) )
+    print( testyaku( "*SSS *777s *111m 888s H H!"  ) )
+    print( testyaku( "*456p 1123478889p 1p!"  ) )
+    print( testyaku( "123456m 34566s 45p 6p!"  ) )

@@ -93,13 +93,13 @@ class Mentu:
         return self.head
 
     def is_kong(self):
-        return self.type >= self.__class__.MINKONG or self.type == self.__class__.CONCKONG or self.type == self.__class__.APKONG
+        return self.type == self.__class__.MINKONG or self.type == self.__class__.CONCKONG or self.type == self.__class__.APKONG
 
     def is_pong(self):
-        return self.type >= self.__class__.PUNG or self.type == self.__class__.CONCPUNG
+        return self.type == self.__class__.PUNG or self.type == self.__class__.CONCPUNG
 
     def is_chow(self):
-        return self.type >= self.__class__.CHOW or self.type == self.__class__.CONCCHOW
+        return self.type == self.__class__.CHOW or self.type == self.__class__.CONCCHOW
 
     def is_pongorkong(self):
         return self.is_pong() or self.is_kong()
