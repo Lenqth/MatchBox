@@ -92,9 +92,9 @@ class Player:
             if ex.type == Exposed.PUNG :
                 for (p,t) in enumerate(self.hand) :
                     if t == ex.head :
-                        res.append( TurnCommand(TurnCommand.APKONG,p) )
+                        res.append( TurnCommand(TurnCommand.APKONG,[p] , ex ) )
                 if self.drew == ex.head :
-                    res.append( TurnCommand(TurnCommand.APKONG,-1) )
+                    res.append( TurnCommand(TurnCommand.APKONG,[-1] , ex ) )
 
         #conckong
         fq = np.bincount(self.hand,minlength=64)
@@ -155,7 +155,7 @@ class Player:
         import collections
         single = False
         if isinstance(position,collections.Iterable):
-            position_list = sorted(list(position))
+            position_list = sorted(list(position),reverse=True)
         else:
             single = True
             position_list = [position]

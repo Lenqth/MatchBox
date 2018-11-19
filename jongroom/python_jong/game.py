@@ -244,6 +244,9 @@ class Game:
                     self.turn = command_player_id
                     self.skip_draw = True
                     await self.send_expose(command_player_id,ex)
+            
+            if self.apkong :
+                turn_command.target.type = Exposed.APKONG                
 
             if turn_player.drew is not None :
                 turn_player.hand.append(turn_player.drew)

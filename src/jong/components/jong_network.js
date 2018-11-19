@@ -49,7 +49,7 @@ export class Deck{
     this.seat_wind = 0;
     this.yakulist = [];
     this.calculated_score = "";
-    this.meld_selection = {type:"",meld_selection:[]};
+    this.meld_selection = {type:"",tiles:[]};
 
     this.player_id = 0;
 
@@ -256,6 +256,7 @@ export function command(type){
     input_resolve(type,fil[0].pos);
     return;
   }else{
+    console.log("meld_sel");
     var selections = fil.map( x => x.pos );
     var tiles = selections.map( x => x.map( y => y >= 0 ? pl.hand[y] : ( y == -1 ? pl.drawed : deck.claim_target ) ) );
     deck.meld_selection.type = type ;
