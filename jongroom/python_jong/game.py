@@ -65,10 +65,12 @@ class Game:
         await Promise.all(t)
 
     async def send_agari(self,pid,tsumo,kousei,yaku):
+        print("send_agari")
         t = []
         for i in range(4):
             pl = self.players[i]
             t.append( await pl.agent.send( {"type":"agari","tsumo":tsumo,"kousei":kousei,"yaku":yaku,"pid":pid}) )
+            t.append( await pl.agent.send( {"type":"open_hand","hand":[{"hand":self.players[i].hand,"drew":self.players[i].drew} for i in range(4)]}) )
         await Promise.all(t)
 
     def __init__(self):
@@ -101,6 +103,7 @@ class Game:
             p.reset()
             for i in range(13):
                 p.hand.append(self.draw())
+        self.players[0].hand=[1,1,1,2,2,2,3,3,3,4,4,4,5]
         self.is_ready = True
         self.konged_tile = False
 
@@ -190,7 +193,8 @@ class Game:
                 score_li = [-8,-8,-8,-8]
                 score_li[self.turn] = 24
                 self.is_done = True
-                print("ツモ")
+                self.is_ready = False
+                await self.send_agari(self.turn,True,turn_player.agari_infos,turn_player.agari_infos)
                 return tuple(score_li)
             # print(tile)
             self.target_tile = tile
@@ -213,7 +217,8 @@ class Game:
                     score_li[command_player_id] = 24
                     self.is_done = True
                     self.is_ready = False
-                    print("ロン")
+                    agari_player = self.players[command_player_id]
+                    await self.send_agari(command_player_id,False,agari_player.agari_infos,agari_player.agari_infos)
                     return tuple(score_li)
                 elif command[command_player_id].type == Claim.MINKONG :
                     a,b,c = filter( lambda x:x>=0 , command[command_player_id].pos  )

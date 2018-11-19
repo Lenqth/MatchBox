@@ -29,7 +29,8 @@ export default {
 <style>
 .group-clickable:hover{
   background: orange;
-}.exposed-area{
+}
+.exposed-area{
 	display: flex;
 	flex-wrap: nowrap;
   margin-left: auto;
@@ -48,7 +49,6 @@ export default {
   border: 1px red dotted;
   display: flex;
 }
-
 
 .meld-select-box{
   border: solid 2px orange;

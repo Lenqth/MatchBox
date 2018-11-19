@@ -29,7 +29,7 @@ class Yaku:
         else:
             return "( {0} : {1} pts. )".format(self.name,self.score)
     def toJSON(self):
-        return {"name":name,"chinese_name":chinese_name,"score":score}
+        return {"name":self.name,"chinese_name":self.chinese_name,"score":self.score}
 
 class ScoreCalculation:
     def __init__(self,checker=None):

@@ -46,17 +46,21 @@ export default {
   beforeRouteEnter (route, redirect, next) {
     next( vm => {
       __vm = vm;
-      console.log( __vm );
-      console.log(arguments);
+      if(!window.socket){
+        new_socket();
+      }
     } );
   },
 }
-
-if(!window.socket){
-  window.socket = new WebSocket("ws://"+(location.hostname+":8000")+"/jong/room/nyan");
+function new_socket(){
+  var socket = window.socket = new WebSocket("ws://"+(location.hostname+":8000")+"/jong/room/nyan");
+  socket.onmessage = h_onmessage;
+  socket.onerror = h_onerror;
+  socket.onclose = h_onclose;
 }
+
  
-socket.onmessage = function(e) {
+function h_onmessage(e) {
   var o = JSON.parse(e.data);
   if("message" in o){
 //    utils.play_sound("../assets/puu79_a.wav");
@@ -102,9 +106,8 @@ socket.onmessage = function(e) {
     game_start(o.start);
   }
 }
-
-socket.onerror = function(e) {console.log("error:",e);}
-socket.onclose = function(e) {
+function h_onerror(e) {console.log("error:",e);}
+function h_onclose(e) {
   console.log("close:",e);
   writeln("connection closed. please reload later.");
   for(var x of document.getElementsByClassName("group-content") ){
@@ -118,9 +121,6 @@ function send_click(e){
   send(x);
   console.log(x);
 }
-socket.onopen = function() {
-}
-
 function game_start(arg){
   __vm.$router.push("/jong"); 
 }

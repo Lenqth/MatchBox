@@ -41,29 +41,24 @@ class Player:
         self.id = id
         self.reset()
 
-    def chk_agari(self,game,tile):
-        self.agari_tile = tile
-        res = is_agari( list_to_array(self.hand+[tile]),exposed_mentu=len(self.exposed) )
-        self.agari_tile = None
-        self.agari_patterns = res
-        return (res is not None)
-
-    def chk_value(self,game,tile,pattern):
-        sc = ScoreCalculation(ChineseScore)
-        total,yaku = sc.calc_score( to_mentu(pattern,self.exposed) , env = {
+    def chk_agari(self,game,tile,tsumo):
+        env = {
                         "prevalent_wind": game.prevalent_wind ,
                         "seat_wind": game.get_seat_wind(self.id),
                         "tsumo":tsumo ,
-                        "agari_tile":tile,
                         "deck_left":game.lefttile(),
                         "discarded_tiles": [ p.trash for p in game.players ],
-                        "exposed_tiles": [ [ Mentu(x.type,x.head) for x in p.exposed ] for p in game.players ]
-                     } )
-        return (total,yaku)
+                        "exposed_tiles": [ [ Mentu(x.type,x.head) for x in p.exposed ] for p in game.players ],
+                        "robbed_tile":False,
+                        "konged_tile":False,
+                     } 
+        res = ChineseScore.judge( self.hand+[tile] ,self.exposed,env=env,agari_tile=tile)
+        self.agari_infos = res
+        return (res is not None)
 
     def chk_claim(self,game,tile,apkong):
         res = []
-        if self.chk_agari( game , tile  ): #ロン
+        if self.chk_agari( game , tile , tsumo = False ): #ロン
             res.append( Claim(Claim.RON) )
         if apkong:
             return res
@@ -108,7 +103,7 @@ class Player:
                 res.append( TurnCommand(TurnCommand.CONCKONG, list(np.where(a == t)[0][0:3]) + [-1] ) )
 
         #tsumo
-        if self.drew != None and self.chk_agari( game , self.drew ):
+        if self.drew != None and self.chk_agari( game , self.drew , tsumo = True ):
             res.append( TurnCommand(TurnCommand.TSUMO) )
         return res
 

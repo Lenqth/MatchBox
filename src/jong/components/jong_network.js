@@ -50,6 +50,7 @@ export class Deck{
     this.yakulist = [];
     this.calculated_score = "";
     this.meld_selection = {type:"",tiles:[]};
+    this.result = null ; // { player : "" , score : 0 , yaku : [] };
 
     this.player_id = 0;
 
@@ -338,4 +339,9 @@ export function numtosrc(x){
   }else{ 
     return "";
   }
+}
+
+export function relative_player_format(you,target){
+  var a = ["あなた","下家","対面","上家"];
+  return a[(target-you)%4] ;
 }

@@ -21,6 +21,7 @@
     <p style="">計 : {{ calculated_score }}</p>
   </div>
 	<meld-selection v-bind:meld_selection="meld_selection"></meld-selection>
+	<result-dialog v-bind:result="result"></result-dialog>
 </div>
 
 </template>
@@ -35,6 +36,9 @@ function __img(x){ return '<img src="'+numtosrc(x)+'" >';}
 
 import PlayerArea from './components/player.vue'
 Vue.component('player-area',PlayerArea);
+
+import Result from './components/result.vue'
+Vue.component('result-dialog',Result);
 
 import meld_selection from './components/meld_selection.vue'
 Vue.component('meld-selection',meld_selection);
