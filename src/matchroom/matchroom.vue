@@ -53,7 +53,9 @@ export default {
   },
 }
 function new_socket(){
-  var socket = window.socket = new WebSocket("ws://"+(location.hostname+":8000")+"/jong/room/nyan");
+  var host = location.host;
+  if(location.port==8080){host=location.hostname+":8000";}
+  var socket = window.socket = new WebSocket("ws://"+(host)+"/jong/room/nyan");
   socket.onmessage = h_onmessage;
   socket.onerror = h_onerror;
   socket.onclose = h_onclose;
