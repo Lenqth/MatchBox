@@ -103,7 +103,7 @@ class Game:
             p.reset()
             for i in range(13):
                 p.hand.append(self.draw())
-        self.players[0].hand=[1,1,1,2,2,2,3,3,3,4,4,4,5]
+        #self.players[0].hand=[1,1,1,2,2,2,3,3,3,4,4,4,5]
         self.is_ready = True
         self.konged_tile = False
 
