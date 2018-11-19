@@ -1,13 +1,23 @@
 <template>
   <div v-if="result!=null" class="result-box">
     <div class="result-top">
-      {{result.player}} の {{ result.type }}
+      {{result.player}} の {{ result.tsumo ? "ツモ" : "ロン" }}
     </div>
     <div class="yaku-group">
-			役：
-      <div v-for="(item,index) in result.yaku">
-				{{item}}
-      </div>
+			<table class="yaku-table">
+				<thead class="yaku-thead">
+					<tr>
+						<td class="row-yaku"> 役 </td>
+						<td class="row-score"> 点 </td>
+					</tr>
+				</thead>
+				<tbody class="yaku-tbody">
+		      <tr v-for="(item,index) in result.yaku" :key="index">
+						<td>{{item.chinese_name}}</td>
+						<td>{{item.score}}</td>
+		      </tr>
+				</tbody>
+			</table>
     </div>
     <div class="score-box">
       計 {{result.score}} 点
@@ -26,7 +36,7 @@ export default {
     get_wind_name : get_wind_name
   },
 }
-  
+
 </script>
 <style>
 
@@ -47,7 +57,7 @@ export default {
 
 .result-top{
 	font-size:20px;
-	
+
 }
 
 .meld-select-enter-active{
@@ -67,7 +77,30 @@ export default {
 	position:absolute;
 	bottom : 40px;
 	right: 40px;
-	
+
 }
 
+.yaku-table{
+	width:80%;
+	margin: auto;
+}
+.yaku-thead{
+	background-color: pink;
+}
+.yaku-tbody{
+
+}
+.yaku-tbody>:nth-child(odd){
+	background-color: lightgreen;
+}
+.yaku-tbody>:nth-child(even){
+	background-color: lightblue;
+}
+
+.row-yaku{
+	width:60%;
+}
+.row-score{
+	width:20%;
+}
 </style>

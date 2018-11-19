@@ -141,6 +141,8 @@ class Game:
         self.is_done = False
         self.reward = (0,0,0,0)
         self.init()
+        for p in self.players:
+            p.hand.sort()
         self.skip_draw = False
         await Promise.all( [self.send_all_state(i) for i in range(4)] )
         while True:
@@ -186,10 +188,6 @@ class Game:
                 await self.send_expose(self.turn,ex)
                 continue
             elif turn_command.type == TurnCommand.TSUMO :
-                turn_player.hand.append(turn_player.drew)
-                sh = turn_player.shanten()
-                if ( sh >= 0 ):
-                    print("(TSUMO)shanten:{0} = {1} shanten?".format(list_to_string(turn_player.hand),sh))
                 score_li = [-8,-8,-8,-8]
                 score_li[self.turn] = 24
                 self.is_done = True
@@ -209,7 +207,7 @@ class Game:
 
             if command[command_player_id].type > 0 : # 鳴き/ロンがあった場合
                 if command[command_player_id].type == Claim.RON :
-                    self.players[command_player_id].hand.append(tile)
+                    self.players[command_player_id].drew = tile
                     sh = self.players[command_player_id].shanten()
                     if ( sh >= 0 ):
                         print("(RON)shanten:{0} = {1} shanten?".format(list_to_string(self.players[command_player_id].hand),sh))
@@ -249,9 +247,9 @@ class Game:
                     self.turn = command_player_id
                     self.skip_draw = True
                     await self.send_expose(command_player_id,ex)
-            
+
             if self.apkong :
-                turn_command.target.type = Exposed.APKONG                
+                turn_command.target.type = Exposed.APKONG
 
             if turn_player.drew is not None :
                 turn_player.hand.append(turn_player.drew)

@@ -75,6 +75,19 @@ Deck.prototype.start = async function(sock){
     if(res.type == "reset"){
       delete res["reset"];
       this.assign(res);
+    }if(res.type == "agari" ){
+      this.result = { player : "" , score : 0 , tsumo : false , yaku : [] };
+      this.result.player = relative_player_format(this.player_id,res.pid);
+      this.result.score = res.yaku[0] ;
+      this.result.yaku = res.yaku[1] ;
+      this.result.tsumo = res.tsumo ;
+    }if(res.type == "open_hand" ){
+      var hands = res.hand;
+      for(let i=0;i<4;i++){
+        let p = hands[i];
+        this.players[i].hand = p.hand;
+        this.players[i].drawed = p.drew;
+      }
     }if(res.type == "deck_left" ){
       this.deck_left = res.deck_left;
     }if(res.type == "claim_command" ){
@@ -99,8 +112,6 @@ Deck.prototype.start = async function(sock){
         this.conn.send(input_res);
       }
       this.players[tg_pl].target = null;
-    }else if( res.type == "agari" ){
-
     }else if( res.type == "expose" ){
       this.players[res.pid].exposed.push( res.obj );
     }else if( res.type == "apkong" ){
@@ -335,13 +346,13 @@ const images = importAll(require.context('../assets/', false, /\.(png|jpe?g|svg)
 
 export function numtosrc(x){
   if( x in Deck.numtosrc_table ){
-    return require("@/jong/assets/images30_22/" + Deck.numtosrc_table[x]+".png"); 
-  }else{ 
+    return require("@/jong/assets/images30_22/" + Deck.numtosrc_table[x]+".png");
+  }else{
     return "";
   }
 }
 
 export function relative_player_format(you,target){
   var a = ["あなた","下家","対面","上家"];
-  return a[(target-you)%4] ;
+  return a[(((target-you)%4)+4)%4] ;
 }

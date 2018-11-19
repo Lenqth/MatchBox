@@ -135,7 +135,7 @@ class ChineseScore:
                     if part.contains(agari_tile) :
                         part.agari_tile = agari_tile
                         mentu = list(exposed) + list(parts)
-                        res.append( cls.list_yaku(all_tiles,mentu,env) )
+                        res.append( cls.list_yaku(ag["type"],all_tiles,mentu,env) )
                         part.agari_tile = None
             elif ag["type"] == "knitted_normal":
                 parts = Mentu.from_mentu_array( ag["data"] , atama=ag["atama"])
@@ -143,16 +143,17 @@ class ChineseScore:
                     if part.contains(agari_tile) :
                         part.agari_tile = agari_tile
                         mentu = list(exposed) + list(parts)
-                        res.append( cls.list_yaku(all_tiles,mentu,env) )
+                        res.append( cls.list_yaku(ag["type"],all_tiles,mentu,env) )
                         part.agari_tile = None
             else:
-                res.append( cls.list_yaku(all_tiles,[],env) )
+                res.append( cls.list_yaku(ag["type"],all_tiles,[],env) )
         res.sort( key = lambda dat:dat[0] , reverse=True )
         return res[0]
 
     @classmethod
-    def list_yaku(cls,tiles,mentu,env):
+    def list_yaku(cls,type,tiles,mentu,env):
         obj = cls()
+        obj.type = type
         obj.mentu = mentu
         obj.conc_mentu = []
         obj.atama = None
@@ -185,7 +186,7 @@ class ChineseScore:
                     result.extend(res)
                 else:
                     result.append(res)
-        total = 0
+        total = np.sum( list(map(lambda x:x.score,result)) )
         return (total,result)
 
     flowerbonus      = Yaku( "Flower" , "花牌" , 1  )
@@ -226,7 +227,24 @@ class ChineseScore:
     alltypes         = Yaku( "All Types" , "五門斉" , 6  )
     @yakuroutine
     def types(self):
-        map(id2suit,self.tiles)
+        typelist = np.zeros(5,dtype=np.bool)
+        for t in self.tiles:
+            s = id2suit(t)
+            if s <= 2:
+                typelist[s] = True
+            elif id2number(s) <= 4:
+                typelist[3] = True
+            else:
+                typelist[4] = True
+        if ( typelist ).all() :
+            return ChineseScore.alltypes
+        elif sum( typelist ) == 1:
+            return ChineseScore.fullflush
+        elif sum( typelist[0:3] ) == 1:
+            return ChineseScore.halfflush
+        elif sum( typelist[0:3] ) <= 2 :
+            return ChineseScore.onevoid
+
 
     four             = Yaku( "Tile Hog" , "四帰一" , 2  )
 
@@ -254,7 +272,7 @@ class ChineseScore:
     def termchows(self):
         atama = self.atama
         if atama is None :
-            return None 
+            return None
         if not ( id2suit(atama) <=2 and id2number(atama) == 5 ) :
             return None
         if np.all( self.chows[id2suit(atama),[1,9]] == 2 ) :
@@ -457,7 +475,7 @@ class ChineseScore:
     chow3ms  = Yaku( "Mixed Triple Chow" , "三色三同順" , 8  )#
     @yakuroutine
     def samechow(self):
-        cnt = np.sum( self.chows > 0 )
+        cnt = np.sum( self.chows > 0 , axis = 0 )
         if ( cnt >= 4 ).any():
             return ChineseScore.chow4s
         if ( cnt >= 3 ).any():
