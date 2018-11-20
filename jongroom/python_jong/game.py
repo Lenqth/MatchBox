@@ -252,7 +252,11 @@ class Game:
                     await self.send_expose(command_player_id,ex)
 
             if self.apkong :
-                turn_command.target.type = Exposed.APKONG
+                for ex in turn_player.exposed:
+                    if ex.type == Exposed.PUNG :
+                        if tile == ex.head :
+                            ex.type = Exposed.APKONG
+                            break
 
             if turn_player.drew is not None :
                 turn_player.hand.append(turn_player.drew)
