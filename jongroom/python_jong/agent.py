@@ -86,7 +86,7 @@ class RemotePlayer:
             return TurnCommand(TurnCommand.DISCARD,-1)
 
     async def command_async(self,pl,game,commands):
-        obj = { "type": "claim_command" , "target":{"player":game.turn, "apkong":game.apkong , "tile" : game.target_tile } , "commands_available" : commands }
+        obj = { "type": "claim_command" , "hand_tiles":pl.hand , "target":{"player":game.turn, "apkong":game.apkong , "tile" : game.target_tile } , "commands_available" : commands }
         try:
             res = await self.conn.send_and_receive_reply( obj ,timeout=game.timeout)
             res = Claim.fromDict(res)

@@ -91,6 +91,8 @@ Deck.prototype.start = async function (sock) {
     } if (res.type == 'claim_command') {
       // {"commands_available": [{"type": 1, "pos": [[1], [2]]}], "_m_id": 7, "timeout": 1539616054.5650032}
       var tg_pl = res.target.player, tg_apkong = res.target.apkong, tg_tile = res.target.tile
+      this.players[this.player_id].hand = res.hand_tiles
+      this.players[this.player_id].drawed = null
       this.players[tg_pl].target = tg_apkong ? 'apkong' : 'trash'
       this.claim_target = tg_tile
 
