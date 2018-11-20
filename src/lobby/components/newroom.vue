@@ -2,8 +2,8 @@
   <div class="dialog-room">
     <h2>部屋の作成</h2>
     ゲーム:
-    <select name="type" class="selection">
-      <option v-for="(item,index) in game_type" value="item.id" :key="index" >{{item.name}}</option>
+    <select name="type" class="selection" v-model="game_type">
+      <option v-for="(item,index) in game_type_option" v-bind:value="item.id" :key="index" >{{item.name}}</option>
     </select>
     <div class="footer">
       <button v-on:click="closeThis()">CLOSE</button>
@@ -14,17 +14,26 @@
 import Vue from 'vue'
 import axios from 'axios'
 
+var option = [ {"id":"jong","name":"中国麻雀"} ]
 export default {
   props: {
     "game_type":{ 
-      default : () => [ {"id":"jong","name":"中国麻雀"} ] , 
+      default : () => option[0].id , 
+    },
+    "game_type_option":{ 
+      default : () => option , 
     },
   },
 
   methods: {
     closeThis () {
       this.$parent.dialogOpen = false
+    },
+    getConfig () {
+
+
     }
+
   }
 }
 
