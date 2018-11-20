@@ -20,6 +20,7 @@ from .views import *
 
 urlpatterns = [
     path('', WebPackIndex.as_view(), name='home') ,
+    path('config/<str:game_type>', Config.as_view(), name='config') ,
     #path('', RoomSelect.as_view(), name='home') ,
     #path('room', Room.as_view(), name='room') ,
     #path('jong', Jong.as_view(), name='jong') ,

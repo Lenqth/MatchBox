@@ -185,6 +185,7 @@ Deck.numtosrc_table =
 
 class Hand {
   constructor () {
+    this.score = 0;
     this.id = -1
     this.hand = []
     this.trash = []
@@ -212,6 +213,7 @@ class Hand {
     this.trash = obj.trash
     this.exposed = obj.exposed
     this.flower = obj.flower
+    this.score = obj.score
   }
   trash_tile (pos) {
     if (pos == -1) {

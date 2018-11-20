@@ -25,7 +25,7 @@ export default {
 .pullout-area{
   margin-right: auto;
   float: left;
-  width:20%;
+  flex-basis:10%;
   height:33px;
   border: 1px pink dotted;
 }

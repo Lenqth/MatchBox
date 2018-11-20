@@ -5,15 +5,13 @@ from channels.consumer import AsyncConsumer
 import json
 from pprint import pprint
 
-from .python_jong.game import *
-from .python_jong.player import *
-from .python_jong.agent import *
-
 from channels.layers import get_channel_layer
 channel_layer = get_channel_layer()
 
 import secrets,traceback
 import time
+import asyncio
+import numpy as np
 from promise import Promise
 
 
@@ -61,7 +59,7 @@ class GameConnection:
                     rem.append(f)
             except SkipHandler:
                 pass
-                
+
     async def send(self,obj):
         txt = json.dumps(obj,cls = myJSONEncoder)
         await self.conn.send(text_data=txt)

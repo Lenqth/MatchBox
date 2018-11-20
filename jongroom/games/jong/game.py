@@ -31,7 +31,7 @@ class Game:
         await Promise.all(t)
 
     async def send_all_state(self,pid):
-        pls = [ self.players[i].get_data(pid) for i in range(4) ]
+        pls = [ self.players[i].get_data(self,pid) for i in range(4) ]
         obj = {
             "type" : "reset",
             "deck_left" : self.lefttile(),
@@ -73,7 +73,8 @@ class Game:
             t.append( await pl.agent.send( {"type":"open_hand","hand":[{"hand":self.players[i].hand,"drew":self.players[i].drew} for i in range(4)]}) )
         await Promise.all(t)
 
-    def __init__(self):
+    def __init__(self,config):
+        self.total_score = np.zeros( 4 , np.int16 )
         self.timeout = 300
         self.is_ready = False
         self.players = [ Player(self,i) for i in range(4)]
@@ -82,6 +83,7 @@ class Game:
         self.is_done = False
         self._prevalent_wind = 0
         self._seat_wind_offset = 0
+        self.config = config
 
     def get_seat_wind(self,pid):
         return ( self._seat_wind_offset + pid ) % 4
@@ -119,27 +121,31 @@ class Game:
     def lefttile(self):
         return len(self.pile) - self.pilepos
 
-    def run(self):
-        print("run start")
-        res = self.go()
-        self.reward = res
-        print( "END: reward = ( {0:>3} , {1:>3} , {2:>3} , {3:>3} )".format(*res) , flush=True )
-        print("run end")
-
-    def run_forever(self):
-        while True:
-            res = self.go()
-            self.reward = res
-            self.shanten_end = [ self.players[i].shanten() for i in range(4) ]
+#    def run(self):
+#        print("run start")
+#        res = self.go()
+#        self.reward = res
+#        print( "END: reward = ( {0:>3} , {1:>3} , {2:>3} , {3:>3} )".format(*res) , flush=True )
+#        print("run end")
+#
+#    def run_forever(self):
+#        while True:
+#            res = self.go()
+#            self.reward = res
+#            self.shanten_end = [ self.players[i].shanten() for i in range(4) ]
 #            print( "{0:>3} , {1:>3} , {2:>3} , {3:>3} , {4:>3} , {5:>3} , {6:>3} , {7:>3}".format(*res , *self.shanten_end  ) , flush=True )
 
-    async def run_16_async(self):
-        await self.one_game()
-        return (0,0,0,0)
+    async def run(self):
+        self.total_score = np.zeros( 4 , np.int16 )
+        for i in self.config["iteration"]:
+            self._prevalent_wind = i // 4
+            self._seat_wind_offset = i % 4
+            res = await self.one_game()
+            self.total_score += res
+        return self.total_score
 
     async def one_game(self):
         self.is_done = False
-        self.reward = (0,0,0,0)
         self.init()
         for p in self.players:
             p.hand.sort()

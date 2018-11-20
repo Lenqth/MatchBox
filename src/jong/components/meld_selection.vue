@@ -30,13 +30,6 @@ export default {
 .group-clickable:hover{
   background: orange;
 }
-.exposed-area{
-	display: flex;
-	flex-wrap: nowrap;
-  margin-left: auto;
-  width:75%;
-  height:33px;
-}
 .tile{
 	flex-wrap: nowrap;
   margin:1px;

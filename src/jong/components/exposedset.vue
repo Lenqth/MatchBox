@@ -99,11 +99,5 @@ export default {
   height:33px;
   border: 1px pink dotted;
 }
-.exposed-area{
-	display: flex;
-	flex-wrap: nowrap;
-  margin-left: auto;
-  width:75%;
-  height:33px;
-}
+
 </style>

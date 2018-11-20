@@ -26,10 +26,13 @@
       </td>
       </tr>
     </table>
-    <pullout-tile v-bind:pullout="player.pullout"></pullout-tile>
-    <div class="exposed-area">
-        <exposed-set v-for="(grp,index) in player.exposed" v-bind:type="grp.type" v-bind:tiles="grp.tiles" v-bind:target="player.target=='apkong'"></exposed-set>
-    </div>
+		<div class="bottom-bar">
+			<pullout-tile v-bind:pullout="player.pullout"></pullout-tile>
+	    <div class="exposed-area">
+	        <exposed-set v-for="(grp,index) in player.exposed" v-bind:type="grp.type" v-bind:tiles="grp.tiles" v-bind:target="player.target=='apkong'"></exposed-set>
+	    </div>
+			<div class="score-area">{{player.score}}</div>
+		</div>
   </div>
 </template>
 <script>
@@ -100,6 +103,32 @@ export default {
 .border-discard-hand{
 	outline:1px orange solid;
 	animation: blinkborder 0.7s ease 0.4s infinite alternate;
+}
+
+
+.bottom-bar{
+	width:120%;
+	display: flex;
+	flex-wrap:nowrap;
+}
+.exposed-area{
+	display: flex;
+	flex-wrap: nowrap;
+  margin-left: auto;
+  flex-basis:75%;
+  height:33px;
+}
+.score-area{
+	margin-right: auto;
+	float: left;
+	line-height:33px;
+	flex-basis: calc(10%);
+	border: 1px blue dotted;
+	text-align: right;
+	vertical-align: middle;
+	padding-right: 5px;
+	font-size: 16px;
+
 }
 
 </style>

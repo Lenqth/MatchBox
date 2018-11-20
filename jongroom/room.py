@@ -5,9 +5,6 @@ from channels.consumer import AsyncConsumer
 import json
 from pprint import pprint
 
-from .python_jong.game import *
-from .python_jong.player import *
-from .python_jong.agent import *
 
 from channels.layers import get_channel_layer
 channel_layer = get_channel_layer()
@@ -17,6 +14,9 @@ import time
 
 from promise import Promise
 from .connection import GameConnection
+
+import sys,os
+
 
 class RoomException(Exception):
     pass
@@ -76,6 +76,7 @@ class Room:
     def __init__(self):
         roomsize = self.room_size
         self.name = secrets.token_hex(16)
+        self.config = { "game_type":"jong" }
         self.players = [ {"token":None , "connection" : None , "ready" : False } for i in range(roomsize) ]
         self.finalized = False
 
@@ -88,32 +89,20 @@ class Room:
 
 
     async def start(self):
+        import importlib
+        import os,sys
+        from .installed_games import INSTALLED_GAMES
+
         self.finalized = True
-        game = Game()
         active_users = list( filter( lambda x : x is not None , [ pl["connection"] for pl in self.players ]  ) )
         conns = list( map( lambda conn : GameConnection(conn) , active_users ) )
         self.conns = conns
-        for i in range(4):
-            game.players[i].agent = AITsumogiri()
-        game.players[0].agent = RemotePlayer( conns[0] )
-        if len(conns) >= 2:
-            game.players[2].agent = RemotePlayer( conns[1] )
-        if len(conns) >= 3:
-            game.players[1].agent = RemotePlayer( conns[2] )
-        if len(conns) >= 4:
-            game.players[3].agent = RemotePlayer( conns[3] )
-        
-        print("waiting standby ... ")
-        tasks = [ c.receive_any(timeout=60) for c in conns ]
-        tasks2 = [ c.send( { "start" : "1" } ) for c in conns ]
-        await Promise.all(tasks2)
-        await Promise.all(tasks)
-        print("waiting standby finished ")
 
-        try:
-            await game.one_game()
-        except Exception as e :
-            traceback.print_exc()
+        game = self.config["game_type"]
+        if game in INSTALLED_GAMES :
+            await importlib.import_module( ( ".games.%s.main" % game ) , package=__package__ ).main(conns,self)
+        else:
+            print("error")
         await self.destroy_room()
 
     async def destroy_room(self):

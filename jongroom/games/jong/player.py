@@ -109,21 +109,23 @@ class Player:
         self.drew = None
         self.flower = 0
 
-    def get_data(self,viewfrom):
+    def get_data(self,game,viewfrom):
         if viewfrom == self.id :
             return {
                 "hand" : self.hand,
                 "drew" : self.drew,
                 "trash" : self.trash ,
                 "exposed" : map(lambda x:x.toDict(),self.exposed) ,
-                "flower" : self.flower
+                "flower" : self.flower,
+                "score" : game.total_score[self.id]
             }
         else:
             return {
                 "hand" : to_back(self.hand),
                 "trash" : self.trash ,
                 "exposed" : map(lambda x:x.toDict(),self.exposed) ,
-                "flower" : self.flower
+                "flower" : self.flower,
+                "score" : game.total_score[self.id]
             }
 
     async def turn(self,game):

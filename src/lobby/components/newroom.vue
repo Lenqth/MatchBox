@@ -14,14 +14,16 @@
 import Vue from 'vue'
 import axios from 'axios'
 
+
+
 var option = [ {"id":"jong","name":"中国麻雀"} ]
 export default {
   props: {
-    "game_type":{ 
-      default : () => option[0].id , 
+    "game_type":{
+      default : () => option[0].id ,
     },
-    "game_type_option":{ 
-      default : () => option , 
+    "game_type_option":{
+      default : () => option ,
     },
   },
 
@@ -29,7 +31,10 @@ export default {
     closeThis () {
       this.$parent.dialogOpen = false
     },
-    getConfig () {
+    async getConfig (arg="") {
+      if (location.port == 8080) { host = location.hostname + ':8000' }
+      var response = await axios.get('http://'+host+'/jong/config/'+arg)
+      var result = JSON.parse( response.data )
 
 
     }
