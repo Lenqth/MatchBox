@@ -277,10 +277,11 @@ class ChineseScore:
             s = id2suit(t)
             if s <= 2:
                 typelist[s] = True
-            elif id2number(s) <= 4:
-                typelist[3] = True
             else:
-                typelist[4] = True
+                if id2number(t) <= 4:
+                    typelist[3] = True
+                else:
+                    typelist[4] = True
         if ( typelist ).all() :
             return ChineseScore.alltypes
         elif sum( typelist ) == 1:
@@ -540,7 +541,7 @@ class ChineseScore:
     pong2s = Yaku( "Double Pong" , "双同刻" , 2  )#
     @yakuroutine
     def samepong(self):
-        cnt = np.sum( self.pongs > 0 , axis = 0 )
+        cnt = np.sum( self.pongs[0:3] > 0 , axis = 0 )
         if ( cnt >= 3 ).any() :
             return ChineseScore.pong3s
         if ( cnt >= 2 ).any() :
@@ -766,4 +767,6 @@ if __name__ == "__main__" :
     #print( testyaku( "*5555pa *111p *999s *777m 3m 3m"  ) )
     #print( testyaku( "*5555pa *111p *999s 3377m 3m"  ) )
 
-    print( testyaku( "1122335566778m 8m!"  ) )
+    #print( testyaku( "1122335566778m 8m!"  ) )
+    print( testyaku( "*123s *123p *EEE 13sWW 2s" ) )
+    # print( testyaku( "*333s *678m 555p WWGG W" ) ) 7pts

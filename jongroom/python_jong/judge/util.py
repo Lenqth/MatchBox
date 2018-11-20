@@ -66,7 +66,7 @@ class Mentu:
     def machi(self): # machi type for 1 pts hands
         if self.agari_tile is None :
             return None
-        if self.type == self.__class__.CONCCHOW :
+        if self.type == self.__class__.CHOW :
             if self.agari_tile == self.head + 1 :
                 return "KANCHAN"
             elif self.agari_tile == self.head and id2number(self.head) == 7 :
@@ -74,11 +74,11 @@ class Mentu:
             elif self.agari_tile == self.head + 2 and id2number(self.head) == 1 :
                 return "PENCHAN"
             else:
-                return "OTHER"
+                return "OTHER1"
         elif self.type == self.__class__.ATAMA :
             return "TANKI"
         else:
-            return "OTHER"
+            return "OTHER2"
 
     @classmethod
     def from_mentu_array(cls,data,atama=None):
