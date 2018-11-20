@@ -355,9 +355,9 @@ class ChineseScore:
             fq = list_to_array(self.tiles)
             ini = [1,2,3,17,18,19,33,34,35]
             for x in ini:
-                if np.all( fq[ini:ini+7] == 2 ) :
+                if np.all( fq[x:x+7] == 2 ) :
                     return ChineseScore.sevenpairsh
-            return Chin.sevenpairs
+            return ChineseScore.sevenpairs
 
 
 
@@ -760,8 +760,10 @@ if __name__ == "__main__" :
 
     print( testyaku( "*123s *567s 88s 55789p 5p"  ) )
     """
-    print( testyaku( "*5555pk *111p *999s 3377m 3m"  ) )
-    print( testyaku( "*5555pc 111p 999s 3377m 3m!"  ) )
-    print( testyaku( "*5555pc 111p 999s 3377m 3m"  ) )
-    print( testyaku( "*5555pa *111p *999s *777m 3m 3m"  ) )
-    print( testyaku( "*5555pa *111p *999s 3377m 3m"  ) )
+    #print( testyaku( "*5555pk *111p *999s 3377m 3m"  ) )
+    #print( testyaku( "*5555pc 111p 999s 3377m 3m!"  ) )
+    #print( testyaku( "*5555pc 111p 999s 3377m 3m"  ) )
+    #print( testyaku( "*5555pa *111p *999s *777m 3m 3m"  ) )
+    #print( testyaku( "*5555pa *111p *999s 3377m 3m"  ) )
+
+    print( testyaku( "1122335566778m 8m!"  ) )
