@@ -26,15 +26,15 @@
 </template>
 <script>
 
-import Vue from 'vue';
-import {get_wind_name,numtosrc} from '../components/jong_network.js';
+import Vue from 'vue'
+import {get_wind_name, numtosrc} from '../components/jong_network.js'
 
 export default {
-  props : ["result"]  ,
-  methods:{
+  props: ['result'],
+  methods: {
     numtosrc,
-    get_wind_name : get_wind_name
-  },
+    get_wind_name: get_wind_name
+  }
 }
 
 </script>

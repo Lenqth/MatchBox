@@ -6,16 +6,16 @@
   </div>
 </template>
 <script>
-import Vue from 'vue';
+import Vue from 'vue'
 import spinningtarget from './target.vue'
-import {get_wind_name,numtosrc} from './jong_network.js';
-Vue.component('spinning-target',spinningtarget);
+import {get_wind_name, numtosrc} from './jong_network.js'
+Vue.component('spinning-target', spinningtarget)
 export default {
-  props : ["pullout","target"],
-  methods:{
+  props: ['pullout', 'target'],
+  methods: {
     numtosrc,
-    get_wind_name : get_wind_name
-  },
+    get_wind_name: get_wind_name
+  }
 }
 </script>
 <style>

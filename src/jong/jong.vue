@@ -27,42 +27,42 @@
 </template>
 
 <script>
-import Vue from 'vue';
-import {Deck,get_wind_name,numtosrc} from './components/jong_network.js';
-import * as utils from './components/utils.js' ;
-var deck = new Deck();
-
-function __img(x){ return '<img src="'+numtosrc(x)+'" >';}
+import Vue from 'vue'
+import {Deck, get_wind_name, numtosrc} from './components/jong_network.js'
+import * as utils from './components/utils.js'
 
 import PlayerArea from './components/player.vue'
-Vue.component('player-area',PlayerArea);
 
 import Result from './components/result.vue'
-Vue.component('result-dialog',Result);
 
 import meld_selection from './components/meld_selection.vue'
-Vue.component('meld-selection',meld_selection);
+var deck = new Deck()
 
-window.deck = deck;
+function __img (x) { return '<img src="' + numtosrc(x) + '" >' }
+Vue.component('player-area', PlayerArea)
+Vue.component('result-dialog', Result)
+Vue.component('meld-selection', meld_selection)
+
+window.deck = deck
 
 export default {
   name: 'Loader',
-  data(){
-    return deck;    
+  data () {
+    return deck
   },
-  methods:{
+  methods: {
     numtosrc,
-    get_wind_name : get_wind_name
+    get_wind_name: get_wind_name
   },
-	beforeRouteEnter (route, redirect, next) {
-		next( vm => {
-			if(window.socket==null){
-				vm.$router.push("/room");
-			}else{
-				deck.start(window.socket);
-			}
-		} );
-	},
+  beforeRouteEnter (route, redirect, next) {
+    next(vm => {
+      if (window.socket == null) {
+        vm.$router.push('/room')
+      } else {
+        deck.start(window.socket)
+      }
+    })
+  }
 }
 </script>
 
@@ -144,6 +144,5 @@ body{
   overflow: hidden;
   font-size: 13px;
 }
-
 
 </style>

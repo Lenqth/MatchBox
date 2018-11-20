@@ -13,18 +13,18 @@
 </template>
 <script>
 
-import Vue from 'vue';
-import {get_wind_name,numtosrc,click_meld_popup} from './jong_network.js';
+import Vue from 'vue'
+import {get_wind_name, numtosrc, click_meld_popup} from './jong_network.js'
 
 export default {
-  props : ["meld_selection"]  ,
-  methods:{
+  props: ['meld_selection'],
+  methods: {
     numtosrc,
-    get_wind_name : get_wind_name,
-    click_meld_popup:click_meld_popup
-  },
+    get_wind_name: get_wind_name,
+    click_meld_popup: click_meld_popup
+  }
 }
-  
+
 </script>
 <style>
 .group-clickable:hover{
@@ -76,6 +76,5 @@ export default {
   top: 500px !important;
   display:none;
 }
-
 
 </style>

@@ -1,4 +1,4 @@
-<template>  
+<template>
   <div>
     <trash-tile v-bind:trash="player.trash" v-bind:target="player.target=='trash'"></trash-tile>
     <div v-if="main" class="command-bar clearfix" style="width:100%;height:24px;">
@@ -33,28 +33,26 @@
   </div>
 </template>
 <script>
-import Vue from 'vue';
+import Vue from 'vue'
 import exposedset from './exposedset.vue'
-Vue.component('exposed-set',exposedset);
 import pullout from './pullout.vue'
-Vue.component('pullout-tile',pullout);
 import trashtile from './trashtile.vue'
-Vue.component('trash-tile',trashtile);
 import spinningtarget from './target.vue'
-Vue.component('spinning-target',spinningtarget);
 
-import {get_wind_name,numtosrc,tile_click,command,click_meld_popup} from './jong_network.js';
-
-
+import {get_wind_name, numtosrc, tile_click, command, click_meld_popup} from './jong_network.js'
+Vue.component('exposed-set', exposedset)
+Vue.component('pullout-tile', pullout)
+Vue.component('trash-tile', trashtile)
+Vue.component('spinning-target', spinningtarget)
 
 export default {
-  props : ["player","main"],
-  methods:{
+  props: ['player', 'main'],
+  methods: {
     numtosrc,
-    get_wind_name : get_wind_name,
+    get_wind_name: get_wind_name,
     tile_click,
-    command,
-  },
+    command
+  }
 }
 </script>
 <style>
@@ -103,6 +101,5 @@ export default {
 	outline:1px orange solid;
 	animation: blinkborder 0.7s ease 0.4s infinite alternate;
 }
-
 
 </style>

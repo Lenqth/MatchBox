@@ -7,7 +7,7 @@
   </div>
 </template>
 <script>
-import Vue from 'vue';
+import Vue from 'vue'
 export default {}
 </script>
 <style>
@@ -35,6 +35,5 @@ export default {}
   0% {transform: rotate(0deg);}
 	100% {transform: rotate(360deg);}
 }
-
 
 </style>

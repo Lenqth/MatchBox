@@ -1,18 +1,18 @@
 <template>
   <div id="player-list" class="col2">
     <div class="group-detail">
-      <div v-for=" (item,index) in player_slot" class="group-content" v-bind:class="{ joined : item.joined , ready : item.ready , 'group-content-you' : item.you }" v-on:click="item.you ? (item.ready=!item.ready,$emit('ready-changed')) : 0 ;" >
+      <div v-for=" (item,index) in player_slot" class="group-content" v-bind:class="{ joined : item.joined , ready : item.ready , 'group-content-you' : item.you }" v-on:click="item.you ? (item.ready=!item.ready,$emit('ready-changed')) : 0 ;"  :key="index" >
       </div>
     </div>
   </div>
 </template>
 <script>
-import Vue from 'vue';
+import Vue from 'vue'
 
 export default {
-  props : ["player_slot"] 
+  props: ['player_slot']
 }
-  
+
 </script>
 <style>
 
@@ -39,7 +39,6 @@ export default {
   border-style: solid;
   animation: blinkborder 0.7s ease 0.4s infinite alternate;
 }
-
 
 .group-content:nth-child(1).joined.ready{background-color: #ffcccc;}
 .group-content:nth-child(2).joined.ready{background-color: #ccccff;}

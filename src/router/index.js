@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import HelloWorld from '@/components/HelloWorld'
+import Lobby from '@/lobby/lobby'
 import Loader from '@/jong/jong'
 import MatchRoom from '@/matchroom/matchroom'
 
@@ -10,9 +10,9 @@ export default new Router({
   routes: [
     {
       path: '/',
-      name: 'HelloWorld',
-      component: HelloWorld
-    },    
+      name: 'Lobby',
+      component: Lobby
+    },
     {
       path: '/jong',
       name: 'JongLoader',

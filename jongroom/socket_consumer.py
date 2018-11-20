@@ -7,8 +7,6 @@ from pprint import pprint
 from .room import Room
 import asyncio
 
-group_cnt = 0
-
 class RoomListConsumer(AsyncWebsocketConsumer):
     async def connect(self):
         await self.accept()
@@ -31,16 +29,21 @@ class RoomListConsumer(AsyncWebsocketConsumer):
             data = json.loads(text_data)
         except:
             pass
+        await self.send_all_room()
+    
+    async def send_all_room(self):
         rooms = []
         for (k,v) in Room.rooms.items():
             rooms.append( {"room_id":k,"room_pop":v.room_population , "room_cap":v.room_size , "state":v.room_state } )
         await self.send(text_data=json.dumps({
             'rooms' : rooms ,
-        }))
+        }))        
 
     async def lobby_refresh(self, event):
-        await self.receive("")
-
+        await self.send_all_room()
+        
+        
+        
 class MainConsumer(AsyncWebsocketConsumer):
     async def connect(self):
         self.onreceive = []

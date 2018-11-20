@@ -30,22 +30,21 @@
   </div>
 </template>
 <script>
-import Vue from 'vue';
-import {get_wind_name,numtosrc} from './jong_network.js';
+import Vue from 'vue'
+import {get_wind_name, numtosrc} from './jong_network.js'
 import spinningtarget from './target.vue'
-Vue.component('spinning-target',spinningtarget);
+Vue.component('spinning-target', spinningtarget)
 
 export default {
-  props : {"tiles":{default: x=>[] },"type":{default:"chow"},"target":{default:false}},
-  methods:{
+  props: {'tiles': {default: x => [] }, 'type': {default: 'chow'}, 'target': {default: false}},
+  methods: {
     numtosrc,
-    get_wind_name : get_wind_name
-  },
+    get_wind_name: get_wind_name
+  }
 }
 
 </script>
 <style>
-
 
 .tile-yoko{
   display: block;
