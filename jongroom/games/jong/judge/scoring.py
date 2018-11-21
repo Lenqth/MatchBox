@@ -200,7 +200,8 @@ class ChineseScore:
         if len(result) == 0:
             result.append(ChineseScore.chicken)
         total = np.sum( list(map(lambda x:x.score,result)) )
-        return (total,result)
+        total2 = np.sum( list(map(lambda x:x.score if not x.bonus else 0,result)) )
+        return (total,result,total2)
 
     flowerbonus      = Yaku( "Flower" , "花牌" , 1  )
 

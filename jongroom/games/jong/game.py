@@ -210,6 +210,9 @@ class Game:
                 continue
             elif turn_command.type == TurnCommand.TSUMO :
                 score_li = [-8,-8,-8,-8]
+                score_li[:] -= turn_player.agari_infos[0]
+                score_li[command_player_id] = 24 + turn_player.agari_infos[0] * 3
+                score_li = [-8,-8,-8,-8]
                 score_li[self.turn] = 24
                 self.is_done = True
                 self.is_ready = False
@@ -229,14 +232,12 @@ class Game:
             if command[command_player_id].type > 0 : # 鳴き/ロンがあった場合
                 if command[command_player_id].type == Claim.RON :
                     self.players[command_player_id].drew = tile
-                    sh = self.players[command_player_id].shanten()
-                    if ( sh >= 0 ):
-                        print("(RON)shanten:{0} = {1} shanten?".format(list_to_string(self.players[command_player_id].hand),sh))
+                    agari_player = self.players[command_player_id]
                     score_li = [-8,-8,-8,-8]
-                    score_li[command_player_id] = 24
+                    score_li[self.turn] -= agari_player.agari_infos[0]
+                    score_li[command_player_id] = 24 + agari_player.agari_infos[0]
                     self.is_done = True
                     self.is_ready = False
-                    agari_player = self.players[command_player_id]
                     await self.send_agari(command_player_id,False,agari_player.agari_infos,agari_player.agari_infos)
                     return tuple(score_li)
                 elif command[command_player_id].type == Claim.MINKONG :
@@ -283,6 +284,7 @@ class Game:
                 turn_player.hand.append(turn_player.drew)
                 turn_player.drew = None
                 turn_player.hand.sort()
+            turn_player.agari_infos = None
 
             if command[command_player_id].type <= 0 and ( not self.apkong ) :
                 self.turn = ( self.turn + 1 ) % 4

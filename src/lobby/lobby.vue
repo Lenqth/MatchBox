@@ -45,15 +45,16 @@ export default {
       this.dialogOpen = !this.dialogOpen
     },
     autoMatch () {
-
+      this.$router.push("/room")
     }
   },
   beforeRouteEnter (route, redirect, next) {
     next(vm => {
       __vm = vm
-      if (!window.socket) {
-        new_socket(vm)
+      if (window.socket) {
+        window.socket.close()
       }
+      new_socket(vm)
     })
   }
 }

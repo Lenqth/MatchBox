@@ -17,13 +17,13 @@ from .connection import GameConnection
 
 import sys,os
 
-async def default_config(game):
+def default_config(game):
     import importlib
     import os,sys
     from .installed_games import INSTALLED_GAMES
 
     if game in INSTALLED_GAMES :
-        config = importlib.import_module( ( ".games.%s.main" % game ) , package=__package__ ).config(conns,self)
+        config = importlib.import_module( ( ".games.%s.main" % game ) , package=__package__ ).config()
 
     res = { "game_type": game }
     for (k,v) in config.items():
@@ -100,7 +100,9 @@ class Room:
             config = default_config("jong")
 
         self.config = config
-        roomsize = self.room_size
+        roomsize = 4
+        if "room_size" in config :
+            roomsize = self.room_size
         self.players = [ {"token":None , "connection" : None , "ready" : False } for i in range(roomsize) ]
         self.finalized = False
 
