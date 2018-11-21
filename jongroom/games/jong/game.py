@@ -212,8 +212,6 @@ class Game:
                 score_li = [-8,-8,-8,-8]
                 score_li[:] -= turn_player.agari_infos[0]
                 score_li[command_player_id] = 24 + turn_player.agari_infos[0] * 3
-                score_li = [-8,-8,-8,-8]
-                score_li[self.turn] = 24
                 self.is_done = True
                 self.is_ready = False
                 await self.send_agari(self.turn,True,turn_player.agari_infos,turn_player.agari_infos)
