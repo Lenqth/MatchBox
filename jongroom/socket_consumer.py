@@ -30,20 +30,21 @@ class RoomListConsumer(AsyncWebsocketConsumer):
         except:
             pass
         await self.send_all_room()
-    
+
     async def send_all_room(self):
         rooms = []
         for (k,v) in Room.rooms.items():
             rooms.append( {"room_id":k,"room_pop":v.room_population , "room_cap":v.room_size , "state":v.room_state } )
         await self.send(text_data=json.dumps({
             'rooms' : rooms ,
-        }))        
+        }))
 
     async def lobby_refresh(self, event):
         await self.send_all_room()
-        
-        
-        
+
+
+
+
 class MainConsumer(AsyncWebsocketConsumer):
     async def connect(self):
         self.onreceive = []
@@ -73,7 +74,6 @@ class MainConsumer(AsyncWebsocketConsumer):
     async def receive(self, text_data):
         self.loop.create_task( self.receive_async(text_data) )
 
-
     # Receive message from WebSocket
     async def receive_async(self, text_data):
         data = json.loads(text_data)
@@ -99,3 +99,22 @@ class MainConsumer(AsyncWebsocketConsumer):
         obj = event['obj']
         print(obj)
         await self.send(text_data=json.dumps(obj))
+
+class ConfiguredMainConsumer(MainConsumer):
+    async def connect(self):
+        self.onreceive = []
+        self.loop = asyncio.get_event_loop()
+        self.connect_configured = False
+        await self.accept()
+        print("waiting config...")
+
+
+    async def receive_async(self, text_data):
+        sup = super(ConfiguredMainConsumer,self)
+        if self.connect_configured:
+            return await sup.receive_async(text_data)
+        else:
+            config = json.loads(text_data)
+            result = await ( Room.new_room(config,self) )
+            self.connect_configured = True
+            print("configured!!")

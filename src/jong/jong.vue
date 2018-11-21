@@ -21,7 +21,7 @@
     <p style="">計 : {{ calculated_score }}</p>
   </div>
 	<meld-selection v-bind:meld_selection="meld_selection"></meld-selection>
-	<result-dialog v-bind:result="result"></result-dialog>
+	<result-dialog v-bind:result="result" v-on:ok="ok()"></result-dialog>
 </div>
 
 </template>
@@ -52,7 +52,10 @@ export default {
   },
   methods: {
     numtosrc,
-    get_wind_name: get_wind_name
+    get_wind_name: get_wind_name,
+		ok(){
+			deck.ok();
+		}
   },
   beforeRouteEnter (route, redirect, next) {
     next(vm => {

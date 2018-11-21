@@ -15,7 +15,7 @@
     </div>
     <table v-bind:class="{'border-discard-hand':player.allow_discard}">
       <tr>
-      <td v-for="(item,index) in player.hand">
+      <td v-for="(item,index) in player.hand" :key="index">
         <span v-on:click="tile_click(index);" >
             <img v-bind:src="numtosrc(item)" >
         </span>
@@ -29,7 +29,7 @@
 		<div class="bottom-bar">
 			<pullout-tile v-bind:pullout="player.pullout"></pullout-tile>
 	    <div class="exposed-area">
-	        <exposed-set v-for="(grp,index) in player.exposed" v-bind:type="grp.type" v-bind:tiles="grp.tiles" v-bind:target="player.target=='apkong'"></exposed-set>
+	        <exposed-set v-for="(grp,index) in player.exposed" v-bind:type="grp.type" v-bind:tiles="grp.tiles" v-bind:target="player.target=='apkong'" :key="index"></exposed-set>
 	    </div>
 			<div class="score-area">{{player.score}}</div>
 		</div>

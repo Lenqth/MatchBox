@@ -24,7 +24,7 @@ async def main(conns,room):
     await Promise.all(tasks)
 
     try:
-        await game.one_game()
+        await game.run()
     except Exception as e :
         traceback.print_exc()
         raise e
@@ -32,6 +32,8 @@ async def main(conns,room):
 
 def config():
     obj = {}
+    obj["room_size"] = { "display_name":"人数" , "default":2 , "value":[1,2,4]  }
     obj["iteration"] = { "display_name":"局数" , "default":4 , "value":[1,2,4,8,16]  }
+    obj["timeout"] = { "display_name":"制限時間" , "default":30 , "value":[15,30,60,300]  }
 
     return obj

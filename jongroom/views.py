@@ -16,9 +16,11 @@ class Config(View):
         game = kwargs["game_type"]
         if game in INSTALLED_GAMES :
             conf =  importlib.import_module( ( ".games.%s.main" % game ) , package=__package__ ).config()
+            res = HttpResponse( json.dumps(conf) )
         else:
-            return HttpResponse("error")
-        return HttpResponse( json.dumps(conf) )
+            res =  HttpResponse("error")
+        res["Access-Control-Allow-Origin"] = "*"
+        return res
 
 class Room(View):
     def get(self, request, *args, **kwargs):

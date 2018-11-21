@@ -46,16 +46,29 @@ export default {
   beforeRouteEnter (route, redirect, next) {
     next(vm => {
       __vm = vm
-      if (!window.socket) {
-        new_socket()
+      if (!isRoomSocket(window.socket)) {
+        set_event(new_socket())
+      }else{
+        set_event(window.socket)
       }
     })
   }
 }
-function new_socket () {
+function isRoomSocket(socket){
+  if(!socket) return false;
+  if(socket.url.indexOf("room") >= 0 ){
+    return true;
+  }
+  return false;
+}
+
+function new_socket() {
   var host = location.host
   if (location.port == 8080) { host = location.hostname + ':8000' }
-  var socket = window.socket = new WebSocket('ws://' + (host) + '/jong/room/nyan')
+  var socket = window.socket = new WebSocket('ws://' + (host) + '/jong/room/auto')
+  return socket
+}
+function set_event(socket){
   socket.onmessage = h_onmessage
   socket.onerror = h_onerror
   socket.onclose = h_onclose
@@ -69,7 +82,6 @@ function h_onmessage (e) {
     if (s1) { s1.play() };
     writeln(o.message)
   }
-  console.log(o)
   if ('roomsize' in o) {
     roominfo.player_slot = (new Array(o.roomsize).fill(0)).map(function () { return {'joined': false, 'ready': false, 'you': false, 'name': 'none'} })
   }

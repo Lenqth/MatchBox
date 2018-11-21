@@ -79,6 +79,11 @@ Deck.prototype.start = async function (sock) {
       this.result.score = res.yaku[0]
       this.result.yaku = res.yaku[1]
       this.result.tsumo = res.tsumo
+    } if (res.type == 'gameover') {
+      this.result = { player: '', score: 0, tsumo: false, yaku: [] }
+      this.result.player = -1
+      this.result.score = 0
+      this.result.yaku = []
     } if (res.type == 'open_hand') {
       var hands = res.hand
       for (let i = 0; i < 4; i++) {
@@ -123,6 +128,9 @@ Deck.prototype.start = async function (sock) {
           break
         }
       }
+    } else if (res.type == "confirm" ) {
+      await new Promise( (res,rej) => this.listener_ok = res )
+      this.result = null;
     } else if (res.type == 'discard') {
       utils.play_sound('clock04.wav')
       this.players[res.pid].trash.push(res.tile)
@@ -149,6 +157,13 @@ Deck.prototype.start = async function (sock) {
 
       // await turn_input(this.player_id);
     }
+  }
+}
+
+Deck.prototype.ok = function(){
+  if( this.listener_ok != null ){
+    this.listener_ok()
+    this.listener_ok = null;
   }
 }
 

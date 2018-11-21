@@ -1,7 +1,10 @@
 <template>
   <div v-if="result!=null" class="result-box">
-    <div class="result-top">
+    <div v-if="result.player != -1" class="result-top">
       {{result.player}} の {{ result.tsumo ? "ツモ" : "ロン" }}
+    </div>
+    <div v-else class="result-top">
+      流局
     </div>
     <div class="yaku-group">
 			<table class="yaku-table">
@@ -21,6 +24,7 @@
     </div>
     <div class="score-box">
       計 {{result.score}} 点
+			<button v-on:click="fire_ok()">OK</button>
     </div>
   </div>
 </template>
@@ -33,7 +37,10 @@ export default {
   props: ['result'],
   methods: {
     numtosrc,
-    get_wind_name: get_wind_name
+    get_wind_name: get_wind_name,
+		fire_ok(){
+			this.$emit("ok","");
+		}
   }
 }
 

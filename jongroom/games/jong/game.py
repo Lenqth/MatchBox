@@ -17,6 +17,11 @@ from .judge.util import *
 async def pure_async(x):
     return x
 
+def safe_get(dic,key,default=None):
+    if key in dic  :
+        return dic[key]
+    else:
+        return default
 
 class Game:
     async def send_deck_left(self):
@@ -73,9 +78,18 @@ class Game:
             t.append( await pl.agent.send( {"type":"open_hand","hand":[{"hand":self.players[i].hand,"drew":self.players[i].drew} for i in range(4)]}) )
         await Promise.all(t)
 
+    async def send_ryukyoku(self):
+        t = []
+        for i in range(4):
+            pl = self.players[i]
+            t.append( await pl.agent.send( {"type":"gameover"}) )
+            t.append( await pl.agent.send( {"type":"open_hand","hand":[{"hand":self.players[i].hand,"drew":self.players[i].drew} for i in range(4)]}) )
+        await Promise.all(t)
+
     def __init__(self,config):
+        self.config = config
         self.total_score = np.zeros( 4 , np.int16 )
-        self.timeout = 300
+        self.timeout = safe_get(config,"timeout",30)
         self.is_ready = False
         self.players = [ Player(self,i) for i in range(4)]
         for i,p in enumerate( self.players ):
@@ -83,7 +97,6 @@ class Game:
         self.is_done = False
         self._prevalent_wind = 0
         self._seat_wind_offset = 0
-        self.config = config
 
     def get_seat_wind(self,pid):
         return ( self._seat_wind_offset + pid ) % 4
@@ -137,11 +150,13 @@ class Game:
 
     async def run(self):
         self.total_score = np.zeros( 4 , np.int16 )
-        for i in self.config["iteration"]:
+        for i in range(self.config["iteration"]):
             self._prevalent_wind = i // 4
             self._seat_wind_offset = i % 4
             res = await self.one_game()
             self.total_score += res
+            confirm_tasks = [ p.agent.confirm("next") for p in self.players  ]
+            Promise.all(confirm_tasks)
         return self.total_score
 
     async def one_game(self):
@@ -158,7 +173,7 @@ class Game:
                 if tm == None:
                     self.is_done = True
                     self.is_ready = False
-                    print("流局")
+                    await self.send_ryukyoku()
                     return (0,0,0,0) #流局
                 self.players[self.turn].drew = tm
             self.skip_draw = False
