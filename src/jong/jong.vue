@@ -13,7 +13,7 @@
   <player-area id="hand0" v-bind:player="players[player_id]" main=1 class="player-field"></player-area>
   <div id="sideinfo">
     <table>
-      <tr v-for="(y,i) in yakulist">
+      <tr v-for="(y,i) in yakulist" :key="i">
         <td>{{ y.title }}</td>
         <td>{{ y.score }}</td>
       </tr>
