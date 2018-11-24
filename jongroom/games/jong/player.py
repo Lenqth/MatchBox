@@ -10,7 +10,7 @@ from .structs import *
 
 from .judge.agari import is_agari
 from .judge.shanten import shanten
-from .judge.scoring import ScoreCalculation,ChineseScore
+from .judge.scoring import ChineseScore
 from .judge.util import *
 
 import asyncio

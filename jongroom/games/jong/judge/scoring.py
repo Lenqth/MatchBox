@@ -680,100 +680,98 @@ class ChineseScore:
     kong1 = Yaku("Kong", "明槓", 1)
     selfdrawn = Yaku("Self Drawn", "自摸",  1)
     no_honor = Yaku("No Honor", "無字", 1)
-    chicken = Yaku("Chicken Hand", "無番和", 8)
-
-
-
-
-    outside = Yaku("Outside Hand", "全帯么", 4)
-    all_fives = Yaku("All Fives", "全帯五", 16, override=[])
-
-    halfflush = Yaku("Half Flush", "混一色", 6)
-    fullflush = Yaku("Full Flush", "清一色", 24)
-    alltypes = Yaku("All Types", "五門斉", 6)
 
     four = Yaku("Tile Hog", "四帰一", 2)
+    kong1c = Yaku("Concealed Kong", "暗槓", 2)
+    menzen = Yaku("Concealed Hand", "門前清",  2)
+    pong2c = Yaku("2 Concealed Pongs", "双暗刻", 2)
+    pong2s = Yaku("Double Pong", "双同刻", 2)
+    prev_wind = Yaku("Prevalent Wind", "圏風刻", 2)
+    seat_wind = Yaku("Seat Wind", "門風刻", 2)
+    dragon1 = Yaku("Dragon Pong", "箭刻", 2)
+    allchow = Yaku("All Chows", "平和", 2,override=[no_honor])
+    all_simples = Yaku("All Simples", "断么",  2, override=[no_honor])
 
-    knit = Yaku("Lesser Honors And Knitted Tiles", "全不靠", 12)
-    knit7 = Yaku("Greater Honors And Knitted Tiles", "七星不靠", 24)
-
-    ninegates = Yaku("Nine Gates", "九蓮宝燈", 88, override=[fullflush,pung_t_or_h,menzen])
-
-    termchowsp = Yaku("Pure Terminal Chows", "一色双龍会",
-                      64, override=[fullflush, twoterms])
-    termchowsm = Yaku("Three-Suited Terminal Chows",
-                      "三色双龍会", 16, override=[twoterms])
-
-    sevenpairs = Yaku("Seven Pairs", "七対", 24)
-    sevenpairsh = Yaku("Seven Shifted Pairs", "連七対", 88)
-
+    outside = Yaku("Outside Hand", "全帯么", 4)
     lasttile = Yaku("Last Tile", "和絶張", 4)
+    kong2 = Yaku("2 Kongs", "双明槓", 4)
+    menzentsumo = Yaku("Fully Concealed", "不求人",  4)
+   
+    halfflush = Yaku("Half Flush", "混一色", 6)
+    alltypes = Yaku("All Types", "五門斉", 6)
+    allmeld = Yaku("Melded Hand", "全求人",  6)
+    allpong = Yaku("All Pongs", "碰碰和", 6)
+    step3mp = Yaku("Mixed Shifted Chows", "三色三歩高", 6)
+    pong3msh = Yaku("Mixed Shifted Pongs", "三色三節高", 6)
+    dragon2 = Yaku("Two Dragons", "双箭刻", 6)
+
+    chicken = Yaku("Chicken Hand", "無番和", 8)
     lastdraw = Yaku("Last Tile Draw", "妙手回春", 8)
     lastclaim = Yaku("Last Tile Claim", "海底撈月", 8)
     repltile = Yaku("Out With Replacement Tile", "槓上開花", 8)
     robkong = Yaku("Robbing The Kongs", "搶槓和", 8)
-
-    purest = Yaku("Pure Straight", "清龍", 16,override=[six,twoterms])
-    knittedst = Yaku("Knitted Straight", "組合龍", 12)
     mixedst = Yaku("Mixed Straight", "花龍", 8)
-
-    kong4 = Yaku("4 Kongs", "四槓", 88)
-    kong3 = Yaku("3 Kongs", "三槓", 32)
     kong2c = Yaku("2 Concealed Kongs", "双暗槓", 8)
-    kong2 = Yaku("2 Kongs", "双明槓", 4)
-    kong1c = Yaku("Concealed Kong", "暗槓", 2)
-
-    menzen = Yaku("Concealed Hand", "門前清",  2)
-    menzentsumo = Yaku("Fully Concealed", "不求人",  4)
-    allmeld = Yaku("Melded Hand", "全求人",  6)
-
-    allpong = Yaku("All Pongs", "碰碰和", 6)
-    allevenpong = Yaku("All Even Pongs", "全双刻",     24)
-    pong4c = Yaku("4 Concealed Pongs", "四暗刻", 64)
-    pong3c = Yaku("3 Concealed Pongs", "三暗刻", 16)
-    pong2c = Yaku("2 Concealed Pongs", "双暗刻", 2)
-
-    step4p = Yaku("Four Shifted Chows", "一色四歩高", 32)
-    step3p = Yaku("Three Shifted Chows", "一色三歩高", 16)
-    step3mp = Yaku("Mixed Shifted Chows", "三色三歩高", 6)
-
-    pong4sh = Yaku("Four Pure Shifted Pongs", "一色四節高", 48)
-    pong3sh = Yaku("Triple Pure Shifted Pongs", "一色三節高", 24)
-    pong3msh = Yaku("Mixed Shifted Pongs", "三色三節高", 6)
-
-    pong3s = Yaku("Triple Pong", "三同刻", 16)
-    pong2s = Yaku("Double Pong", "双同刻", 2)
-
-    chow4s = Yaku("Quadruple Chow", "一色四同順", 48)
-    chow3s = Yaku("Pure Triple Chow", "一色三同順", 24)
     chow3ms = Yaku("Mixed Triple Chow", "三色三同順", 8)
+    allsymm = Yaku("Reversible Tiles", "推不倒", 8)
 
-    wind4 = Yaku("Big Four Kongs", "大四喜", 88)
-    wind4s = Yaku("Little Four Kongs", "小四喜", 64)
+
+
+    knittedst = Yaku("Knitted Straight", "組合龍", 12)
+    knit = Yaku("Lesser Honors And Knitted Tiles", "全不靠", 12)
     wind3 = Yaku("Three Winds", "三風刻", 12)
-    prev_wind = Yaku("Prevalent Wind", "圏風刻", 2)
-    seat_wind = Yaku("Seat Wind", "門風刻", 2)
-    dragon3 = Yaku("Big Three Dragons", "大三元", 88)
-    dragon3s = Yaku("Little Three Dragons", "小三元", 64)
-    dragon2 = Yaku("Two Dragons", "双箭刻", 6)
-    dragon1 = Yaku("Dragon Pong", "箭刻", 2)
-
-    allchow = Yaku("All Chows", "平和", 2,override=[no_honor])
-    all_simples = Yaku("All Simples", "断么",  2, override=[no_honor])
     upp4 = Yaku("Upper Four", "大于五",      12 ,override=[no_honor])
     low4 = Yaku("Lower Four", "小于五",     12,override=[no_honor])
+
+
+    all_fives = Yaku("All Fives", "全帯五", 16, override=[])
+    termchowsm = Yaku("Three-Suited Terminal Chows",
+                      "三色双龍会", 16, override=[twoterms])
+    purest = Yaku("Pure Straight", "清龍", 16,override=[six,twoterms])
+    pong3c = Yaku("3 Concealed Pongs", "三暗刻", 16)
+    step3p = Yaku("Three Shifted Chows", "一色三歩高", 16)
+    pong3s = Yaku("Triple Pong", "三同刻", 16)
+
+    fullflush = Yaku("Full Flush", "清一色", 24)
+    sevenpairs = Yaku("Seven Pairs", "七対", 24)
+    allevenpong = Yaku("All Even Pongs", "全双刻",     24)
+    pong3sh = Yaku("Triple Pure Shifted Pongs", "一色三節高", 24)
+    chow3s = Yaku("Pure Triple Chow", "一色三同順", 24)
+    knit7 = Yaku("Greater Honors And Knitted Tiles", "七星不靠", 24)
     upp3 = Yaku("All Upper Tiles",  "全大",   24,override=[no_honor])
     mid3 = Yaku("All Middle Tiles",  "全中",  24, 
                 override=[no_honor, all_simples])
     low3 = Yaku("All Lower Tiles", "全小", 24, override=[no_honor])
-    allgreen = Yaku("All Green", "緑一色", 88 , override=[halfflush])
-    allsymm = Yaku("Reversible Tiles", "推不倒", 8)
+
+
+    termchowsp = Yaku("Pure Terminal Chows", "一色双龍会",
+                      64, override=[fullflush, twoterms])
+
+
+    kong3 = Yaku("3 Kongs", "三槓", 32)
     all_t_or_h = Yaku("All Terminals/Honors", "混么九", 32,
                 override=[allpong, pong_t_or_h, outside])
+    step4p = Yaku("Four Shifted Chows", "一色四歩高", 32)
+
+
+    pong4sh = Yaku("Four Pure Shifted Pongs", "一色四節高", 48)
+    chow4s = Yaku("Quadruple Chow", "一色四同順", 48)
+
+
+    pong4c = Yaku("4 Concealed Pongs", "四暗刻", 64)
     allhonor = Yaku("All Honors", "字一色",        64,
                 override=[pong_t_or_h])
     allterm = Yaku("All Terminals", "清么九",     64, override=[all_t_or_h])
+    wind4s = Yaku("Little Four Kongs", "小四喜", 64)
+    dragon3s = Yaku("Little Three Dragons", "小三元", 64)
+
+    kong4 = Yaku("4 Kongs", "四槓", 88)
+    sevenpairsh = Yaku("Seven Shifted Pairs", "連七対", 88)
+    wind4 = Yaku("Big Four Kongs", "大四喜", 88)
+    dragon3 = Yaku("Big Three Dragons", "大三元", 88)
+    allgreen = Yaku("All Green", "緑一色", 88 , override=[halfflush])
     orphans13 = Yaku("Thirteen Orphans", "十三么", 88)
+    ninegates = Yaku("Nine Gates", "九蓮宝燈", 88, override=[fullflush,pong_t_or_h,menzen])
 
 
 

@@ -12,113 +12,99 @@
       </div>
     </div>
     <div v-if="dialogOpen" class="modal">
-      <div class="modal-mask">
-        <div class="modal-wrapper">
-          <newroom>
-          </newroom>
-        </div>
-      </div>
+      <newroom/>
     </div>
   </div>
 </template>
 <script>
-import Vue from 'vue'
+import Vue from "vue";
 
-import * as utils from './components/utils.js'
-import newroomDialog from './components/newroom.vue'
-Vue.component('newroom', newroomDialog)
+import * as utils from "./components/utils.js";
+import newroomDialog from "./components/newroom.vue";
+Vue.component("newroom", newroomDialog);
 
-var audio1 = document.getElementById('sound1')
+var audio1 = document.getElementById("sound1");
 
-var __vm = null
+var __vm = null;
 
 export default {
-  name: 'Lobby',
-  data () {
-    return {rlist: [], dialogOpen: false}
+  name: "Lobby",
+  data() {
+    return { rlist: [], dialogOpen: false };
   },
   methods: {
-    openModal () {
-      this.dialogOpen = true
+    openModal() {
+      this.dialogOpen = true;
     },
-    toggleModal () {
-      this.dialogOpen = !this.dialogOpen
+    toggleModal() {
+      this.dialogOpen = !this.dialogOpen;
     },
-    autoMatch () {
-      this.$router.push("/room")
+    autoMatch() {
+      this.$router.push("/room");
     }
   },
-  beforeRouteEnter (route, redirect, next) {
+  beforeRouteEnter(route, redirect, next) {
     next(vm => {
-      __vm = vm
+      __vm = vm;
       if (window.socket) {
-        window.socket.close()
+        window.socket.close();
       }
-      new_socket(vm)
-    })
+      new_socket(vm);
+    });
   }
-}
+};
 
-function new_socket (root) {
-  var host = location.host
-  if (location.port == 8080) { host = location.hostname + ':8000' }
-  var socket = window.socket = new WebSocket('ws://' + (host) + '/jong/lobby')
-  socket.onmessage = function (e) { var o = JSON.parse(e.data); console.log(o); root.rlist = o.rooms }
+function new_socket(root) {
+  var host = location.host;
+  if (location.port == 8080) {
+    host = location.hostname + ":8000";
+  }
+  var socket = (window.socket = new WebSocket("ws://" + host + "/jong/lobby"));
+  socket.onmessage = function(e) {
+    var o = JSON.parse(e.data);
+    console.log(o);
+    root.rlist = o.rooms;
+  };
 }
 </script>
 <style>
-
-.col1{
-  width:60%;
+.col1 {
+  width: 60%;
 }
-#output{
-  width:80%;
-  height:40%
-
+#output {
+  width: 80%;
+  height: 40%;
 }
 
-.room-container{
+.room-container {
   display: flex;
-  width:80%;
+  width: 80%;
   border: 1px lightcyan solid;
-  margin:10px;
-  border:2px black solid;
+  margin: 10px;
+  border: 2px black solid;
 }
 
-.room-item{
+.room-item {
   box-sizing: border-box;
-  flex-basis:50%;
-  flex-shrink:1;
+  flex-basis: 50%;
+  flex-shrink: 1;
 }
 
 @keyframes blinkborder {
-  0% {border-color: rgba(255,255,255,1);}
-  100% {border-color: rgba(255,255,255,0.2);}
+  0% {
+    border-color: rgba(255, 255, 255, 1);
+  }
+  100% {
+    border-color: rgba(255, 255, 255, 0.2);
+  }
 }
 
 .room-item:nth-child(2n) {
-  background-color: #eeeeee ;
+  background-color: #eeeeee;
   /*flex-basis: 100%;*/
 }
-.room-item:nth-child(2n+1) {
-  background-color: #ccccdd ;
+.room-item:nth-child(2n + 1) {
+  background-color: #ccccdd;
   /*flex-basis: 100%;*/
-}
-
-.modal-mask {
-  position: fixed;
-  z-index: 9998;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, .5);
-  display: table;
-  transition: opacity .3s ease;
-}
-
-.modal-wrapper {
-  display: table-cell;
-  vertical-align: middle;
 }
 </style>

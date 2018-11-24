@@ -19,8 +19,11 @@ from django.urls import path
 from .views import *
 
 urlpatterns = [
-    path('', WebPackIndex.as_view(), name='home') ,
-    path('config/<str:game_type>', Config.as_view(), name='config') ,
+    path('', WebPackIndex.as_view(), name='home'),
+    path('login', LoginAjax.as_view(), name='login_ajax'),
+    path('account', GetLoginStateAjax.as_view(), name='account_ajax'),
+    path('logout', LogoutAjax.as_view(), name='logout_ajax'),
+    path('config/<str:game_type>', Config.as_view(), name='config'),
     #path('', RoomSelect.as_view(), name='home') ,
     #path('room', Room.as_view(), name='room') ,
     #path('jong', Jong.as_view(), name='jong') ,
