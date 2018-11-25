@@ -311,7 +311,7 @@ class ChineseScore:
             if all( fq[49:49+7] == 1 ) :
                 return ChineseScore.knit7
             else:
-                return ChineseScore,knit
+                return ChineseScore.knit
     """
     ninegates = Yaku( "Nine Gates" , "九蓮宝燈" , 88 , override=[] )
     """
@@ -865,6 +865,8 @@ if __name__ == "__main__" :
     print( testyaku( "22255m 345p 34s *GGG 2s!"  ) )
 
     print( testyaku( "*123s *567s 88s 55789p 5p"  ) )
+
+    print( testyaku( "7m 258p 369s ESWNGR 1m!"  ) )
     
     #print( testyaku( "*5555pk *111p *999s 3377m 3m"  ) )
     #print( testyaku( "*5555pc 111p 999s 3377m 3m!"  ) )
