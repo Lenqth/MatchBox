@@ -6,7 +6,7 @@
           {{username}}
         </div>
         <div v-else>
-          not logined. <button v-on:click="loginModal=true">(login)</button>
+          ログインしていません <button v-on:click="loginModal=true">(login)</button>
         </div>
       </div>
     </div>
