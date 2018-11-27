@@ -21,7 +21,7 @@ import django.contrib.auth.views as auth_views
 
 urlpatterns = [
     path('superusers/', admin.site.urls),
-    path('jong/', include('jongroom.urls')),
+    path('jong/', include('matchbox.urls')),
     path('login/',auth_views.LoginView.as_view(
         template_name='accounts/login.html',
         extra_context={

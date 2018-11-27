@@ -11,8 +11,6 @@ migrations/
 build/
 !/build/
 
-jong_server/settings.py
-
 .DS_Store
 node_modules/
 /dist/

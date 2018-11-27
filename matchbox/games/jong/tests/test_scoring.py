@@ -1,10 +1,12 @@
 
 
-import unittest
-import agari
-from util import *
-from scoring import ChineseScore
 import sys,os
+sys.path.append( os.path.dirname( os.path.dirname(__file__) ) )
+
+import unittest
+from judge.agari import *
+from judge.util import *
+from judge.scoring import ChineseScore
 
 def testyaku(str) : 
     handtiles,exposed,tsumo = string_to_list_ex(str)
@@ -17,8 +19,7 @@ def testyaku(str) :
         "exposed_tiles": []
     }
     return ChineseScore.judge( handtiles,exposed,env )
-#testyaku("111m *NNN 444p 99p 77m 7m!")
-#sys.exit()
+
 
 class TestScore(unittest.TestCase):
 
@@ -43,9 +44,13 @@ class TestScore(unittest.TestCase):
         self.assertYaku( "111m *NNN 444p 99p 77m 7m!" , ["三暗刻","缺一門","自摸","么九刻","碰碰和"] )
         self.assertYaku( "111m *NNN 444p 99p 77m 7m" , ["双暗刻","缺一門","么九刻","碰碰和"] )
         self.assertYaku( "111m *NNN *444p 99p 77m 7m" , ["缺一門","么九刻","碰碰和"] )
+        self.assertYaku( "123m *234m *345m 77p GG 7p!" , ["一色三歩高", "缺一門","自摸"] )
 
     def test_007(self):
-        self.assertYaku( "123m *234m *345m 77p GG 7p!" , ["一色三歩高", "缺一門","自摸"] )
+        self.assertYaku( "1112345678999m 9m!" , ["九蓮宝燈","不求人","清龍","四帰一"] )
+        self.assertYaku( "1112345678999m 6m!" , ["九蓮宝燈","不求人"] )
+        self.assertYaku( "11123456788999m 6m" , ["不求人"] )
+        self.assertYaku( "*345m 1112678999m 9m" , ["清一色","么九刻"] )
 
     def test_misc(self):
         self.assertYaku( "*678m *123s 44678s SS 4s!"  ,[ "自摸","喜相逢","缺一門" ] )
@@ -74,6 +79,11 @@ class TestScore(unittest.TestCase):
         self.assertYaku( "7m 258p 369s ESWNGR 1m!"  ,[    ] )
                 
 
+        #print( testyaku( "*5555pk *111p *999s 3377m 3m"  ) )
+        #print( testyaku( "*5555pc 111p 999s 3377m 3m!"  ) )
+        #print( testyaku( "*5555pc 111p 999s 3377m 3m"  ) )
+        #print( testyaku( "*5555pa *111p *999s *777m 3m 3m"  ) )
+        #print( testyaku( "*5555pa *111p *999s 3377m 3m"  ) )
 
 if __name__ == "__main__":
     from pprint import pprint

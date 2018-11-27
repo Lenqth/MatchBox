@@ -157,7 +157,7 @@ class ChineseScore:
                 obj.atama = x.head
                 continue
             if x.is_concealed():
-                obj.conc_mentu.append(mentu)
+                obj.conc_mentu.append(x)
             if x.is_chow() :
                 obj.chows[x.get_color(),x.get_number()] += 1
             if x.is_pongorkong() :
@@ -305,11 +305,12 @@ class ChineseScore:
     """
     @yakuroutine
     def f_nine_gates(self):
-        if len(self.conc_mentu)==0 :
+        if len(self.conc_mentu)>=4 :
             suit = id2suit( self.tiles[0] )
-            if np.all( map(id2suit,self.tiles) == suit ):
-                 nums = map(id2number,self.tiles)
-                 if np.all( nums - [0,3,1,1,1,1,1,1,1,3] >= 0 ):
+            if np.all( np.fromiter(map(id2suit,self.tiles),dtype=np.int) == suit ):
+                 nums = np.bincount( np.fromiter(map(id2number,self.tiles),dtype=np.int) , minlength=10)
+                 nums[id2number(self.agari_tile)] -= 1
+                 if np.all( nums - [0,3,1,1,1,1,1,1,1,3] == 0 ):
                      return ChineseScore.ninegates
     """
     termchowsp = Yaku( "Pure Terminal Chows" , "一色双龍会" , 64  )
