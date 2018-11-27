@@ -23,10 +23,15 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = '******'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
+
 
 ALLOWED_HOSTS = ["***.***.***.***","localhost"]
 
+from os.path import dirname,abspath
+DJANGO_ROOT = dirname(abspath(__file__))
+PROJECT_ROOT = dirname(DJANGO_ROOT)
+STATIC_ROOT = os.path.join(PROJECT_ROOT, 'django_static')
 
 # Application definition
 
