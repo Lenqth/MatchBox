@@ -66,7 +66,7 @@ class Mentu:
     def machi(self): # machi type for 1 pts hands
         if self.agari_tile is None :
             return None
-        if self.type == self.__class__.CHOW :
+        if self.type == self.__class__.CHOW or self.type == self.__class__.CONCCHOW :
             if self.agari_tile == self.head + 1 :
                 return "KANCHAN"
             elif self.agari_tile == self.head and id2number(self.head) == 7 :
@@ -114,6 +114,11 @@ class Mentu:
 
     def is_conc_pongorkong(self):
         return ( self.is_pong() or self.is_kong() ) and self.is_concealed()
+
+    def is_fully_concealed_pong(self,tsumo):
+        if tsumo :
+            return self.is_conc_pongorkong()
+        return self.is_conc_pongorkong() and self.agari_tile == None
 
     def is_concealed(self):
         return self.type == self.__class__.CONCKONG or self.type == self.__class__.CONCCHOW or self.type == self.__class__.CONCPUNG

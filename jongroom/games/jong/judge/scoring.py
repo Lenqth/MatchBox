@@ -40,12 +40,7 @@ def topologicalSort(yakus):
             overrided |= set(y.override)
             res.append(y) 
     return res
-
-
-
-def calc_score(mentu,env):
-    pass
-
+    
 # CHINESE DEFAULT SET
 
 def safe_get(dic,key,default=None):
@@ -128,28 +123,21 @@ class ChineseScore:
                 for part in parts:
                     if part.contains(agari_tile) :
                         part.agari_tile = agari_tile
-                        old_type = part.type
-                        if not env["tsumo"] :
-                            part.type = part.get_melded_type()
                         mentu = list(exposed) + list(parts)
                         res.append( cls.list_yaku(ag["type"],all_tiles,mentu,env) )
-                        part.type = old_type
                         part.agari_tile = None
             elif ag["type"] == "knitted_normal":
                 parts = Mentu.from_mentu_array( ag["data"] , atama=ag["atama"])
                 for part in parts:
                     if part.contains(agari_tile) :
                         part.agari_tile = agari_tile
-                        old_type = part.type
-                        if not env["tsumo"] :
-                            part.type = part.get_melded_type()
                         mentu = list(exposed) + list(parts)
                         res.append( cls.list_yaku(ag["type"],all_tiles,mentu,env) )
-                        part.type = old_type
                         part.agari_tile = None
             else:
                 res.append( cls.list_yaku(ag["type"],all_tiles,[],env) )
         res.sort( key = lambda dat:dat[0] , reverse=True )
+        res[0][1].sort( key = lambda x:(x.score,x.chinese_name) , reverse = True )
         return res[0]
     """
     chicken = Yaku( "Chicken Hand" , "無番和" , 8  )
@@ -393,8 +381,9 @@ class ChineseScore:
         if self.env["agari_form"] != "normal":
             if self.env["agari_form"] == "knitted_normal":
                 return ChineseScore.knittedst
-            elif self.env["agari_form"] == "knitted" and self.tiles :
-                return ChineseScore.knittedst
+            elif self.env["agari_form"] == "knitted" :
+                if len(list(filter(lambda x:id2suit(x)<=2,self.tiles))) == 9:
+                    return ChineseScore.knittedst
             return None
         chows = self.chows
         pure = np.all( chows[:,[1,4,7]]>0 , axis=1).any()
@@ -418,31 +407,20 @@ class ChineseScore:
         kl = len(kongs)
         ckl = len(conckongs)
         res = []
+
+        if ckl >= 2:
+            res.append(ChineseScore.kong2c)
+        elif ckl >= 1:
+            res.append(ChineseScore.kong1c)
+
         if kl >= 4:
-            if ckl >= 2:
-                res.append(ChineseScore.kong2c)
-            elif ckl >= 1:
-                res.append(ChineseScore.kong1c)
             res.append(ChineseScore.kong4)
         elif kl >= 3 :
-            if ckl >= 2:
-                res.append(ChineseScore.kong2c)
-            elif ckl >= 1:
-                res.append(ChineseScore.kong1c)
             res.append(ChineseScore.kong3)
         elif kl >= 2 :
-            if ckl >= 2:
-                res.append(ChineseScore.kong2c)
-            elif ckl >= 1:
-                res.append(ChineseScore.kong2)
-                res.append(ChineseScore.kong1c)
-            else:
-                res.append(ChineseScore.kong2)
+            res.append(ChineseScore.kong2)       
         elif kl >= 1 :
-            if ckl >= 1:
-                res.append(ChineseScore.kong1c)
-            else:
-                res.append(ChineseScore.kong1)
+            res.append(ChineseScore.kong1)
         return res
     """
     menzen           = Yaku( "Concealed Hand" , "門前清" ,  2  )
@@ -475,20 +453,19 @@ class ChineseScore:
     @yakuroutine
     def f_pongs(self):
         pongs = self.pongs
-        cpongs = self.cpongs
-        s = np.sum( cpongs  ) 
+        ts = safe_get(self.env,"tsumo",False) 
+        s = sum( [ 1 if m.is_fully_concealed_pong(ts) else 0 for m in self.mentu] )
         if np.sum(pongs) >= 4 :
             if filter( lambda x:id2suit(x)<=2 and (id2number(x)&1)==0 , self.tiles ) == 14 :
                 yield ChineseScore.allevenpong
             else:
                 yield ChineseScore.allpong
-                
         if s >= 4:
-            return ChineseScore.pong4c
+            yield ChineseScore.pong4c
         elif s >= 3 :
-            return ChineseScore.pong3c
+            yield ChineseScore.pong3c
         elif s >= 2 :
-            return ChineseScore.pong2c
+            yield ChineseScore.pong2c
     """
     step4p   = Yaku( "Four Shifted Chows" , "一色四歩高" , 32  )#
     step3p   = Yaku( "Three Shifted Chows" , "一色三歩高" , 16  )#
@@ -801,17 +778,7 @@ override_transitive(ChineseScore)
 # print(len( sc.yaku ))
 # print( ",".join( map( lambda x: x.chinese_name , sc.yaku ) ) )
 
-def testyaku(str):
-    handtiles,exposed,tsumo = string_to_list_ex(str)
-    env = {
-        "prevalent_wind": -1 ,
-        "seat_wind": -1,
-        "tsumo":tsumo ,
-        "deck_left":11,
-        "discarded_tiles": [],
-        "exposed_tiles": []
-    }
-    return ChineseScore.judge( handtiles,exposed,env )
+
 
 """
             "prevalent_wind": game.prevalent_wind ,
@@ -824,15 +791,8 @@ def testyaku(str):
 """
 
 
-if __name__ == "__main__" :
-#    unittest.main()
-    import unittest
-    import agari
+#    
 
-    class TestScore(unittest.TestCase):
-        __sc__ = ChineseScore
-        def test(self):
-            pass
 
     #print(TestScore.__sc__.calc_score(getmentu("123m234p345sEEESS") ) )
     #print(TestScore.__sc__.calc_score(getmentu("123m456p123789sSS") ) )
@@ -840,33 +800,6 @@ if __name__ == "__main__" :
     #print( string_to_list_ex("67m 123456789s 99p 5m!") )
     #print( string_to_list_ex("*456p *789m *567s 5678p 5p") )
     #print( string_to_list_ex("*SSS *777s *111m 888s H H!") )
-    
-    print( testyaku( "*678m *123s 44678s SS 4s!"  ) )
-    print( testyaku( "6m 147s 28p ESWNRGH 9m!"  ) )
-    print( testyaku( "*567m 55678s 45667p 5p"  ) )
-    print( testyaku( "*222p *333p 11199m 13s 2s"  ) )
-    print( testyaku( "*123s *RRR 78s 123p WW 9s"  ) )
-    print( testyaku( "*123m *123s *444p 11m 22s 1m"  ) )
-    print( testyaku( "*678p *EEE *WWWWk 4456p 4p"  ) )
-    print( testyaku( "*RRR 23s 123789p HH 4s"  ) )
-    print( testyaku( "*567s 234s 2355789p 1p"  ) )
-    print( testyaku( "*789m *123s 78899s RR 7s"  ) )
-    print( testyaku( "*456m *234p *456s 2288m 8m!"  ) )
-    print( testyaku( "*NNN *999m 67m 44s 678p 8m"  ) )
-    print( testyaku( "*678p 234s 1134445p 1p!"  ) )
-    print( testyaku( "*456p *789m *567s 5678p 5p"  ) )
-    print( testyaku( "*HHH *123m *RRRRk 78m EE 6m!"  ) )
-    print( testyaku( "67m 123456789s 99p 5m!"  ) )
-    print( testyaku( "12345679m 567s 77p 8m!"  ) )
-    print( testyaku( "*HHH *345p 57m 11456s 6m!"  ) )
-    print( testyaku( "*SSS *777s *111m 888s H H!"  ) )
-    print( testyaku( "*456p 1123478889p 1p!"  ) )
-    print( testyaku( "123456m 34566s 45p 6p!"  ) )
-    print( testyaku( "22255m 345p 34s *GGG 2s!"  ) )
-
-    print( testyaku( "*123s *567s 88s 55789p 5p"  ) )
-
-    print( testyaku( "7m 258p 369s ESWNGR 1m!"  ) )
     
     #print( testyaku( "*5555pk *111p *999s 3377m 3m"  ) )
     #print( testyaku( "*5555pc 111p 999s 3377m 3m!"  ) )
