@@ -13,16 +13,15 @@ channel_layer = get_channel_layer()
 
 CROSSORIGIN = False
 
+
 class Config(View):
     def get(self, request, *args, **kwargs):
-        from .installed_games import INSTALLED_GAMES
-        import importlib
+        from .room import import_game
         game = kwargs["game_type"]
-        if game in INSTALLED_GAMES:
-            conf = importlib.import_module(
-                (".games.%s.main" % game), package=__package__).config()
+        try:
+            conf = import_game(game).config()
             res = HttpResponse(json.dumps(conf))
-        else:
+        except:
             res = HttpResponse("error")
         #res["Access-Control-Allow-Origin"] = "*" if CROSSORIGIN
         return res

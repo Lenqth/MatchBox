@@ -17,13 +17,18 @@ from .connection import GameConnection
 
 import sys,os
 
-def default_config(game):
+def import_game(game):
     import importlib
     import os,sys
     from .installed_games import INSTALLED_GAMES
-
     if game in INSTALLED_GAMES :
-        config = importlib.import_module( ( ".games.%s.main" % game ) , package=__package__ ).config()
+        try:
+            return importlib.import_module( ( ".games.%s.main" % game ) , package=__package__ )
+        except:
+            return importlib.import_module( ( "games.%s.main" % game ) , package=__package__ )
+
+def default_config(game):
+    config = import_game(game).config()
 
     res = { "game_type": game }
     for (k,v) in config.items():
@@ -124,11 +129,11 @@ class Room:
         conns = list( map( lambda conn : GameConnection(conn) , active_users ) )
         self.conns = conns
 
-        game = self.config["game_type"]
-        if game in INSTALLED_GAMES :
-            await importlib.import_module( ( ".games.%s.main" % game ) , package=__package__ ).main(conns,self)
-        else:
-            print("error")
+        game = self.config["game_type"]        
+        try:
+            await import_game(game).main(conns,self)
+        except:
+            pass
         await self.destroy_room()
 
     async def destroy_room(self):
