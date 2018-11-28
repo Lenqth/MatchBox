@@ -23,12 +23,12 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = '******'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+from os.path import dirname,abspath
 
+DEBUG = os.path.exists(os.path.join(dirname(abspath(__file__)),"./debug.log"))
 
 ALLOWED_HOSTS = ["***.***.***.***","localhost"]
 
-from os.path import dirname,abspath
 DJANGO_ROOT = dirname(dirname(abspath(__file__)))
 PROJECT_ROOT = DJANGO_ROOT
 STATIC_ROOT = os.path.join(PROJECT_ROOT, './django_static/')
