@@ -7,6 +7,7 @@ ignore/
 db.sqlite3
 migrations/
 /static/
+/django_static/
 
 build/
 !/build/

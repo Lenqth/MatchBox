@@ -130,6 +130,7 @@ Deck.prototype.start = async function (sock) {
       }
     } else if (res.type == "confirm" ) {
       await new Promise( (res,rej) => this.listener_ok = res )
+      this.conn.send( {"_m_id" : res._m_id} )
       this.result = null;
     } else if (res.type == 'discard') {
       utils.play_sound('clock04.wav')

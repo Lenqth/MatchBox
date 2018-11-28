@@ -23,15 +23,18 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = '******'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 
 ALLOWED_HOSTS = ["***.***.***.***","localhost"]
 
 from os.path import dirname,abspath
-DJANGO_ROOT = dirname(abspath(__file__))
-PROJECT_ROOT = dirname(DJANGO_ROOT)
-STATIC_ROOT = os.path.join(PROJECT_ROOT, 'django_static')
+DJANGO_ROOT = dirname(dirname(abspath(__file__)))
+PROJECT_ROOT = DJANGO_ROOT
+STATIC_ROOT = os.path.join(PROJECT_ROOT, './django_static/')
+STATICFILES_DIRS = (
+    os.path.join(PROJECT_ROOT, './dist/static'), 
+)
 
 # Application definition
 
@@ -129,9 +132,6 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-STATICFILES_DIRS = (
-    os.path.join(BASE_DIR, './dist/static/'), 
-)
 
 WEBPACK_LOADER = {
     'DEFAULT': {
