@@ -43,6 +43,9 @@ class GameConnection:
         self.wait_for_reply = {}
         conn.onreceive.append(self.push_received)
 
+    def get_user(self):
+        return self.conn.user
+
     def replace_connection(self,conn):
         self.conn = conn
         print("connection replaced")

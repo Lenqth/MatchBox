@@ -47,8 +47,10 @@ class RoomListConsumer(AsyncWebsocketConsumer):
 
 class MainConsumer(AsyncWebsocketConsumer):
     async def connect(self):
+        self.user = self.scope["user"]
         self.onreceive = []
         token = None
+        print(self.user)
         if str(self.scope["user"]) != "" :
             token = str( self.scope["user"] )
         elif "token" in self.scope["session"] :
@@ -102,6 +104,7 @@ class MainConsumer(AsyncWebsocketConsumer):
 
 class ConfiguredMainConsumer(MainConsumer):
     async def connect(self):
+        self.user = self.scope["user"]
         self.onreceive = []
         self.loop = asyncio.get_event_loop()
         self.connect_configured = False
