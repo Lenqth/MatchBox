@@ -16,7 +16,7 @@
     <table v-bind:class="{'border-discard-hand':player.allow_discard}">
       <tr>
       <td v-for="(item,index) in player.hand" :key="index">
-        <span v-on:click="tile_click(index);" >
+        <span v-on:click="tile_click(index)" >
             <img v-bind:src="numtosrc(item)" >
         </span>
       </td>

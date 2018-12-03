@@ -300,7 +300,7 @@ export async function turn_input () {
       input_resolve = function (type, value) {
         var pl = deck.players[deck.player_id]
         if (type == 'discard') {
-          if ((pl.drawed != null && value == -1) || (value >= 0 < pl.hand.length)) {
+          if ((pl.drawed != null && value == -1) || (value >= 0 || value < pl.hand.length)) {
             pl.trash_tile(value)
             input_resolve = null
             pl.allow_discard = false
