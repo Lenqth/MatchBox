@@ -281,6 +281,7 @@ export function command (type) {
   } else {
     var selections = fil.map(x => x.pos)
     var tiles = selections.map(x => x.map(y => y >= 0 ? pl.hand[y] : (y == -1 ? pl.drawed : deck.claim_target)))
+    deck.meld_selection = {}
     deck.meld_selection.type = type
     deck.meld_selection.tiles = tiles
     deck.meld_selection.pos = selections
