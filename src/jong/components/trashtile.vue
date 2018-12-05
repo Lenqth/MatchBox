@@ -20,7 +20,7 @@ export default {
   }
 }
 </script>
-<style>
+<style scoped>
 
 .tile-yoko{
   display: block;
@@ -50,6 +50,7 @@ export default {
 .discarded-item{
   float: left;
   display: block;
+  position: relative;
 }
 .discarded-item img {
   width:22px;
