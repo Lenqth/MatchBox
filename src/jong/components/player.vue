@@ -29,7 +29,8 @@
 		<div class="bottom-bar">
 			<pullout-tile v-bind:pullout="player.pullout"></pullout-tile>
 	    <div class="exposed-area">
-	        <exposed-set v-for="(grp,index) in player.exposed" v-bind:type="grp.type" v-bind:tiles="grp.tiles" v-bind:target="player.target=='apkong'" :key="index"></exposed-set>
+	        <exposed-set v-for="(grp,index) in player.exposed" v-bind:type="grp.type" v-bind:tiles="grp.tiles"
+          v-bind:target="player.target=='apkong'" v-bind:show_conc="main || open" :key="index"></exposed-set>
 	    </div>
 			<div class="score-area">{{player.score}}</div>
 		</div>
@@ -49,7 +50,7 @@ Vue.component('trash-tile', trashtile)
 Vue.component('spinning-target', spinningtarget)
 
 export default {
-  props: ['player', 'main'],
+  props: [ 'player', 'main' , 'open' ],
   methods: {
     numtosrc,
     get_wind_name: get_wind_name,

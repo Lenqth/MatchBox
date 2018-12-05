@@ -47,6 +47,7 @@ export class Deck {
     this.prev_wind = 0
     this.seat_wind = 0
     this.yakulist = []
+    this.open = false
     this.calculated_score = ''
     this.meld_selection = {type: '', tiles: []}
     this.result = null // { player : "" , score : 0 , yaku : [] };
@@ -67,33 +68,39 @@ Deck.prototype.start = async function (sock) {
   this.conn = new AsyncConnection(sock)
   this.conn.send(JSON.stringify({'stand_by': ''}))
   var res = null
+  this.open = false
   while (true) {
     res = await this.conn.receiveAsync()
-    var pl = deck.players[deck.player_id]
-    if (res.type == 'reset') {
-      delete res['reset']
+    var pl = this.players[this.player_id]
+    if (res.type === 'reset') {
+      delete res.type
       this.assign(res)
-    } if (res.type == 'agari') {
+      this.open = false
+      this.meld_selection = {type: '', tiles: []}
+      this.players[this.player_id].commands_available = []
+    } if (res.type === 'agari') {
       this.result = { player: '', score: 0, tsumo: false, yaku: [] }
       this.result.player = relative_player_format(this.player_id, res.pid)
       this.result.score = res.yaku[0]
       this.result.yaku = res.yaku[1]
       this.result.tsumo = res.tsumo
-    } if (res.type == 'gameover') {
+    } if (res.type === 'gameover') {
       this.result = { player: '', score: 0, tsumo: false, yaku: [] }
       this.result.player = -1
       this.result.score = 0
       this.result.yaku = []
-    } if (res.type == 'open_hand') {
+      this.open = true
+    } if (res.type === 'open_hand') {
       var hands = res.hand
       for (let i = 0; i < 4; i++) {
         let p = hands[i]
         this.players[i].hand = p.hand
         this.players[i].drawed = p.drew
+        this.open = true
       }
-    } if (res.type == 'deck_left') {
+    } if (res.type === 'deck_left') {
       this.deck_left = res.deck_left
-    } if (res.type == 'claim_command') {
+    } if (res.type === 'claim_command') {
       // {"commands_available": [{"type": 1, "pos": [[1], [2]]}], "_m_id": 7, "timeout": 1539616054.5650032}
       var tg_pl = res.target.player, tg_apkong = res.target.apkong, tg_tile = res.target.tile
       this.players[this.player_id].hand = res.hand_tiles
@@ -113,13 +120,12 @@ Deck.prototype.start = async function (sock) {
       cancelObj.cancel = true
       if (input_res != null) {
         input_res._m_id = res._m_id
-        console.log(input_res)
         this.conn.send(input_res)
       }
       this.players[tg_pl].target = null
-    } else if (res.type == 'expose') {
+    } else if (res.type === 'expose') {
       this.players[res.pid].exposed.push(res.obj)
-    } else if (res.type == 'apkong') {
+    } else if (res.type === 'apkong') {
       var ex = this.players[res.pid].exposed
       for (var v of ex) {
         if (v.type == 'pong' && v.tiles[0] == res.tile) {
@@ -273,7 +279,6 @@ export function command (type) {
   if (fil.length == 1) {
     input_resolve(type, fil[0].pos)
   } else {
-    console.log('meld_sel')
     var selections = fil.map(x => x.pos)
     var tiles = selections.map(x => x.map(y => y >= 0 ? pl.hand[y] : (y == -1 ? pl.drawed : deck.claim_target)))
     deck.meld_selection.type = type

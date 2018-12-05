@@ -20,7 +20,7 @@
     </table>
     <p style="">計 : {{ calculated_score }}</p>
   </div>
-	<meld-selection v-bind:meld_selection="meld_selection"></meld-selection>
+	<meld-selection v-bind:meld_selection="meld_selection" v-on:cancel="meld_selection_cancel()"></meld-selection>
 	<result-dialog v-bind:result="result" v-on:ok="ok()"></result-dialog>
 </div>
 
@@ -55,7 +55,11 @@ export default {
     get_wind_name: get_wind_name,
 		ok(){
 			deck.ok();
-		}
+    },
+    meld_selection_cancel(){
+      deck.meld_selection = null;
+
+    }
   },
   beforeRouteEnter (route, redirect, next) {
     next(vm => {

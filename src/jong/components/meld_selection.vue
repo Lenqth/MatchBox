@@ -1,10 +1,14 @@
 <template>
-  <div id="meld-select">
+  <div>
     <transition name="meld-select">
-      <div v-if="meld_selection != null && meld_selection.tiles.length > 0" class="meld-select-box">
-        <div v-for="(grp,index) in meld_selection.tiles" class="exposed-group group-clickable" v-on:click="click_meld_popup(index);">
-          <div v-for="(item,jndex) in grp" class="exposed-item tile">
-            <img v-bind:src="numtosrc(item)" >
+      <div class="modal-mask" v-if="meld_selection != null && meld_selection.tiles.length > 0" v-on:click="close()">
+        <div class="modal-wrapper">
+          <div class="meld-select-box">
+            <div v-for="(grp,index) in meld_selection.tiles" class="exposed-group group-clickable" v-on:click="click_meld_popup(index);" :key="index" >
+              <div v-for="(item,jndex) in grp" class="exposed-item tile" :key="jndex">
+                <img v-bind:src="numtosrc(item)" >
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -21,12 +25,15 @@ export default {
   methods: {
     numtosrc,
     get_wind_name: get_wind_name,
-    click_meld_popup: click_meld_popup
+    click_meld_popup: click_meld_popup,
+    close(){
+      this.$emit("cancel")
+    }    
   }
 }
 
 </script>
-<style>
+<style scoped>
 .group-clickable:hover{
   background: orange;
 }
@@ -38,24 +45,21 @@ export default {
 
 .exposed-group{
 	flex-wrap: nowrap;
-  margin-left: 5px;
   border: 1px red dotted;
   display: flex;
+  margin:0px 4px;
 }
 
 .meld-select-box{
   border: solid 2px orange;
   background: lightgray;
-  opacity: 0.6;
-  position: absolute;
   width: 400px;
   height: 250px;
-  left: 0;
-  right: 0;
-  top: 0;
-  bottom: 0;
-	margin:auto;
+  opacity: 0.8;
+  display: flex;
+  align-items : center;
   padding:8px;
+  margin: 0px auto;
 }
 
 .meld-select-enter-active{
@@ -68,6 +72,24 @@ export default {
 .meld-select-enter , .meld-select-leave-to{
   top: 500px !important;
   display:none;
+}
+
+
+.modal-mask {
+  position: fixed;
+  z-index: 9998;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: table;
+  transition: opacity 0.3s ease;
+}
+
+.modal-wrapper {
+  display: table-cell;
+  vertical-align: middle;
 }
 
 </style>
