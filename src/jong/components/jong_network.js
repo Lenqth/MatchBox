@@ -51,6 +51,7 @@ export class Deck {
     this.calculated_score = ''
     this.meld_selection = {type: '', tiles: []}
     this.result = null // { player : "" , score : 0 , yaku : [] };
+    this.final_result = null;
 
     this.player_id = 0
 
@@ -90,6 +91,8 @@ Deck.prototype.start = async function (sock) {
       this.result.score = 0
       this.result.yaku = []
       this.open = true
+    } if (res.type === 'final_result' ) {
+      this.final_result = res.dat;
     } if (res.type === 'open_hand') {
       var hands = res.hand
       for (let i = 0; i < 4; i++) {

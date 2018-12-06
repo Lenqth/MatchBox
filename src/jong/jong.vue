@@ -22,6 +22,7 @@
   </div>
 	<meld-selection v-bind:meld_selection="meld_selection" v-on:cancel="meld_selection_cancel()"></meld-selection>
 	<result-dialog v-bind:result="result" v-on:ok="ok()"></result-dialog>
+	<final-result-dialog v-bind:result="final_result" v-on:ok="ok()"></final-result-dialog>
 </div>
 
 </template>
@@ -32,16 +33,20 @@ import {Deck, get_wind_name, numtosrc} from './components/jong_network.js'
 import * as utils from './components/utils.js'
 
 import PlayerArea from './components/player.vue'
+Vue.component('player-area', PlayerArea)
 
 import Result from './components/result.vue'
+Vue.component('result-dialog', Result)
+
+import FinalResult from './components/final_result.vue'
+Vue.component('final-result-dialog', FinalResult)
 
 import meld_selection from './components/meld_selection.vue'
+Vue.component('meld-selection', meld_selection)
+
 var deck = new Deck()
 
 function __img (x) { return '<img src="' + numtosrc(x) + '" >' }
-Vue.component('player-area', PlayerArea)
-Vue.component('result-dialog', Result)
-Vue.component('meld-selection', meld_selection)
 
 window.deck = deck
 

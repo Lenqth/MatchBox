@@ -45,7 +45,7 @@ export default {
 }
 
 </script>
-<style>
+<style scoped>
 
 .result-box{
   border: solid 2px orange;
