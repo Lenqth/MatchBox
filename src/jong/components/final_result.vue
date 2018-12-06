@@ -1,5 +1,5 @@
 <template>
-  <div v-if="result!=null" class="result-box">
+  <div v-if="final_result!=null" class="result-box">
     <div class="yaku-group">
       <table class="ranking-table">
         <thead class="ranking-thead">
