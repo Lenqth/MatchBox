@@ -1,6 +1,6 @@
 <template>
   <div class="my-discarded">
-    <div v-for="(item,index) in trash" class="discarded-item tile" v-bind:class="{ 'tile-yoko': item.yoko , 'discarded-tsumogiri' : item.tsumogiri }">
+    <div v-for="(item,index) in trash" class="discarded-item tile" v-bind:class="{ 'tile-yoko': item.yoko , 'discarded-tsumogiri' : item.tsumogiri , 'claimed' : item.claimed }">
       <img v-bind:src="numtosrc(item.id)">
       <spinning-target v-if="target && ( index + 1 == trash.length )"></spinning-target>
     </div>
@@ -61,6 +61,10 @@ export default {
 
 .discarded-tsumogiri img{
   border: 1px blue solid;
+}
+ 
+.claimed>img {
+  filter: brightness(0.6);
 }
 
 </style>
