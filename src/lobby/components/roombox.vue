@@ -35,7 +35,7 @@ export default {
 .room-full{
   background-color: magenta ;
 }
-.room:hover:not(:room-full){
+.room:hover:not(.room-full){
   background-color: #aaaadd ;
 }
 
