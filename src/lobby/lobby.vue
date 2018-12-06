@@ -2,9 +2,7 @@
   <div>
     <div class="room-root">
       <div class="room-container" id="roomlist">
-        <div class="room-item" v-for="(item,index) in rlist" :key="index" >
-          {{ item.room_id }}
-        </div>
+        <roombox class="room-item" v-for="(item,index) in rlist" v-bind:room="item" :key="index" v-on:dblclick.native="joinRoom(item)"  />
       </div>
       <div class="footer">
         <button v-on:click="openModal()">ルームを新規作成</button>
@@ -20,8 +18,12 @@
 import Vue from "vue";
 
 import * as utils from "./components/utils.js";
+
 import newroomDialog from "./components/newroom.vue";
 Vue.component("newroom", newroomDialog);
+
+import roombox from "./components/roombox.vue";
+Vue.component("roombox", roombox);
 
 var audio1 = document.getElementById("sound1");
 
@@ -40,6 +42,25 @@ export default {
       this.dialogOpen = !this.dialogOpen;
     },
     autoMatch() {
+      this.$router.push("/room");
+    },
+    async joinRoom(room){
+      console.log("nyan");
+      var host = location.host;
+      if (location.port == 8080) {
+        host = location.hostname + ":8000";
+      }
+      await new Promise( function(res,rej){
+        var socket = (window.socket = new WebSocket(
+          "ws://" + host + "/jong/room/join/" + room.room_id
+        ));
+        window.socket.addEventListener(
+          "open",
+          () => {
+            res(socket);
+          },
+          { once: true }
+        ); } );
       this.$router.push("/room");
     }
   },
@@ -86,7 +107,7 @@ function new_socket(root) {
 
 .room-item {
   box-sizing: border-box;
-  flex-basis: 50%;
+  flex-basis: 33.34%;
   flex-shrink: 1;
 }
 

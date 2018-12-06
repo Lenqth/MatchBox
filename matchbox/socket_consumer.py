@@ -46,17 +46,21 @@ class RoomListConsumer(AsyncWebsocketConsumer):
 
 
 class MainConsumer(AsyncWebsocketConsumer):
-    async def connect(self):
+    async def connect(self,room_id=None):
         self.user = self.scope["user"]
         self.onreceive = []
         token = None
-        print(self.user)
         if str(self.scope["user"]) != "" :
             token = str( self.scope["user"] )
         elif "token" in self.scope["session"] :
             token = self.scope["session"]["token"]
         await self.accept()
-        result = await ( Room.random_match(self,None) )
+        if room_id is None :
+            result = await ( Room.random_match(self,None) )
+        else:
+            rm = Room.rooms[room_id]
+            result = await rm.connect(self,None)
+
         if result == None:
             return
         # Join room group
