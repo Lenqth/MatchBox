@@ -10,10 +10,16 @@ class ObservableList(list,IObservableCollection):
         self.__stream__ = Subject()
     
     def __setitem__(self, key, value):
+        l_prev = len(self)
         res = super().__setitem__(key, value) 
         e = ()
         if isinstance(key,slice):
-            e = ( "splice", key.indices(len(self)) , value )
+            start,end,step = key.indices(l_prev)
+            if step == 1 :
+                e = ( "splice", (start,end) , value )
+            else:
+                self.full_sync()
+                return res       
         else:
             if key < 0 :
                 e = ( "replace", len(self) - key , value )
@@ -27,8 +33,9 @@ class ObservableList(list,IObservableCollection):
         self.__stream__.on_next( ("push" , value) )
 
     def extend(self, iterable):
+        l_prev = len(self)
         super().extend(iterable)
-        self.__stream__.on_next( ("add_last_range" , list(iterable) ) )
+        self.__stream__.on_next( ("splice" , (l_prev,0) , list(iterable) ) )
     
     def insert(self, index, value):
         super().insert(index, value) 
@@ -49,16 +56,16 @@ class ObservableList(list,IObservableCollection):
     
     def reverse(self):
         res = super().reverse()
-        self.__stream__.on_next( ("reverse") )
+        self.full_sync()
         return res    
     
     def sort(self):
-        super().sort()  
-        self.__stream__.on_next( ("sort") )
+        super().sort() 
+        self.full_sync()
 
     def full_sync(self):
         self.__stream__.on_next( ("clear") )
-        self.__stream__.on_next( ("add_last_range" , list(self) ) )
+        self.__stream__.on_next( ("splice" , (0,0) , list(self) ) )
 
 
 class ObservableStorage(IObservableCollection):
