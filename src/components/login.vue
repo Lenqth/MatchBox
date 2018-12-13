@@ -72,7 +72,7 @@ export default {
   width: 100%;
   height: 40px;
   background-color: gray;
-  margin: 0px 0px 20px;
+  margin: 0px;
   color: white;
 }
 

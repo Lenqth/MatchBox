@@ -1,12 +1,14 @@
 <template>
-  <transition-group name="command" class="root">
-    <div key="open" v-if="open">
-      <img :src="source" :width="width" :height="height" :alt="alt" class="card open">
-    </div>
-    <div key="close" v-else>
-      <img :src="id2source(0)" :width="width" :height="height" :alt="id2alt(0)" class="card close">
-    </div>
-  </transition-group>
+  <div>
+    <transition-group name="command" class="card-root">
+      <div key="open" v-if="open">
+        <img :src="source" :alt="alt" class="card open">
+      </div>
+      <div key="close" v-else>
+        <img :src="id2source(0)" :alt="id2alt(0)" class="card close">
+      </div>
+    </transition-group>
+  </div>
 </template>
 <script scoped>
 import Vue from "vue";
@@ -147,7 +149,7 @@ export default {
   }
 }
 
-.root {
+.card-root {
   position: relative;
 }
 </style>

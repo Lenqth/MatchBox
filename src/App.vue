@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div id="root">
     <login/>
     <router-view id="app"/>
   </div>
@@ -15,14 +15,23 @@ export default {
   name: "App"
 };
 </script>
-
 <style>
+body{
+  margin:0;
+}
+</style>
+<style scoped>
+#root{
+  margin:0;
+  height:100vh;
+}
+
 #app {
-  font-family: "Avenir", Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
-  margin-top: 60px;
+  margin: 0 0 0 0;
+  height:calc(100vh - 40px);
 }
 </style>
