@@ -2,7 +2,7 @@
   <div>
     <trash-tile v-bind:trash="player.trash" v-bind:target="player.target=='trash'"></trash-tile>
 		<div class="score-area">{{player.score}}</div>
-    <div v-if="main" class="command-bar clearfix" style="width:100%;height:24px;">
+    <div class="command-bar clearfix" style="width:100%;height:24px;">
       <transition-group class="command-bar clearfix" name="command">
         <div id="chow" key="chow" v-if="player.command_types_available.has('chow')" class="command" v-on:click="command('chow');">チー(Z)</div>
         <div id="pong" key="pong" v-if="player.command_types_available.has('pong')" class="command" v-on:click="command('pong');">ポン(X)</div>
@@ -21,7 +21,7 @@
             <img v-bind:src="numtosrc(item)" >
         </span>
       </td>
-      <td width='20'></td>
+      <td width='10'></td>
       <td v-if="player.drawed != null" v-on:click="tile_click(-1);" >
         <img v-bind:src="numtosrc(player.drawed)" >
       </td>
@@ -86,9 +86,9 @@ export default {
 .command{
   background-color: white;
   border:1px black solid;
-  width:100%;
-  font-size: 10%;
-  height: 10%;
+  width:20%;
+  font-size: 100%;
+  height: 100%;
 }
 .command-enter-active{
   transition: height 0.6s 0s ease;
