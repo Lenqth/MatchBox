@@ -4,7 +4,8 @@ import Lobby from '@/lobby/lobby'
 import LoaderJong from '@/jong/jong'
 import MatchRoom from '@/matchroom/matchroom'
 
-const LoaderD7 = () => import(/* webpackChunkName: "group-foo" */ '@/destiny7/destiny7')
+const LoaderD7 = () => import(/* webpackChunkName: "group-d7" */ '@/destiny7/destiny7')
+const LoaderQuarto = () => import(/* webpackChunkName: "group-quarto" */ '@/quarto/index')
 
 Vue.use(Router)
 
@@ -14,6 +15,11 @@ export default new Router({
       path: '/',
       name: 'Lobby',
       component: Lobby
+    },
+    {
+      path: '/room',
+      name: 'MatchRoom',
+      component: MatchRoom
     },
     {
       path: '/jong',
@@ -26,9 +32,9 @@ export default new Router({
       component: LoaderD7
     },
     {
-      path: '/room',
-      name: 'MatchRoom',
-      component: MatchRoom
-    }
+      path: '/quarto',
+      name: 'QuartoLoader',
+      component: LoaderQuarto
+    },
   ]
 })
