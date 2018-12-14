@@ -43,8 +43,8 @@ export default {
 }
 
 .my-discarded{
-  height:100px;
-  width:210px;
+  height:40%;
+  width:37.5%;
   margin:auto;
 }
 .discarded-item{
@@ -65,6 +65,10 @@ export default {
  
 .claimed>img {
   filter: brightness(0.6);
+}
+
+.discarded-item{
+  zoom: 0.8;
 }
 
 </style>

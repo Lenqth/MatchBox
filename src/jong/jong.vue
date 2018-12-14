@@ -87,44 +87,45 @@ export default {
 }
 
 .player-field {
-  width: 400px;
-  height: 200px;
-  /* border: 2px blue solid; */
+  width: 80% ;
+  height: 35% ;
+  box-sizing: border-box;
+/*  border: 2px blue solid;*/
 }
 
 #hand0 {
   position: absolute;
-  left: 100px;
-  top: 400px;
+  left: 10%;
+  top: 65%;
 }
 
 #hand1 {
   position: absolute;
-  left: 300px;
-  top: 200px;
+  left: 42.5%;
+  top: 32.5% ;
   transform: rotate(-90deg);
 }
 
 #hand2 {
   position: absolute;
-  left: 100px;
-  top: 0px;
+  left: 10%;
+  top: 0%;
   transform: rotate(180deg);
 }
 
 #hand3 {
   position: absolute;
-  left: -100px;
-  top: 200px;
+  left: -22.5%;
+  top: 32.5%;
   transform: rotate(90deg);
 }
 
 #info {
   position: absolute;
-  left: 232px;
-  top: 232px;
-  width: 133px;
-  height: 133px;
+  left: 35%;
+  top: 35%;
+  width: 30%;
+  height: 30%;
   margin: auto;
   border: 1px orange solid;
 }
@@ -142,9 +143,9 @@ export default {
 
 .board-root {
   position: relative;
-  margin: 50px;
-  width: 600px;
-  height: 600px;
+  margin: 25px;
+  width: 520px;
+  height: 520px;
   border: red solid 1px;
 }
 .jong-root {

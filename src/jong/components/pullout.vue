@@ -1,7 +1,7 @@
 <template>
   <div class="pullout-area">
     <div v-if="pullout.length>=0" class="pullout-item tile">
-        <img v-bind:src="numtosrc(65)" > × {{ pullout.length }}
+        <img v-bind:src="numtosrc(65)" class="flower-tile">×{{ pullout.length }}
     </div>
   </div>
 </template>
@@ -28,5 +28,9 @@ export default {
   flex-basis:10%;
   height:33px;
   border: 1px pink dotted;
+}
+.flower-tile{
+  zoom:0.8;
+
 }
 </style>

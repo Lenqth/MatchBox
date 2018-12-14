@@ -1,6 +1,7 @@
 <template>
   <div>
     <trash-tile v-bind:trash="player.trash" v-bind:target="player.target=='trash'"></trash-tile>
+		<div class="score-area">{{player.score}}</div>
     <div v-if="main" class="command-bar clearfix" style="width:100%;height:24px;">
       <transition-group class="command-bar clearfix" name="command">
         <div id="chow" key="chow" v-if="player.command_types_available.has('chow')" class="command" v-on:click="command('chow');">チー(Z)</div>
@@ -32,7 +33,6 @@
 	        <exposed-set v-for="(grp,index) in player.exposed" v-bind:type="grp.type" v-bind:tiles="grp.tiles"
           v-bind:target="player.target=='apkong'" v-bind:show_conc="main || open" :key="index"></exposed-set>
 	    </div>
-			<div class="score-area">{{player.score}}</div>
 		</div>
   </div>
 </template>
@@ -86,9 +86,9 @@ export default {
 .command{
   background-color: white;
   border:1px black solid;
-  width:60px;
-  font-size: 14px;
-  height: 14px;
+  width:100%;
+  font-size: 10%;
+  height: 10%;
 }
 .command-enter-active{
   transition: height 0.6s 0s ease;
@@ -108,7 +108,7 @@ export default {
 
 
 .bottom-bar{
-	width:120%;
+	width:110%;
 	display: flex;
 	flex-wrap:nowrap;
 }
@@ -120,16 +120,16 @@ export default {
   height:33px;
 }
 .score-area{
-	margin-right: auto;
-	float: left;
+  position:absolute;
+  left:70%;
+  top:5%;
+  width: 10%;
 	line-height:33px;
-	flex-basis: calc(10%);
 	border: 1px blue dotted;
 	text-align: right;
 	vertical-align: middle;
 	padding-right: 5px;
 	font-size: 16px;
-
 }
 
 </style>
