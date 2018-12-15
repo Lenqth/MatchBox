@@ -1,3 +1,4 @@
+
 <template>
   <div class="exposed-group">
     <div v-if="type==='pong' || type==='chow' || type==='minkong'" v-for="(item,jndex) in tiles" class="exposed-item tile" :key="jndex">

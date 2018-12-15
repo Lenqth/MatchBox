@@ -1,4 +1,5 @@
 <template>
+  <div>
   <div class="jong-root">
     <div id="board-root" class="board-root">
       <div id="info">
@@ -24,6 +25,7 @@
       </table>
       <p style>計 : {{ calculated_score }}</p>
     </div>
+  </div>
   </div>
 </template>
 
@@ -150,7 +152,7 @@ export default {
 }
 .jong-root {
   position: relative;
-  margin: 50px;
+  margin: 0px auto;
   width: 800px;
   height: 600px;
   display: inline-block;
