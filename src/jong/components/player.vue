@@ -2,7 +2,7 @@
   <div>
     <trash-tile v-bind:trash="player.trash" v-bind:target="player.target=='trash'"></trash-tile>
 		<div class="score-area">{{player.score}}</div>
-    <div class="command-bar clearfix" style="width:100%;height:24px;">
+    <div class="command-bar clearfix" :class='{"player-main":main}' style="width:100%;height:24px;">
       <transition-group class="command-bar clearfix" name="command">
         <div id="chow" key="chow" v-if="player.command_types_available.has('chow')" class="command" v-on:click="command('chow');">チー(Z)</div>
         <div id="pong" key="pong" v-if="player.command_types_available.has('pong')" class="command" v-on:click="command('pong');">ポン(X)</div>
@@ -14,7 +14,7 @@
         <div id="skip" key="skip" v-if="player.command_types_available.has('skip')" class="command" v-on:click="command('skip');">スキップ</div>
       </transition-group>
     </div>
-    <table v-bind:class="{'border-discard-hand':player.allow_discard}">
+    <table class="player-hand" :class='{"border-discard-hand":player.allow_discard,"player-main":(main||open)}'>
       <tr>
       <td v-for="(item,index) in player.hand" :key="index">
         <span v-on:click="tile_click(index)" >
@@ -59,7 +59,7 @@ export default {
   }
 }
 </script>
-<style>
+<style scoped>
 
 @keyframes up {
   0% {top: 1500px;display:none;opacity:0;}
@@ -131,5 +131,7 @@ export default {
 	padding-right: 5px;
 	font-size: 16px;
 }
-
+.player-hand:not(.player-main){
+  visibility: hidden;
+}
 </style>
