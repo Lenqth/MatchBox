@@ -5,23 +5,8 @@
     </div>
     <div v-else class="result-top">
       流局
-    </div>
-    <div class="yaku-group">
-			<table class="yaku-table">
-				<thead class="yaku-thead">
-					<tr>
-						<td class="row-yaku"> 役 </td>
-						<td class="row-score"> 点 </td>
-					</tr>
-				</thead>
-				<tbody class="yaku-tbody">
-		      <tr v-for="(item,index) in result.yaku" :key="index">
-						<td>{{item.chinese_name}}</td>
-						<td>{{item.score}}</td>
-		      </tr>
-				</tbody>
-			</table>
-    </div>
+    </div>    
+    <yakulist :yakus="result.yaku" />
     <div class="score-box">
       計 {{result.score}} 点
 			<button v-on:click="fire_ok()">OK</button>
@@ -87,27 +72,4 @@ export default {
 
 }
 
-.yaku-table{
-	width:80%;
-	margin: auto;
-}
-.yaku-thead{
-	background-color: pink;
-}
-.yaku-tbody{
-
-}
-.yaku-tbody>:nth-child(odd){
-	background-color: lightgreen;
-}
-.yaku-tbody>:nth-child(even){
-	background-color: lightblue;
-}
-
-.row-yaku{
-	width:60%;
-}
-.row-score{
-	width:20%;
-}
 </style>

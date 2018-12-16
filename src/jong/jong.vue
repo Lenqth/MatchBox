@@ -16,15 +16,12 @@
       <result-dialog v-bind:result="result" v-on:ok="ok()"></result-dialog>
       <final-result-dialog v-bind:result="final_result" v-on:ok="ok()"></final-result-dialog>
     </div>
-    <div id="sideinfo">
-      <table>
-        <tr v-for="(y,i) in yakulist" :key="i">
-          <td>{{ y.title }}</td>
-          <td>{{ y.score }}</td>
-        </tr>
-      </table>
-      <p style>計 : {{ calculated_score }}</p>
-    </div>
+    <transition name="sideinfo">
+      <div v-if="yakulist!=null" id="sideinfo">
+        <yakulist :yakus="yakulist" />
+        <p style>計 : {{ calculated_score }}</p>
+      </div>
+    </transition>
   </div>
   </div>
 </template>
@@ -36,6 +33,9 @@ import * as utils from "./components/utils.js";
 
 import PlayerArea from "./components/player.vue";
 Vue.component("player-area", PlayerArea);
+
+import Yakulist from "./components/yakulist.vue";
+Vue.component("yakulist", Yakulist);
 
 import Result from "./components/result.vue";
 Vue.component("result-dialog", Result);
@@ -133,30 +133,58 @@ export default {
 }
 
 #sideinfo {
-  position: absolute;
-  margin: 50px;
-  left: 600px;
-  top: 100px;
-  width: 160px;
+  position:relative;
+  width: 180px;
   height: 380px;
-  padding: 10px;
-  border: 1px orange solid;
+  padding: 5px;
+  background: lightyellow;
+  border: 1px orange solid; 
+  float: left;  
+}
+
+.sideinfo-enter-active{
+  animation-name: stretch-in;
+	animation-timing-function: ease-in;
+  animation-duration: 0.4s;
+}
+.sideinfo-leave-active{
+  animation-name: stretch-in;
+	animation-direction: reverse;
+	animation-timing-function: ease-out;
+  animation-duration: 0.4s;
+}
+
+@keyframes stretch-in {
+	0% {
+    transform: scaleX(0);
+    transform-origin: 0 0;
+  }
+	100% {
+    transform: scaleX(1);
+    transform-origin: 0 0;
+	}	
+
 }
 
 .board-root {
   position: relative;
-  margin: 25px;
+  background: rgb(231, 255, 231);
   width: 520px;
   height: 520px;
+  margin-right:0px;
   border: red solid 1px;
+  float: left;
 }
 .jong-root {
   position: relative;
   margin: 0px auto;
+  padding: 25px;
   width: 800px;
   height: 600px;
   display: inline-block;
 }
+
+
 body {
   margin: auto;
   overflow: hidden;

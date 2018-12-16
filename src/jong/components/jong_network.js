@@ -46,7 +46,7 @@ export class Deck {
     this.message = '*'
     this.prev_wind = 0
     this.seat_wind = 0
-    this.yakulist = []
+    this.yakulist = null
     this.open = false
     this.calculated_score = ''
     this.meld_selection = {type: '', tiles: []}
