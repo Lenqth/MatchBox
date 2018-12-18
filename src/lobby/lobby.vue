@@ -97,6 +97,10 @@ function new_socket(root) {
   height: 40%;
 }
 
+.room-root{
+  margin: 25px;
+}
+
 .room-container {
   display: flex;
   width: 80%;

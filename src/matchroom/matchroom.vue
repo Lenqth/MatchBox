@@ -1,10 +1,10 @@
 <template>
-  <div id="room-root" class="flexbox">
+  <div class="room-root flexbox">
     <audio id="sound1" preload="auto">
       <source src="@/assets/sounds/puu79_a.wav" type="audio/wav">
     </audio>
     <div class="col1">
-      <textarea id="output" rows="40"></textarea>
+      <textarea id="output" class="chat-output" rows="30"></textarea>
       <input type="text" id="txbox"><input type="button" value="send" id="sendbutton">
     </div>
     <memberbox v-bind:player_slot="player_slot" v-on:ready-changed="send_ready()"></memberbox>
@@ -139,27 +139,18 @@ function game_start (arg) {
 }
 
 </script>
-<style>
-.navbar{
-  width:100%;
-  height:40px;
-  background-color: gray;
-  margin: 0px 0px 20px;
-  color : white;
-}
-.login-disp{
-  text-align:right;
-  margin:10px;
+<style scoped>
+.room-root{
+  margin: 25px;
 }
 
 .flexbox{
   display: flex;
-
 }
 .col1{
   width:60%;
 }
-#output{
+.chat-output{
   width:80%;
   height:40%
 }

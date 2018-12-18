@@ -8,10 +8,10 @@
         <p v-if="time_left!=null">入力待機 残り：{{ time_left.toFixed(1) }}秒</p>
         <p>{{ message }}</p>
       </div>
-      <player-area id="hand1" v-bind:player="players[(player_id+1)%4]" class="player-field"></player-area>
-      <player-area id="hand2" v-bind:player="players[(player_id+2)%4]" class="player-field"></player-area>
-      <player-area id="hand3" v-bind:player="players[(player_id+3)%4]" class="player-field"></player-area>
-      <player-area id="hand0" v-bind:player="players[player_id]" main="1" class="player-field"></player-area>
+      <player-area id="hand1" v-bind:player="players[(player_id+1)%4]" :open="open" class="player-field"></player-area>
+      <player-area id="hand2" v-bind:player="players[(player_id+2)%4]" :open="open" class="player-field"></player-area>
+      <player-area id="hand3" v-bind:player="players[(player_id+3)%4]" :open="open" class="player-field"></player-area>
+      <player-area id="hand0" v-bind:player="players[player_id]" main="1" :open="open" class="player-field"></player-area>
       <meld-selection v-bind:meld_selection="meld_selection" v-on:cancel="meld_selection_cancel()"></meld-selection>
       <result-dialog v-bind:result="result" v-on:ok="ok()"></result-dialog>
       <final-result-dialog v-bind:result="final_result" v-on:ok="ok()"></final-result-dialog>

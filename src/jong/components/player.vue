@@ -31,7 +31,7 @@
 			<pullout-tile v-bind:pullout="player.pullout"></pullout-tile>
 	    <div class="exposed-area">
 	        <exposed-set v-for="(grp,index) in player.exposed" v-bind:type="grp.type" v-bind:tiles="grp.tiles"
-          v-bind:target="player.target=='apkong'" v-bind:show_conc="main || open" :key="index"></exposed-set>
+          v-bind:target="player.target=='apkong'" v-bind:show_conc="(main || open)" :key="index"></exposed-set>
 	    </div>
 		</div>
   </div>

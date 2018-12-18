@@ -40,6 +40,10 @@ export default {
   animation: blinkborder 0.7s ease 0.4s infinite alternate;
 }
 
+.flexbox{
+  display: flex;
+}
+
 .group-content:nth-child(1).joined.ready{background-color: #ffcccc;}
 .group-content:nth-child(2).joined.ready{background-color: #ccccff;}
 .group-content:nth-child(3).joined.ready{background-color: #ccffcc;}
