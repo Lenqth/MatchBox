@@ -72,6 +72,7 @@ Deck.prototype.start = async function (sock) {
   this.open = false
   while (true) {
     res = await this.conn.receiveAsync()
+    console.log(res)
     var pl = this.players[this.player_id]
     if (res.type === 'reset') {
       delete res.type
@@ -116,6 +117,11 @@ Deck.prototype.start = async function (sock) {
       this.players[this.player_id].command_types_available = new Set(this.players[this.player_id].commands_available.map(x => x.type))
       this.players[this.player_id].allow_discard = false
 
+      if(res.agari_info != null) {
+        this.yakulist = res.agari_info[1];
+        this.calculated_score = res.agari_info[0]
+      }
+
       var timeout = res.timeout * 1000
       var cancelObj = {cancel: false}
       utils.play_sound('puu79_a.wav')
@@ -152,12 +158,16 @@ Deck.prototype.start = async function (sock) {
       this.players[this.player_id].command_types_available = new Set(this.players[this.player_id].commands_available.map(x => x.type))
       this.players[this.player_id].allow_discard = true
 
+      if(res.agari_info != null) {
+        this.yakulist = res.agari_info[1];
+        this.calculated_score = res.agari_info[0]
+      }
+      
       var timeout = res.timeout * 1000
       var cancelObj = {cancel: false}
       utils.play_sound('puu79_a.wav')
       var input_res = await Promise.race([turn_input(cancelObj), timer(timeout, cancelObj)])
       cancelObj.cancel = true
-      console.log(input_res)
       if (input_res != null) {
         input_res._m_id = res._m_id
         this.conn.send(input_res)
@@ -169,6 +179,8 @@ Deck.prototype.start = async function (sock) {
     }
   }
 }
+
+
 
 Deck.prototype.ok = function(){
   if( this.listener_ok != null ){
