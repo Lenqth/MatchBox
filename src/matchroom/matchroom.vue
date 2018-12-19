@@ -1,14 +1,16 @@
 <template>
-  <div class="room-root flexbox">
-    <audio id="sound1" preload="auto">
-      <source src="@/assets/sounds/puu79_a.wav" type="audio/wav">
-    </audio>
-    <div class="col1">
-      <textarea id="output" class="chat-output" rows="30"></textarea>
-      <input type="text" id="txbox">
-      <input type="button" value="send" id="sendbutton">
+  <div>
+    <div class="room-root flexbox">
+      <audio id="sound1" preload="auto">
+        <source src="@/assets/sounds/puu79_a.wav" type="audio/wav">
+      </audio>
+      <div class="col1">
+        <textarea id="output" class="chat-output" rows="30"></textarea>
+        <input type="text" id="txbox">
+        <input type="button" value="send" id="sendbutton">
+      </div>
+      <memberbox v-bind:player_slot="player_slot" v-on:ready-changed="send_ready()"></memberbox>
     </div>
-    <memberbox v-bind:player_slot="player_slot" v-on:ready-changed="send_ready()"></memberbox>
   </div>
 </template>
 <script>
