@@ -2,20 +2,24 @@
   <div>
     <div class="navbar">
       <div class="login-disp">
-        <div v-if="username != null">
-          {{username}}
-        </div>
-        <div v-else>
-          ログインしていません <button v-on:click="loginModal=true">(login)</button>
+        <div v-if="username != null">{{username}}</div>
+        <div v-else>ログインしていません
+          <button v-on:click="loginModal=true">(login)</button>
         </div>
       </div>
     </div>
     <div class="modal-mask" v-if="loginModal===true">
       <div class="modal-wrapper">
         <div class="dialog-login">
-          <p>username:<input type="text" v-model="username"> </p>
-          <p>password:<input type="password" v-model="password"></p>
-          <p> <button v-on:click="login(username,password)">submit</button> </p>
+          <p>username:
+            <input type="text" v-model="username">
+          </p>
+          <p>password:
+            <input type="password" v-model="password">
+          </p>
+          <p>
+            <button v-on:click="login(username,password)">submit</button>
+          </p>
         </div>
       </div>
     </div>
@@ -24,8 +28,8 @@
 <script>
 import Vue from "vue";
 import axios from "axios";
-axios.defaults.xsrfCookieName = 'csrftoken'
-axios.defaults.xsrfHeaderName = 'X-CSRFToken'
+axios.defaults.xsrfCookieName = "csrftoken";
+axios.defaults.xsrfHeaderName = "X-CSRFToken";
 
 export default {
   data: vm => ({
@@ -39,9 +43,7 @@ export default {
   methods: {
     get_host() {
       var h = location.host;
-      if (location.port == 8080) {
-        h = location.hostname + ":8000";
-      }
+      // if (location.port == 8080) { h = location.hostname + ":8000"; }
       return h;
     },
     async state() {
@@ -52,12 +54,16 @@ export default {
     },
     async login(u, p) {
       var host = this.get_host();
-      var response = await axios.post("http://" + host + "/jong/login", {
-        username: u,
-        password: p
-      },{
-        headers: {'Content-Type': 'application/x-www-form-urlencoded'}
-      });
+      var response = await axios.post(
+        "http://" + host + "/jong/login",
+        {
+          username: u,
+          password: p
+        },
+        {
+          headers: { "Content-Type": "application/x-www-form-urlencoded" }
+        }
+      );
       this.state();
     },
     async logout() {

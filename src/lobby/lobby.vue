@@ -77,9 +77,7 @@ export default {
 
 function new_socket(root) {
   var host = location.host;
-  if (location.port == 8080) {
-    host = location.hostname + ":8000";
-  }
+  //if (location.port == 8080) {host = location.hostname + ":8000";}
   var socket = (window.socket = new WebSocket("ws://" + host + "/jong/lobby"));
   socket.onmessage = function(e) {
     var o = JSON.parse(e.data);

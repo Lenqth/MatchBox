@@ -2,15 +2,23 @@
   <div class="modal-mask">
     <div class="modal-wrapper">
       <div class="dialog-room">
-        <h2>部屋の作成</h2>
-        ゲーム:
+        <h2>部屋の作成</h2>ゲーム:
         <select name="type" class="selection" v-model="__game_type" v-on:change="getConfig()">
-          <option v-for="(item,index) in game_type_option" v-bind:value="item.id" :key="index" >{{item.name}}</option>
+          <option
+            v-for="(item,index) in game_type_option"
+            v-bind:value="item.id"
+            :key="index"
+          >{{item.name}}</option>
         </select>
         <div class="dialog-body">
-          <selection v-for="(item,index) in detail_options" :key="index"
+          <selection
+            v-for="(item,index) in detail_options"
+            :key="index"
             v-on:changed="(e) => Changed(index,e)"
-            v-bind:title="item.display_name" v-bind:items="item.value" v-bind:default="item.default"></selection>
+            v-bind:title="item.display_name"
+            v-bind:items="item.value"
+            v-bind:default="item.default"
+          ></selection>
         </div>
         <div class="dialog-footer">
           <button v-on:click="createRoom()">作成</button>
@@ -50,9 +58,7 @@ export default {
     },
     async getConfig() {
       var host = location.host;
-      if (location.port == 8080) {
-        host = location.hostname + ":8000";
-      }
+      // if (location.port == 8080) { host = location.hostname + ":8000"; }
       var response = await axios.get(
         "http://" + host + "/jong/config/" + this.game_type
       );
