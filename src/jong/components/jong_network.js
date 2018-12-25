@@ -114,7 +114,6 @@ Deck.prototype.start = async function (sock) {
 
       var commands = res.commands_available
       this.players[this.player_id].commands_available = [ {type: 'skip'} ].concat(res.commands_available)
-      this.players[this.player_id].command_types_available = new Set(this.players[this.player_id].commands_available.map(x => x.type))
       this.players[this.player_id].allow_discard = false
 
       if(res.agari_info != null) {
@@ -155,7 +154,6 @@ Deck.prototype.start = async function (sock) {
       this.players[this.player_id].hand = res.hand_tiles
       this.players[this.player_id].drawed = res.draw
       this.players[this.player_id].commands_available = res.turn_commands_available == null ? [] : res.turn_commands_available
-      this.players[this.player_id].command_types_available = new Set(this.players[this.player_id].commands_available.map(x => x.type))
       this.players[this.player_id].allow_discard = true
 
       if(res.agari_info != null) {
@@ -237,7 +235,6 @@ class Hand {
 
     this.allow_discard = false
     this.commands_available = []
-    this.command_types_available = new Set()
 
     this.open = false
 

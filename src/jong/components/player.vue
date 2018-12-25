@@ -2,18 +2,7 @@
   <div>
     <trash-tile v-bind:trash="player.trash" v-bind:target="player.target=='trash'"></trash-tile>
 		<div class="score-area">{{player.score}}</div>
-    <div :class='{"player-main":main}' style="width:100%;height:10%;">
-      <transition-group class="command-bar clearfix" name="command">
-        <div id="chow" key="chow" v-if="player.command_types_available.has('chow')" class="command" v-on:click="command('chow');">チー(Z)</div>
-        <div id="pong" key="pong" v-if="player.command_types_available.has('pong')" class="command" v-on:click="command('pong');">ポン(X)</div>
-        <div id="kong" key="kong" v-if="player.command_types_available.has('kong')" class="command" v-on:click="command('kong');">カン(C)</div>
-        <div id="conckong" key="conckong" v-if="player.command_types_available.has('conckong')" class="command" v-on:click="command('conckong');">暗カン</div>
-        <div id="apkong" key="apkong" v-if="player.command_types_available.has('apkong')" class="command" v-on:click="command('apkong');">加カン</div>
-        <div id="ron" key="ron" v-if="player.command_types_available.has('ron')" class="command" v-on:click="command('ron');">ロン</div>
-        <div id="tsumo" key="tsumo" v-if="player.command_types_available.has('tsumo')" class="command" v-on:click="command('tsumo');">ツモ</div>
-        <div id="skip" key="skip" v-if="player.command_types_available.has('skip')" class="command" v-on:click="command('skip');">スキップ</div>
-      </transition-group>
-    </div>
+    <command-bar :class="{'player-main':main}" :commands_available="player.commands_available" @command="command" />
     <table class="player-hand" :class='{"border-discard-hand":player.allow_discard,"player-main":(main||open)}'>
       <tr>
       <td v-for="(item,index) in player.hand" :key="index">
@@ -42,12 +31,14 @@ import exposedset from './exposedset.vue'
 import pullout from './pullout.vue'
 import trashtile from './trashtile.vue'
 import spinningtarget from './target.vue'
+import command_bar from './command_bar.vue'
 
 import {get_wind_name, numtosrc, tile_click, command, click_meld_popup} from './jong_network.js'
 Vue.component('exposed-set', exposedset)
 Vue.component('pullout-tile', pullout)
 Vue.component('trash-tile', trashtile)
 Vue.component('spinning-target', spinningtarget)
+Vue.component('command-bar', command_bar)
 
 export default {
   props: [ 'player', 'main' , 'open' ],
@@ -77,30 +68,6 @@ export default {
     transition-duration: 0.6s;
     transition-delay: 0s;
     transition-timing-function: ease;
-}
-.command-bar{
-  display: flex;
-  flex-wrap: nowrap;
-  margin:3px 0;
-  width:100%;
-}
-
-.command{
-  background-color: white;
-  border:1px black solid;
-  font-size: 100%;
-  flex-basis:15%;
-  height: 100%;
-}
-.command-enter-active{
-  transition: height 0.6s 0s ease;
-}
-.command-leave-active{
-  transition: height 0.6s 0s ease;
-}
-
-.command-enter , .command-leave-to{
-  height: 0px;
 }
 
 .border-discard-hand{
@@ -136,4 +103,5 @@ export default {
 .player-hand:not(.player-main){
   visibility: hidden;
 }
+
 </style>

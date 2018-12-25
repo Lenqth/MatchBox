@@ -8,7 +8,7 @@ export function newMethod (o, n, f) {
 }
 
 export function play_sound (url) {
-  url = '/static/jongroom/sound/' + url
+  url = '@/assets/sound/' + url
   var audio = document.createElement('audio')
   audio.style.display = 'none'
   audio.src = url
