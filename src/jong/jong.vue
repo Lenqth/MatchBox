@@ -12,7 +12,6 @@
       <player-area id="hand2" v-bind:player="players[(player_id+2)%4]" :open="open" class="player-field"></player-area>
       <player-area id="hand3" v-bind:player="players[(player_id+3)%4]" :open="open" class="player-field"></player-area>
       <player-area id="hand0" v-bind:player="players[player_id]" main="1" :open="open" class="player-field"></player-area>
-      <meld-selection v-bind:meld_selection="meld_selection" v-on:cancel="meld_selection_cancel()"></meld-selection>
       <result-dialog v-bind:result="result" v-on:ok="ok()"></result-dialog>
       <final-result-dialog v-bind:result="final_result" v-on:ok="ok()"></final-result-dialog>
     </div>
@@ -43,8 +42,8 @@ Vue.component("result-dialog", Result);
 import FinalResult from "./components/final_result.vue";
 Vue.component("final-result-dialog", FinalResult);
 
-import meld_selection from "./components/meld_selection.vue";
-Vue.component("meld-selection", meld_selection);
+//import meld_selection from "./components/meld_selection.vue";
+//Vue.component("meld-selection", meld_selection);
 
 var deck = new Deck();
 
@@ -65,9 +64,6 @@ export default {
     ok() {
       deck.ok();
     },
-    meld_selection_cancel() {
-      deck.meld_selection = null;
-    }
   },
   beforeRouteEnter(route, redirect, next) {
     next(vm => {

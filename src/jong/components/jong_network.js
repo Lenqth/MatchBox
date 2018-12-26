@@ -76,6 +76,8 @@ Deck.prototype.start = async function (sock) {
     var pl = this.players[this.player_id]
     if (res.type === 'reset') {
       delete res.type
+      this.yakulist = null
+      this.calculated_score = null
       this.assign(res)
       this.open = false
       this.meld_selection = {type: '', tiles: []}
@@ -120,11 +122,14 @@ Deck.prototype.start = async function (sock) {
         this.yakulist = res.agari_info[1];
         this.calculated_score = res.agari_info[0]
       }
-
       var timeout = res.timeout * 1000
       var cancelObj = {cancel: false}
       utils.play_sound('puu79_a.wav')
       var input_res = await Promise.race([claim_input(cancelObj), timer(timeout, cancelObj)])
+      this.players[this.player_id].commands_available = []
+      this.players[this.player_id].allow_discard = false
+      this.yakulist = null
+      this.calculated_score = null
       cancelObj.cancel = true
       if (input_res != null) {
         input_res._m_id = res._m_id
@@ -274,34 +279,16 @@ export function tile_click (x) {
   }
 }
 
-export async function click_meld_popup (pos) {
-  console.log('meld-select:' + pos.toString())
-  if (input_resolve != null) {
-    deck.meld_selection.tiles = []
-    input_resolve(deck.meld_selection.type, deck.meld_selection.pos[pos])
-  }
+export function command(type,pos) {
+  if (input_resolve == null) { return }
+  console.log(type,pos)
+  input_resolve(type,pos)
 }
 
-export function command (type) {
-  if (input_resolve == null) { return }
-  var pl = deck.players[deck.player_id]
-  var cmd = pl.commands_available
-  var fil = cmd.filter(x => (x.type == type))
-  if (fil.length == 0) { return }
-  if (fil.length == 1) {
-    input_resolve(type, fil[0].pos)
-  } else {
-    var selections = fil.map(x => x.pos)
-    var tiles = selections.map(x => x.map(y => y >= 0 ? pl.hand[y] : (y == -1 ? pl.drawed : deck.claim_target)))
-    deck.meld_selection = {}
-    deck.meld_selection.type = type
-    deck.meld_selection.tiles = tiles
-    deck.meld_selection.pos = selections
-  }
-}
+
 
 var input_resolve = null
-export async function claim_input () {
+export async function claim_input (cancelObj) {
   return new Promise(
     function (resolve, reject) {
       input_resolve = function (type, value) {
@@ -312,7 +299,7 @@ export async function claim_input () {
   )
 }
 
-export async function turn_input () {
+export async function turn_input (cancelObj) {
   return new Promise(
     function (resolve, reject) {
       input_resolve = function (type, value) {
@@ -362,8 +349,9 @@ export function __last_target (t) {
 function importAll (r) {
   return r.keys().map(r)
 }
-
 const images = importAll(require.context('../assets/', false, /\.(png|jpe?g|svg)$/))
+
+
 
 export function numtosrc (x) {
   if (x in Deck.numtosrc_table) {

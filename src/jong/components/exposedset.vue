@@ -50,8 +50,9 @@ export default {
 
 .exposed-group{
 	flex-wrap: nowrap;
-  border: 1px red dotted;
-  display: flex;
+  box-sizing: border-box;
+/*  border: 1px red dotted;*/
+  display: flex;  
   margin:0px 4px;
 }
 
@@ -73,40 +74,6 @@ export default {
 .apkong-box{
   align-items:flex-end;
   display: inline-flex;
-}
-
-.my-discarded{
-  height:100px;
-  width:210px;
-  margin:auto;
-}
-.discarded-item{
-  float: left;
-  display: block;
-}
-.discarded-item img {
-  width:22px;
-  height:30px;
-  display: block;
-  border: 1px transparent solid;
-}
-
-.discarded-tsumogiri img{
-  border: 1px blue solid;
-}
-.pullout-item{
-  float: left;
-}
-.exposed-item{
-  float: left;
-  direction: rtl;
-}
-.pullout-area{
-  margin-right: auto;
-  float: left;
-  width:20%;
-  height:33px;
-  border: 1px pink dotted;
 }
 
 </style>

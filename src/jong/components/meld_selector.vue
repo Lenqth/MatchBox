@@ -24,7 +24,6 @@ export default {
   props: ['meld_selection'],
   methods: {
     numtosrc,
-    get_wind_name: get_wind_name,
     click_meld_popup: click_meld_popup,
     close(){
       this.$emit("cancel")

@@ -1,29 +1,22 @@
 <template>
-  <div style="width:100%;height:10%;">
-    <transition-group class="command-bar clearfix" name="command">
-      <div id="chow" key="chow" v-if="command_types_available.has('chow')" class="command" 
-        @keydown.90="command('chow')" @click="command('chow')">チー(Z)</div>
-      <div id="pong" key="pong" v-if="command_types_available.has('pong')" class="command" 
-        @keydown.88="command('pong')" @click="command('pong');">ポン(X)</div>
-      <div id="kong" key="kong" v-if="command_types_available.has('kong')" class="command" 
-        @keydown.67="command('kong')" @click="command('kong');">カン(C)</div>
-      <div id="conckong" key="conckong" v-if="command_types_available.has('conckong')" class="command" 
-        @keydown.67="command('conckong')" @click="command('conckong');">暗カン(C)</div>
-      <div id="apkong" key="apkong" v-if="command_types_available.has('apkong')" class="command" 
-        @keydown.86="command('apkong')" @click="command('apkong');">加カン(V)</div>
-      <div id="ron" key="ron" v-if="command_types_available.has('ron')" class="command" 
-        @click="command('ron');">ロン</div>
-      <div id="tsumo" key="tsumo" v-if="command_types_available.has('tsumo')" class="command" 
-        @click="command('tsumo');">ツモ</div>
-      <div id="skip" key="skip" v-if="command_types_available.has('skip')" class="command" 
-        @click="command('skip');">スキップ</div>
-    </transition-group>
+  <div style="width:100%;height:10%;" class="command-bar">
+    <command-button key="ch" type_name="chow" :items="twc['chow']" @command="command" shortcut="90">チー(Z)</command-button>
+    <command-button key="pn" type_name="pong" :items="twc['pong']" @command="command" shortcut="88">ポン(X)</command-button>
+    <command-button key="kn" type_name="kong" :items="twc['kong']" @command="command" shortcut="67">カン(C)</command-button>
+    <command-button key="ck" type_name="conckong" :items="twc['conckong']" @command="command" shortcut="67">暗槓(C)</command-button>
+    <command-button key="ak" type_name="apkong" :items="twc['apkong']" @command="command" shortcut="86">加槓(V)</command-button>
+    <command-button key="rn" type_name="ron" :items="twc['ron']" @command="command" :show_pattern="false">ロン</command-button>
+    <command-button key="tm" type_name="tsumo" :items="twc['tsumo']" @command="command" :show_pattern="false">ツモ</command-button>
+    <command-button key="sk" type_name="skip" :items="twc['skip']" @command="command" :show_pattern="false">スキップ</command-button>
   </div>
 </template>
 
 <script>
 
 import Vue from 'vue';
+
+import cbt from './command_button'
+Vue.component('command-button', cbt)
 
 export default {
   props:{
@@ -32,8 +25,8 @@ export default {
     }
   },
   methods:{
-    command(x,head_type){
-      this.$emit("command",x,head_type);
+    command(type,head_ids){
+      this.$emit("command",type,head_ids);
     }
   },
   computed:{
@@ -42,8 +35,20 @@ export default {
         return new Set();
       }
       return new Set(this.commands_available.map(x => x.type));
-    }
-
+    },
+    twc(){      
+      if(this.commands_available==null){
+        return {};
+      }
+      let res = {};
+      for(let v of this.commands_available){
+        if(res[v.type] == null){
+          res[v.type] = [];
+        }
+        res[v.type].push(v);
+      }
+      return res;
+    },
   }
 }
   
