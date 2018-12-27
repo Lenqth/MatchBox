@@ -97,11 +97,8 @@ export default {
 function new_socket_conf() {
   return new Promise((res, rej) => {
     var host = location.host;
-    if (location.port == 8080) {
-      host = location.hostname + ":8000";
-    }
     var socket = (window.socket = new WebSocket(
-      "ws://" + host + "/jong/room/configured"
+      "ws://" + host + "/ws/jong/room/configured"
     ));
     window.socket.addEventListener(
       "open",

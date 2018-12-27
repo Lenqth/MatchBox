@@ -9,12 +9,13 @@ import asyncio
 
 class RoomListConsumer(AsyncWebsocketConsumer):
     async def connect(self):
+        print("lobby_enter")
         await self.accept()
         await self.channel_layer.group_add(
             "lobby_listener",
             self.channel_name
         )
-        await self.receive("")
+        await self.send_all_room()
 
     async def disconnect(self, close_code):
         await self.channel_layer.group_discard(

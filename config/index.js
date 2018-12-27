@@ -10,8 +10,8 @@ module.exports = {
     assetsSubDirectory: "static",
     assetsPublicPath: "/bundle/",
     proxyTable: {
-      "ws://*": {
-        target: "http://localhost:8000/",
+      "/ws/**": {
+        target: "ws://localhost:8000/",
         ws: true
       },
       "/jong/account": "http://localhost:8000/",

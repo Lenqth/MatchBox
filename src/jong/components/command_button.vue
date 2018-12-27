@@ -56,9 +56,11 @@ export default {
         if( x == null ){
           return;
         }else{
+          this.hover=false;
           this.$emit("command",this.type_name,x);
         }
       }else{
+        this.hover=false;
         this.$emit("command",this.type_name,this.items[0].pos);
       }
     }

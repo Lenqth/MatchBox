@@ -45,14 +45,10 @@ export default {
       this.$router.push("/room");
     },
     async joinRoom(room){
-      console.log("nyan");
       var host = location.host;
-      if (location.port == 8080) {
-        host = location.hostname + ":8000";
-      }
       await new Promise( function(res,rej){
         var socket = (window.socket = new WebSocket(
-          "ws://" + host + "/jong/room/join/" + room.room_id
+          "ws://" + host + "/ws/jong/room/join/" + room.room_id
         ));
         window.socket.addEventListener(
           "open",
@@ -66,7 +62,7 @@ export default {
   },
   beforeRouteEnter(route, redirect, next) {
     next(vm => {
-      __vm = vm;
+      console.log("aaa")
       if (window.socket) {
         window.socket.close();
       }
@@ -78,7 +74,9 @@ export default {
 function new_socket(root) {
   var host = location.host;
   //if (location.port == 8080) {host = location.hostname + ":8000";}
-  var socket = (window.socket = new WebSocket("ws://" + host + "/jong/lobby"));
+  var socket = (window.socket = new WebSocket("ws://" + host + "/ws/jong/lobby"));
+  console.log("bbb")
+  socket.onopen = () => console.log("ccc")
   socket.onmessage = function(e) {
     var o = JSON.parse(e.data);
     console.log(o);
