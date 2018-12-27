@@ -45,8 +45,12 @@ export default {
   methods: {
     numtosrc,
     get_wind_name: get_wind_name,
-    tile_click,
-    command
+    tile_click(x){
+      this.$emit("tile",x)
+    },
+    command(x,y){
+      this.$emit("command",x,y)
+    }
   }
 }
 </script>

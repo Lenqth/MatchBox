@@ -30,7 +30,7 @@ AsyncConnection.prototype.send = function (obj) {
 AsyncConnection.prototype.receiveAsync = function () {
   if (this.buffer.length > 0) { return this.buffer.shift() }
   var th = this
-  return new Promise(function (resolve, reject) {
+  return new Promise(function (resolve) {
     th.callbacks.push(resolve)
   })
 }
@@ -52,16 +52,76 @@ export class Deck {
     this.meld_selection = {type: '', tiles: []}
     this.result = null // { player : "" , score : 0 , yaku : [] };
     this.final_result = null;
-
     this.player_id = 0
-
     this.time_left = null
     this.timeout = null
-
     for (let i = 0; i < 4; i++) {
       this.players[i] = new Hand()
       this.players[i].id = i
     }
+  }
+  tile_click (x) {
+    var pl = this.players[this.player_id]
+    var pos = x
+    if (input_resolve != null && pl.allow_discard) {
+      input_resolve('discard', pos)
+    }
+  }
+  command(type,pos) {
+    if (input_resolve == null) { return }
+    input_resolve(type,pos)
+  }
+  async turn_input (cancelObj) {
+    return new Promise(
+      function (resolve) {
+        input_resolve = function (type, value) {
+          var pl = this.players[this.player_id]
+          if (type == 'discard') {
+            if ((pl.drawed != null && value == -1) || (value >= 0 || value < pl.hand.length)) {
+              pl.trash_tile(value)
+              input_resolve = null
+              pl.allow_discard = false
+              resolve({'type': 'discard', 'pos': value})
+            }
+          } else {
+            input_resolve = null
+            pl.allow_discard = false
+            resolve({'type': type, 'pos': value})
+          }
+        }
+      }
+    )
+  }
+  timer_interval (resolve, timeout, cancelObj) {
+    var left = this.time_left = Math.floor((timeout - (new Date()).getTime()) / 100) / 10
+    if (left < 0) {
+      this.time_left = null
+      resolve()
+    }
+    if (cancelObj.cancel) {
+      this.time_left = null
+      resolve()
+    }
+  }
+  
+  async claim_input (cancelObj) {
+    return new Promise(
+      function (resolve) {
+        input_resolve = function (type, value) {
+          input_resolve = null
+          resolve({'type': type, 'pos': value})
+        }
+      }
+    )
+  }
+  async timer (timeout, cancelObj) {
+    var cancel = null
+    await new Promise((resolve) => { cancel = setInterval(() => this.timer_interval(resolve, timeout, cancelObj), 100) })
+    clearInterval(cancel)
+    return null
+  }  
+  __last_target (t) {
+    return this.last_target == t
   }
 }
 
@@ -72,7 +132,6 @@ Deck.prototype.start = async function (sock) {
   this.open = false
   while (true) {
     res = await this.conn.receiveAsync()
-    console.log(res)
     var pl = this.players[this.player_id]
     if (res.type === 'reset') {
       delete res.type
@@ -108,24 +167,24 @@ Deck.prototype.start = async function (sock) {
       this.deck_left = res.deck_left
     } if (res.type === 'claim_command') {
       // {"commands_available": [{"type": 1, "pos": [[1], [2]]}], "_m_id": 7, "timeout": 1539616054.5650032}
-      var tg_pl = res.target.player, tg_apkong = res.target.apkong, tg_tile = res.target.tile
+      let tg_pl = res.target.player, tg_apkong = res.target.apkong, tg_tile = res.target.tile
       this.players[this.player_id].hand = res.hand_tiles
       this.players[this.player_id].drawed = null
       this.players[tg_pl].target = tg_apkong ? 'apkong' : 'trash'
       this.claim_target = tg_tile
 
-      var commands = res.commands_available
-      this.players[this.player_id].commands_available = [ {type: 'skip'} ].concat(res.commands_available)
+      let commands = res.commands_available
+      this.players[this.player_id].commands_available = [ {type: 'skip'} ].concat(commands)
       this.players[this.player_id].allow_discard = false
 
       if(res.agari_info != null) {
         this.yakulist = res.agari_info[1];
         this.calculated_score = res.agari_info[0]
       }
-      var timeout = res.timeout * 1000
-      var cancelObj = {cancel: false}
+      let timeout = res.timeout * 1000
+      let cancelObj = {cancel: false}
       utils.play_sound('puu79_a.wav')
-      var input_res = await Promise.race([claim_input(cancelObj), timer(timeout, cancelObj)])
+      let input_res = await Promise.race([this.claim_input(cancelObj), this.timer(timeout, cancelObj)])
       this.players[this.player_id].commands_available = []
       this.players[this.player_id].allow_discard = false
       this.yakulist = null
@@ -148,7 +207,7 @@ Deck.prototype.start = async function (sock) {
         }
       }
     } else if (res.type == "confirm" ) {
-      await new Promise( (res,rej) => this.listener_ok = res )
+      await new Promise( (resolve) => this.listener_ok = resolve )
       this.conn.send( {"_m_id" : res._m_id} )
       this.result = null;
     } else if (res.type == 'discard') {
@@ -169,7 +228,7 @@ Deck.prototype.start = async function (sock) {
       var timeout = res.timeout * 1000
       var cancelObj = {cancel: false}
       utils.play_sound('puu79_a.wav')
-      var input_res = await Promise.race([turn_input(cancelObj), timer(timeout, cancelObj)])
+      var input_res = await Promise.race([this.turn_input(cancelObj), this.timer(timeout, cancelObj)])
       cancelObj.cancel = true
       if (input_res != null) {
         input_res._m_id = res._m_id
@@ -271,80 +330,8 @@ export function get_wind_name (id) {
   return _wind_name[id]
 }
 
-export function tile_click (x) {
-  var pl = deck.players[deck.player_id]
-  var pos = x
-  if (input_resolve != null && pl.allow_discard) {
-    input_resolve('discard', pos)
-  }
-}
-
-export function command(type,pos) {
-  if (input_resolve == null) { return }
-  console.log(type,pos)
-  input_resolve(type,pos)
-}
-
-
 
 var input_resolve = null
-export async function claim_input (cancelObj) {
-  return new Promise(
-    function (resolve, reject) {
-      input_resolve = function (type, value) {
-        input_resolve = null
-        resolve({'type': type, 'pos': value})
-      }
-    }
-  )
-}
-
-export async function turn_input (cancelObj) {
-  return new Promise(
-    function (resolve, reject) {
-      input_resolve = function (type, value) {
-        var pl = deck.players[deck.player_id]
-        if (type == 'discard') {
-          if ((pl.drawed != null && value == -1) || (value >= 0 || value < pl.hand.length)) {
-            pl.trash_tile(value)
-            input_resolve = null
-            pl.allow_discard = false
-            resolve({'type': 'discard', 'pos': value})
-          }
-        } else {
-          input_resolve = null
-          pl.allow_discard = false
-          resolve({'type': type, 'pos': value})
-        }
-      }
-    }
-  )
-}
-
-export function timer_interval (resolve, timeout, cancelObj) {
-  var left = deck.time_left = Math.floor((timeout - (new Date()).getTime()) / 100) / 10
-  if (left < 0) {
-    console.log('!!timeout!!')
-    deck.time_left = null
-    resolve()
-  }
-  if (cancelObj.cancel) {
-    deck.time_left = null
-    resolve()
-  }
-}
-
-export async function timer (timeout, cancelObj) {
-  var cancel = null
-  await new Promise((resolve, reject) => { cancel = setInterval(() => timer_interval(resolve, timeout, cancelObj), 100) })
-  clearInterval(cancel)
-  return null
-}
-// timer( (new Date()).getTime() + 10000 );
-
-export function __last_target (t) {
-  return deck.last_target == t
-}
 
 function importAll (r) {
   return r.keys().map(r)

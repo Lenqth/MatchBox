@@ -11,7 +11,7 @@
       <player-area id="hand1" v-bind:player="players[(player_id+1)%4]" :open="open" class="player-field"></player-area>
       <player-area id="hand2" v-bind:player="players[(player_id+2)%4]" :open="open" class="player-field"></player-area>
       <player-area id="hand3" v-bind:player="players[(player_id+3)%4]" :open="open" class="player-field"></player-area>
-      <player-area id="hand0" v-bind:player="players[player_id]" main="1" :open="open" class="player-field"></player-area>
+      <player-area id="hand0" v-bind:player="players[player_id]" main="1" @tile="on_tile" @command="on_command" :open="open" class="player-field"></player-area>
       <result-dialog v-bind:result="result" v-on:ok="ok()"></result-dialog>
       <final-result-dialog v-bind:result="final_result" v-on:ok="ok()"></final-result-dialog>
     </div>
@@ -54,23 +54,30 @@ function __img(x) {
 window.deck = deck;
 
 export default {
-  name: "Loader",
+  name: "Jong",
   data() {
-    return deck = new Deck();
+    let deck = new Deck();
+    deck.start(window.socket);
+    return deck
   },
   methods: {
     numtosrc,
     get_wind_name: get_wind_name,
     ok() {
-      deck.ok();
+      this.ok();
     },
+    on_tile(pos){
+      this.tile_click(pos);
+    },
+    on_command(type,pos){
+      this.command(type,pos);
+    }
   },
   beforeRouteEnter(route, redirect, next) {
     next(vm => {
       if (window.socket == null) {
         vm.$router.push("/room");
-      } else {
-        deck.start(window.socket);
+        return false;
       }
     });
   }
