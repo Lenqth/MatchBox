@@ -1,5 +1,5 @@
 <template>
-  <div class="room" v-bind:class="{'room-full':is_full}" >
+  <v-card class="room" v-bind:class="{'room-full':is_full}" width="300">
     <div class="room-top">
       <div class="room-title">{{room.room_id}}</div>
       <div class="room-cap">{{room.room_pop}} / {{room.room_cap}}</div>
@@ -7,11 +7,13 @@
     <div class="room-body">
       
     </div>   
-  </div>
+  </v-card>
 </template>
 <script>
 
-import Vue from 'vue';
+import Vue from "vue";
+import Vuetify from 'vuetify'
+Vue.use(Vuetify);
 
 export default {
   props : ["room"],
@@ -35,31 +37,25 @@ export default {
 .room-full{
   background-color: magenta ;
 }
-.room:hover:not(.room-full){
-  background-color: #aaaadd ;
-}
+
 
 .room-top{
   width: 100%;
   display: flex;
-
 }
-
 .room-title{
-  width:88%;
+  width:84%;
   overflow: hidden;
 }
-
 .room-cap{
   box-sizing: border-box;
   border-left: 2px solid black;
-  width: 12%;
+  width: 16%;
 
 }
 
 .room-body{
   min-height:4em;
-
 }
 
 </style>

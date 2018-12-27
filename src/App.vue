@@ -1,12 +1,15 @@
 <template>
-  <div id="root">
+  <v-app id="root">
     <login/>
     <router-view id="app"/>
-  </div>
+  </v-app>
 </template>
 
 <script>
 import Vue from "vue";
+import Vuetify from "vuetify";
+Vue.use(Vuetify);
+
 import Login from "./components/login";
 
 Vue.component("login", Login);

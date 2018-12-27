@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <v-toolbar>
     <div class="navbar">
       <div class="login-disp">
         <div v-if="username != null">{{username}}</div>
@@ -23,10 +23,12 @@
         </div>
       </div>
     </div>
-  </div>
+  </v-toolbar>
 </template>
 <script>
 import Vue from "vue";
+import Vuetify from 'vuetify'
+Vue.use(Vuetify);
 import axios from "axios";
 axios.defaults.xsrfCookieName = "csrftoken";
 axios.defaults.xsrfHeaderName = "X-CSRFToken";

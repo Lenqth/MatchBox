@@ -45,7 +45,7 @@ Vue.component("final-result-dialog", FinalResult);
 //import meld_selection from "./components/meld_selection.vue";
 //Vue.component("meld-selection", meld_selection);
 
-var deck = new Deck();
+var deck = null;
 
 function __img(x) {
   return '<img src="' + numtosrc(x) + '" >';
@@ -56,7 +56,7 @@ window.deck = deck;
 export default {
   name: "Loader",
   data() {
-    return deck;
+    return deck = new Deck();
   },
   methods: {
     numtosrc,

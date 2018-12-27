@@ -1,21 +1,28 @@
 <template>
   <div>
-    <div class="room-root">
-      <div class="room-container" id="roomlist">
-        <roombox class="room-item" v-for="(item,index) in rlist" v-bind:room="item" :key="index" v-on:dblclick.native="joinRoom(item)"  />
+    <v-content>
+      <div class="room-root">
+        <v-flex id="roomlist">
+          <roombox class="room-item" v-for="(item,index) in rlist" :key="index" :room="item" @dblclick.native="joinRoom(item)"/>
+        </v-flex>
       </div>
-      <div class="footer">
-        <button v-on:click="openModal()">ルームを新規作成</button>
-        <button v-on:click="autoMatch()">おまかせマッチ</button>
-      </div>
-    </div>
-    <div v-if="dialogOpen" class="modal">
-      <newroom/>
-    </div>
-  </div>
+    </v-content>
+    <newroom ref="newroom_dialog"/>
+    <v-footer dark height="auto">
+      <v-card class="flex" flat tile>
+        <v-card-title class="teal">
+          <v-btn outline @click="openModal()">ルームを新規作成</v-btn>
+          <v-btn outline @click="autoMatch()">おまかせマッチ</v-btn>
+        </v-card-title>
+      </v-card>
+    </v-footer>
+   </div>
 </template>
 <script>
 import Vue from "vue";
+import Vuetify from 'vuetify'
+Vue.use(Vuetify);
+import 'vuetify/dist/vuetify.min.css'
 
 import * as utils from "./components/utils.js";
 
@@ -36,10 +43,7 @@ export default {
   },
   methods: {
     openModal() {
-      this.dialogOpen = true;
-    },
-    toggleModal() {
-      this.dialogOpen = !this.dialogOpen;
+      this.$refs.newroom_dialog.open();
     },
     autoMatch() {
       this.$router.push("/room");
@@ -62,7 +66,6 @@ export default {
   },
   beforeRouteEnter(route, redirect, next) {
     next(vm => {
-      console.log("aaa")
       if (window.socket) {
         window.socket.close();
       }
@@ -75,8 +78,6 @@ function new_socket(root) {
   var host = location.host;
   //if (location.port == 8080) {host = location.hostname + ":8000";}
   var socket = (window.socket = new WebSocket("ws://" + host + "/ws/jong/lobby"));
-  console.log("bbb")
-  socket.onopen = () => console.log("ccc")
   socket.onmessage = function(e) {
     var o = JSON.parse(e.data);
     console.log(o);
