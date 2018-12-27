@@ -1,11 +1,11 @@
 <template>
   <div>
     <v-content>
-      <div class="room-root">
-        <v-flex id="roomlist">
-          <roombox class="room-item" v-for="(item,index) in rlist" :key="index" :room="item" @dblclick.native="joinRoom(item)"/>
-        </v-flex>
-      </div>
+      <v-flex class="room-root" >
+        <transition-group name="roomtr">
+          <roombox class="room-item" v-for="(item,index) in rlist" :key="index+1" :room="item" @dblclick.native="joinRoom(item)"/>
+        </transition-group>
+      </v-flex>
     </v-content>
     <newroom ref="newroom_dialog"/>
     <v-footer dark height="auto">
@@ -31,6 +31,7 @@ Vue.component("newroom", newroomDialog);
 
 import roombox from "./components/roombox.vue";
 Vue.component("roombox", roombox);
+
 
 var audio1 = document.getElementById("sound1");
 
@@ -106,27 +107,13 @@ function new_socket(root) {
   border: 2px black solid;
 }
 
-.room-item {
-  box-sizing: border-box;
-  flex-basis: 33.34%;
-  flex-shrink: 1;
+
+.roomtr-enter-active,.roomtr-leave-active {
+  transition: opacity .5s;
+}
+.roomtr-enter,.roomtr-leave-to{
+  opacity: 0;
 }
 
-@keyframes blinkborder {
-  0% {
-    border-color: rgba(255, 255, 255, 1);
-  }
-  100% {
-    border-color: rgba(255, 255, 255, 0.2);
-  }
-}
 
-.room-item:nth-child(2n) {
-  background-color: #eeeeee;
-  /*flex-basis: 100%;*/
-}
-.room-item:nth-child(2n + 1) {
-  background-color: #ccccdd;
-  /*flex-basis: 100%;*/
-}
 </style>

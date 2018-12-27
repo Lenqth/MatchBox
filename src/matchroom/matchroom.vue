@@ -164,7 +164,7 @@ function game_start(arg) {
 .message-card-enter-active,.message-card-leave-active {
   transition: opacity .5s;
 }
-.message-card-enter,.megumi-leave-to{
+.message-card-enter,.roomtr-leave-to{
   opacity: 0;
 }
 

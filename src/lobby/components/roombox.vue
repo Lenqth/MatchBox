@@ -1,11 +1,10 @@
 <template>
-  <v-card class="room" v-bind:class="{'room-full':is_full}" width="300">
+  <v-card class="room" :class="{'room-full':is_full}" width="300" color="#ccccdd">
     <div class="room-top">
       <div class="room-title">{{room.room_id}}</div>
       <div class="room-cap">{{room.room_pop}} / {{room.room_cap}}</div>
     </div>
-    <div class="room-body">
-      
+    <div class="room-body">              
     </div>   
   </v-card>
 </template>
