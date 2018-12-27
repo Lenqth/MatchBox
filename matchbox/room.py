@@ -118,6 +118,17 @@ class Room:
                 res.append( {"position":i,"token":pl["token"],"ready":pl["ready"]} )
         return res
 
+    def config_list(self):
+        game = self.config["game_type"]      
+        res = []  
+        cf = import_game(game).config()
+        for (k,v) in cf.items():
+            if k in self.config:
+                res.append( { "id":k ,"display_name":v["display_name"] , "value":self.config[k] } )
+            else:
+                res.append( { "id":k ,"display_name":v["display_name"] , "value":v["default"] } )
+        return res
+
 
     async def start(self):
         import importlib
@@ -237,6 +248,11 @@ class Room:
             'room':self.getplayers() ,
             'message': "welcome!",
         }))
+        cfgs = self.config_list()
+        for x in cfgs:
+            await channel.send(text_data=json.dumps({
+                'message': " %s : %s " % (x["display_name"],x["value"]) ,
+            }))
         return True
         # return {"room":self,"token":token,"pos":i,"roomsize":self.room_size,"message":"welcome!"}
 
