@@ -2,7 +2,7 @@
   <div>
     <trash-tile v-bind:trash="player.trash" v-bind:target="player.target=='trash'"></trash-tile>
 		<div class="score-area">{{player.score}}</div>
-    <command-bar :class="{'player-main':main}" :commands_available="player.commands_available" @command="command" />
+    <command-bar v-show="main" :class="{'player-main':main}" :commands_available="player.commands_available" @command="command" />
     <table class="player-hand" :class='{"border-discard-hand":player.allow_discard,"player-main":(main||open)}'>
       <tr>
       <td v-for="(item,index) in player.hand" :key="index">

@@ -1,13 +1,7 @@
 <template>
-  <div :key="type_name" v-if="items!=null&&items.length>=1" class="command" 
-        @click="clk()" @mouseover="ovr()" @mouseleave="lev()">
-        <slot/>{{items.length>=2?"△":""}}
-        <transition name="meldpop">
-          <div v-if="hover" class="meld-selection-popup">
-            <exposedset v-for="(it,idx) in items" :key="idx" :tiles="it.tiles" :type="type_name" 
-             @click.native="clk(it.pos)" style="margin:3px;"/>
-          </div>
-        </transition>
+  <div :key="type_name" class="command" :class="{checked:value}" 
+        @click="clk()">
+        <slot/>
   </div>
 </template>
 
@@ -23,46 +17,17 @@ export default {
     "type_name":{
       type:String,
     },
-    "items":{
-      type:Array,
-    },
-    "show_pattern":{
+    "value":{
       type:Boolean,
-      default:true
-    }
-  },
-  data(){
-    return {
-      "hover":false
+      default:false
     }
   },
   computed:{
 
   },
   methods:{
-    ovr(){
-      if( this.show_pattern ){
-        this.hover=true;
-      }
-    },
-    lev(){
-      if(this.hover){
-        this.hover=false
-      }
-    },
     clk(x=null){
-      if(this.items == null)return;
-      if(this.items.length >= 2 ){
-        if( x == null ){
-          return;
-        }else{
-          this.hover=false;
-          this.$emit("command",this.type_name,x);
-        }
-      }else{
-        this.hover=false;
-        this.$emit("command",this.type_name,this.items[0].pos);
-      }
+      this.$emit("input",!this.value)
     }
   }
 }
@@ -71,13 +36,8 @@ export default {
 
 <style scoped>
 
-.command-bar{
-  display: flex;
-  flex-wrap: nowrap;
-  margin:3px 0;
-  width:100%;
-}
 .command{
+  user-select: none;
   position: relative;
   background-color: white;
   border:1px black solid;
@@ -88,6 +48,10 @@ export default {
 .command-enter-active{
   transition: height 0.6s 0s ease;
 }
+.checked{
+  background-color: skyblue !important;
+}
+
 .command-leave-active{
   transition: height 0.6s 0s ease;
 }

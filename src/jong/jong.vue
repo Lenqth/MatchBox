@@ -194,42 +194,6 @@ export default {
         this.listener_ok = null;
       }
     },
-    sampleset() {
-      var smpl = {
-        deck_left: 136,
-        player_id: 0,
-        seat_wind: 0,
-        prev_wind: 0,
-        players: [
-          {
-            hand: [2, 39, 55, 54, 54, 35, 6, 3, 24, 8, 9, 1, 18],
-            drew: null,
-            trash: [],
-            exposed: [],
-            flower: 0
-          },
-          {
-            hand: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-            trash: [],
-            exposed: [],
-            flower: 0
-          },
-          {
-            hand: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-            trash: [],
-            exposed: [],
-            flower: 0
-          },
-          {
-            hand: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-            trash: [],
-            exposed: [],
-            flower: 0
-          }
-        ]
-      };
-      this.assign(smpl);
-    },
     assign(obj) {
       for (var k in obj) {
         if (k == "players") {
@@ -257,6 +221,7 @@ export default {
         var pl = this.players[this.player_id];
         if (res.type === "reset") {
           delete res.type;
+          this.$store.commit("reset")
           this.yakulist = null;
           this.calculated_score = null;
           this.assign(res);
@@ -304,6 +269,13 @@ export default {
           this.claim_target = tg_tile;
 
           let commands = res.commands_available;
+          let skippable = true;
+          for(let v of commands){
+            if(v.type=="ron"){
+              skippable=false;
+              break;
+            }
+          }
           this.players[this.player_id].commands_available = [
             { type: "skip" }
           ].concat(commands);
@@ -313,13 +285,18 @@ export default {
             this.yakulist = res.agari_info[1];
             this.calculated_score = res.agari_info[0];
           }
-          let timeout = res.timeout * 1000;
-          let cancelObj = { cancel: false };
-          utils.play_sound("puu79_a.wav");
-          let input_res = await Promise.race([
-            this.claim_input(cancelObj),
-            this.timer(timeout, cancelObj)
-          ]);
+          let input_res;
+          if(this.$store.state.skip_claim && skippable){
+            input_res = { type: "skip" }
+          }else{
+            let timeout = res.timeout * 1000;
+            let cancelObj = { cancel: false };
+            utils.play_sound("puu79_a.wav");
+            input_res = await Promise.race([
+              this.claim_input(cancelObj),
+              this.timer(timeout, cancelObj)
+            ]);
+          }
           this.players[this.player_id].commands_available = [];
           this.players[this.player_id].allow_discard = false;
           this.yakulist = null;

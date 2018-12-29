@@ -1,5 +1,5 @@
 <template>
-  <div style="width:100%;height:10%;" class="command-bar">
+  <v-card style="width:100%;height:10%;" class="command-bar">
     <command-button key="ch" type_name="chow" :items="twc['chow']" @command="command" shortcut="90">チー(Z)</command-button>
     <command-button key="pn" type_name="pong" :items="twc['pong']" @command="command" shortcut="88">ポン(X)</command-button>
     <command-button key="kn" type_name="kong" :items="twc['kong']" @command="command" shortcut="67">カン(C)</command-button>
@@ -8,7 +8,9 @@
     <command-button key="rn" type_name="ron" :items="twc['ron']" @command="command" :show_pattern="false">ロン</command-button>
     <command-button key="tm" type_name="tsumo" :items="twc['tsumo']" @command="command" :show_pattern="false">ツモ</command-button>
     <command-button key="sk" type_name="skip" :items="twc['skip']" @command="command" :show_pattern="false">スキップ</command-button>
-  </div>
+    <v-spacer/>
+    <toggle v-model="skip_claim">鳴かない</toggle>
+  </v-card>
 </template>
 
 <script>
@@ -18,16 +20,19 @@ import Vue from 'vue';
 import cbt from './command_button'
 Vue.component('command-button', cbt)
 
+import ctg from './command_toggle'
+Vue.component('toggle', ctg)
+
 export default {
   props:{
     "commands_available":{
       type:Array,
-    }
+    },
   },
   methods:{
     command(type,head_ids){
       this.$emit("command",type,head_ids);
-    }
+    },
   },
   computed:{
     command_types_available(){
@@ -49,6 +54,14 @@ export default {
       }
       return res;
     },
+    skip_claim:{
+      get(){
+        return this.$store.state.skip_claim
+      },
+      set(skip_claim){
+        this.$store.commit("skip_claim",skip_claim)
+      }
+    }
   }
 }
   

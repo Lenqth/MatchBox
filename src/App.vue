@@ -8,14 +8,35 @@
 <script>
 import Vue from "vue";
 import Vuetify from "vuetify";
+import Vuex from "vuex";
 Vue.use(Vuetify);
+Vue.use(Vuex)
+
+const store = new Vuex.Store({
+  modules:{},
+  state: {
+    skip_claim: false
+  },
+  mutations: {
+    skip_claim (state , value = "toggle") {
+      if(value=="toggle"){
+        state.skip_claim = !state.skip_claim;
+      }else{
+        state.skip_claim = value
+      }
+    },
+    reset(state ){
+      state.skip_claim = false;
+    }
+  }
+})
 
 import Login from "./components/login";
-
 Vue.component("login", Login);
 
 export default {
-  name: "App"
+  name: "App",
+  store
 };
 </script>
 <style>

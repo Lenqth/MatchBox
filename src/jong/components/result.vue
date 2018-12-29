@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="show" width="40vw">
+  <v-dialog v-model="show" width="30vw">
     <v-card v-if="show">
       <v-card-title font-large v-if="result.player != -1" class="headline">
         {{result.player}} の {{ result.tsumo ? "ツモ" : "ロン" }}
