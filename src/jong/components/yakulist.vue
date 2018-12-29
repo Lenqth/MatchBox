@@ -8,7 +8,7 @@
         </tr>
       </thead>
 			<transition-group tag="tbody" class="yaku-tbody" name="yakuentry">
-				<tr v-for="(item,index) in yakus">
+				<tr v-for="(item,index) in yakus" :key="index+1">
 					<td>{{item.chinese_name}}</td>
 					<td class="alignright">{{item.score}}</td>
 				</tr>

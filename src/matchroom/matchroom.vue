@@ -134,7 +134,7 @@ function h_onerror(e) {
 }
 function h_onclose(e) {
   console.log("close:", e);
-  writeln("connection closed. please reload later.");
+  this.error_disp("connection closed. please reload later.");
   for (var x of document.getElementsByClassName("group-content")) {
     x.classList.remove("joined");
     x.classList.remove("group-content-you");

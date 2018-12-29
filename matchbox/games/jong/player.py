@@ -102,13 +102,13 @@ class Player:
             #conckong
             fq = np.bincount(self.hand,minlength=64)
             a = np.array(self.hand)
-            for (t,q) in enumerate(fq) :
+            for (tile,q) in enumerate(fq) :
                 if q >= 4 :
                     arr = np.array(self.hand)
-                    res.append( TurnCommand(TurnCommand.CONCKONG, list(np.where(a == t)[0][0:4] , tiles = [tile]*4 ) ) )
-                elif q >= 3 and t == self.drew :
+                    res.append( TurnCommand(TurnCommand.CONCKONG, list(np.where(a == tile)[0][0:4] , tiles = [tile]*4 ) ) )
+                elif q >= 3 and tile == self.drew :
                     arr = np.array(self.hand)
-                    res.append( TurnCommand(TurnCommand.CONCKONG, list(np.where(a == t)[0][0:3]) + [-1] , tiles = [tile]*4 ) )
+                    res.append( TurnCommand(TurnCommand.CONCKONG, list(np.where(a == tile)[0][0:3]) + [-1] , tiles = [tile]*4 ) )
 
         #tsumo
         if self.drew != None and self.chk_agari( game , self.drew , tsumo = True ):
