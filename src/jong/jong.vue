@@ -43,7 +43,7 @@
         </div>
       </transition>
     </div>
-    <result-dialog :result="result" @ok="ok()"/>
+    <result-dialog v-model="result" @ok="ok()"/>
     <final-result-dialog :result="final_result" @ok="ok()"/>
   </div>
 </template>

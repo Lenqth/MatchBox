@@ -1,55 +1,57 @@
 <template>
-  <v-dialog v-model="show" width="30vw">
-    <v-card v-if="show">
-      <v-card-title font-large v-if="result.player != -1" class="headline">
-        {{result.player}} の {{ result.tsumo ? "ツモ" : "ロン" }}
+  <v-dialog v-model="show" width="30vw" @close="fire_ok()">
+    <v-card v-if="show" key="guard," style="overflow-x:hidden" > 
+      <v-card-title font-large v-if="value.player != -1" class="headline">
+        {{value.player}} の {{ value.tsumo ? "ツモ" : "ロン" }}
       </v-card-title>
       <v-card-title large v-else class="headline">
         流局
       </v-card-title>    
       <v-card-text>
-        <yakulist :yakus="result.yaku" />
+        <yakulist :yakus="value.yaku" key='result-yaku' />
       </v-card-text>
       <v-card-actions>
-        <span class="headline">計 {{result.score}} 点</span>
+        <span class="headline">計 {{value.score}} 点</span>
         <v-spacer/>
-        <v-btn justify-right small @click="fire_ok()">OK</v-btn>
+        <v-btn justify-right small @click="close">OK</v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
 </template>
 <script>
 
-import Vue from 'vue'
+import Vue from 'vue' 
 import {get_wind_name, numtosrc} from '../components/jong_network.js'
 
 export default {
   props: {
-    "result":{
+    "value":{
       default:null
     },
-  },
-  data(){
-    return {"show":false}
   },
   methods: {
     numtosrc,
     get_wind_name: get_wind_name,
 		fire_ok(){
 			this.$emit("ok","");
-		}
-  },
-  watch:{
-    result(v){
-      this.show = (v != null)
     },
-    show(v){
-      if(!v){
-        this.result = null;
-        this.fire_ok();
+    close(){
+      this.show=false;
+    }
+  },
+  computed:{
+    show:{
+      get(){
+        return (this.value != null)
+      },
+      set(v){
+        if(!v){
+          this.$emit("input",null)
+          this.fire_ok();
+        }
       }
     }
-  }
+  },
 }
 
 </script>
