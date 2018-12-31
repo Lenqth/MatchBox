@@ -63,6 +63,11 @@ export default {
           { once: true }
         ); } );
       this.$router.push("/room");
+    },
+    async polling(){
+      if (window.socket) {
+        
+      }
     }
   },
   beforeRouteEnter(route, redirect, next) {
@@ -72,7 +77,7 @@ export default {
       }
       new_socket(vm);
     });
-  }
+  },
 };
 
 function new_socket(root) {
@@ -81,7 +86,6 @@ function new_socket(root) {
   var socket = (window.socket = new WebSocket("ws://" + host + "/ws/jong/lobby"));
   socket.onmessage = function(e) {
     var o = JSON.parse(e.data);
-    console.log(o);
     root.rlist = o.rooms;
   };
 }
