@@ -10,26 +10,8 @@ import Vue from "vue";
 import Vuetify from "vuetify";
 import Vuex from "vuex";
 Vue.use(Vuetify);
-Vue.use(Vuex)
-
-const store = new Vuex.Store({
-  modules:{},
-  state: {
-    skip_claim: false
-  },
-  mutations: {
-    skip_claim (state , value = "toggle") {
-      if(value=="toggle"){
-        state.skip_claim = !state.skip_claim;
-      }else{
-        state.skip_claim = value
-      }
-    },
-    reset(state ){
-      state.skip_claim = false;
-    }
-  }
-})
+Vue.use(Vuex);
+const store = require('./vuex_stores/root.js').store
 
 import Login from "./components/login";
 Vue.component("login", Login);

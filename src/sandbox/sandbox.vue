@@ -20,34 +20,45 @@ import rxconnection from "@/common/rxconnection.ts";
 
 
 
-import {Observable,Observer,Subject} from "rxjs";
-import {  share, distinctUntilChanged, takeWhile, shareReplay } from 'rxjs/operators';
+import {Observable,Observer,Subject,timer,defer} from "rxjs";
+import * as operators from 'rxjs/operators';
+
+
+
 
 export default {
   data(){
     return {
-      result : null
+      result : null,
+      count:0,
+      observer:null
     }
   },
   methods:{
     ok(){
       console.log('ok')
     },
+    sender(){
+      this.observer.next(1+this.count);
+      this.observer.next(2+this.count);
+      if((this.count++)>=5){
+        this.observer.complete();
+        return;
+      }
+      this.observer.error("q");
+    },
     testrx(){
-      var q;
       var o = new Observable((observer) => {
-          q = observer;
+          this.observer = observer;
         }).pipe(
-          shareReplay(1),
-          distinctUntilChanged()
+          operators.retryWhen( (x) => x.pipe( operators.mergeMap( (e,i) => {
+            console.log(i+" error")
+            return timer(i*500).pipe( operators.flatMap( async x =>{await this.sender();return x;} ) )
+          } ) ) ),
         );
-
-      o.subscribe( (x) => console.log("1:"+x) );
-      q.next(true);
-      o.subscribe( (x) => console.log("2:"+x) );
-      q.next(false);
-      o.subscribe( (x) => console.log("3:"+x) );
-      q.next(true);
+      var sleep = (t) => new Promise( (r) => setTimeout(r,t) );
+      o.subscribe( (x) => console.log("1:"+x) , (e) => {console.log("1e:"+e);} );
+      this.sender()
     },
     clk(){
       var result = {player:"あああ",tsumo:true,yaku:[],score:10};

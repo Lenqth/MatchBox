@@ -9,3 +9,4 @@ describe('HelloWorld.vue', () => {
       .toEqual('Welcome to Your Vue.js App')
   })
 })
+

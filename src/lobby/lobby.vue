@@ -21,6 +21,11 @@
 <script>
 import Vue from "vue";
 import Vuetify from 'vuetify'
+import {webSocket as RxWebSocket} from 'rxjs/webSocket'
+import * as operators from 'rxjs/operators';
+import {interval} from 'rxjs';
+
+
 Vue.use(Vuetify);
 import 'vuetify/dist/vuetify.min.css'
 
@@ -40,7 +45,11 @@ var __vm = null;
 export default {
   name: "Lobby",
   data() {
-    return { rlist: [], dialogOpen: false };
+    return { rlist: [],
+     dialogOpen: false ,
+     socket : null,
+     polling : null
+     };
   },
   methods: {
     openModal() {
@@ -52,7 +61,7 @@ export default {
     async joinRoom(room){
       var host = location.host;
       await new Promise( function(res,rej){
-        var socket = (window.socket = new WebSocket(
+        var socket = (window.socket = new RxWebSocket(
           "ws://" + host + "/ws/jong/room/join/" + room.room_id
         ));
         window.socket.addEventListener(
@@ -64,31 +73,43 @@ export default {
         ); } );
       this.$router.push("/room");
     },
-    async polling(){
-      if (window.socket) {
-        
+    reconnect(){
+      this.disconnect()
+      var send_sock = new RxWebSocket("ws://" + location.host + "/ws/jong/lobby");
+      var sock = send_sock.pipe( 
+        operators.retryWhen( (x) => x.pipe( operators.mergeMap( (e,i) => {
+          if(i>3){
+            return throwError(e)
+          }
+          return timer(1000).pipe( operators.flatMap( async x =>{await this.reconnect();return x;} ) )
+        })))
+      ).subscribe(function(data) {
+        console.log("polling")
+        this.rlist = data.rooms;
+      });
+      this.socket = sock;
+      this.polling = interval(5000).pipe( operators.map( (x) => ({"type":"polling"}) )).subscribe( send_sock )
+    },
+    disconnect(){
+      if(this.socket){
+        this.socket.unsubscribe();
+        this.socket = null;
+      }
+      if(this.polling){
+        this.polling.unsubscribe();
+        this.polling = null;
       }
     }
   },
-  beforeRouteEnter(route, redirect, next) {
-    next(vm => {
-      if (window.socket) {
-        window.socket.close();
-      }
-      new_socket(vm);
-    });
+  mounted(){
+    this.reconnect();
   },
+  beforeRouteLeave (to, from, next) {
+    this.disconnect();
+    next()
+  }
 };
 
-function new_socket(root) {
-  var host = location.host;
-  //if (location.port == 8080) {host = location.hostname + ":8000";}
-  var socket = (window.socket = new WebSocket("ws://" + host + "/ws/jong/lobby"));
-  socket.onmessage = function(e) {
-    var o = JSON.parse(e.data);
-    root.rlist = o.rooms;
-  };
-}
 </script>
 <style>
 .col1 {
