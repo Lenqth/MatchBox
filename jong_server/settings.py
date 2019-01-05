@@ -19,16 +19,9 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.0/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '******'
+ALLOWED_HOSTS = ["*"]
 
-# SECURITY WARNING: don't run with debug turned on in production!
 from os.path import dirname,abspath
-
-DEBUG = os.path.exists(os.path.join(dirname(abspath(__file__)),"./debug.log"))
-
-ALLOWED_HOSTS = ["***.***.***.***","localhost"]
-
 DJANGO_ROOT = dirname(dirname(abspath(__file__)))
 PROJECT_ROOT = DJANGO_ROOT
 STATIC_ROOT = os.path.join(PROJECT_ROOT, './django_static/')
@@ -116,9 +109,9 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/2.0/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'ja-jp'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'JST'
 
 USE_I18N = True
 
@@ -147,6 +140,10 @@ CHANNEL_LAYERS = {
         "CONFIG": {
             "hosts": [("localhost", 6379)],
         },
-        #"ROUTING": "jongroom.channel_routing.channel_routing",
     },
 }
+
+try:
+    from .local_settings import *
+except ImportError:
+    pass
