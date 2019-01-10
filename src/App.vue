@@ -6,12 +6,7 @@
 </template>
 
 <script>
-import Vue from "vue";
-import Vuetify from "vuetify";
-import Vuex from "vuex";
-Vue.use(Vuetify);
-Vue.use(Vuex);
-const store = require('./vuex_stores/root.js').store
+const store = require("./vuex_stores/root.js").store;
 
 import Login from "./components/login";
 Vue.component("login", Login);
@@ -22,14 +17,14 @@ export default {
 };
 </script>
 <style>
-body{
-  margin:0;
+body {
+  margin: 0;
 }
 </style>
 <style scoped>
-#root{
-  margin:0;
-  height:100vh;
+#root {
+  margin: 0;
+  height: 100vh;
 }
 
 #app {
@@ -38,6 +33,6 @@ body{
   text-align: center;
   color: #2c3e50;
   margin: 0 0 0 0;
-  height:calc(100vh - 40px);
+  height: calc(100vh - 40px);
 }
 </style>

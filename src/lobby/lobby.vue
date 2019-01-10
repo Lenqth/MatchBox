@@ -27,7 +27,6 @@ import {interval} from 'rxjs';
 
 
 Vue.use(Vuetify);
-import 'vuetify/dist/vuetify.min.css'
 
 import * as utils from "./components/utils.js";
 
