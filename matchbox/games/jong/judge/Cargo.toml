@@ -1,0 +1,10 @@
+[package]
+name = "judge"
+version = "0.1.0"
+authors = ["Lenqth <nullptr00@gmail.com>"]
+
+[dependencies]
+
+[lib]
+name = "jong"
+crate-type = ["dylib"]
