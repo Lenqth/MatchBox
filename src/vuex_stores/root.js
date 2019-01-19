@@ -1,33 +1,30 @@
-
-
-
+import Vue from "vue";
 import Vuex from "vuex";
-import {webSocket as RxWebSocket} from 'rxjs/webSocket'
-import {retryWhen} from 'rxjs/operators';
+Vue.use(Vuex);
+import { webSocket as RxWebSocket } from "rxjs/webSocket";
+import { retryWhen } from "rxjs/operators";
 
 export const lobby = {
-  namespaced: true,
-
-}
-
+  namespaced: true
+};
 
 export const store = new Vuex.Store({
-  modules:{
+  modules: {
     lobby
   },
   state: {
     skip_claim: false
   },
   mutations: {
-    skip_claim (state , value = "toggle") {
-      if(value=="toggle"){
+    skip_claim(state, value = "toggle") {
+      if (value == "toggle") {
         state.skip_claim = !state.skip_claim;
-      }else{
-        state.skip_claim = value
+      } else {
+        state.skip_claim = value;
       }
     },
-    reset(state ){
+    reset(state) {
       state.skip_claim = false;
     }
   }
-})
+});

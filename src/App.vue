@@ -6,14 +6,13 @@
 </template>
 
 <script>
-const store = require("./vuex_stores/root.js").store;
+import Vue from "vue";
 
 import Login from "./components/login";
 Vue.component("login", Login);
 
 export default {
-  name: "App",
-  store
+  name: "App"
 };
 </script>
 <style>

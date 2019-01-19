@@ -1,5 +1,11 @@
 <template>
   <div>
+    <audio id="sound1" preload="auto">
+      <source src="@/assets/sounds/puu79_a.wav" type="audio/wav">
+    </audio>
+    <audio id="sound2" preload="auto">
+      <source src="@/assets/sounds/clock04.wav" type="audio/wav">
+    </audio>
     <div class="jong-root">
       <div id="board-root" class="board-root">
         <div id="info">
@@ -50,7 +56,13 @@
 
 <script>
 import Vue from "vue";
-import { AsyncConnection , Hand , get_wind_name, numtosrc , relative_player_format  } from "./components/jong_network.js";
+import {
+  AsyncConnection,
+  Hand,
+  get_wind_name,
+  numtosrc,
+  relative_player_format
+} from "./components/jong_network.js";
 import * as utils from "./components/utils.js";
 
 import PlayerArea from "./components/player.vue";
@@ -79,33 +91,33 @@ window.deck = deck;
 export default {
   name: "Jong",
   data() {
-    let obj={};
-    obj.players = new Array(4)
-    obj.turn = 0
-    obj.nakimode = -1
-    obj.subturn = -1
-    obj.last_target = null
-    obj.deck_left = 0
-    obj.message = '*'
-    obj.prev_wind = 0
-    obj.seat_wind = 0
-    obj.yakulist = null
-    obj.open = false
-    obj.calculated_score = ''
-    obj.meld_selection = {type: '', tiles: []}
-    obj.result = null // { player : "" , score : 0 , yaku : [] };
+    let obj = {};
+    obj.players = new Array(4);
+    obj.turn = 0;
+    obj.nakimode = -1;
+    obj.subturn = -1;
+    obj.last_target = null;
+    obj.deck_left = 0;
+    obj.message = "*";
+    obj.prev_wind = 0;
+    obj.seat_wind = 0;
+    obj.yakulist = null;
+    obj.open = false;
+    obj.calculated_score = "";
+    obj.meld_selection = { type: "", tiles: [] };
+    obj.result = null; // { player : "" , score : 0 , yaku : [] };
     obj.final_result = null;
-    obj.player_id = 0
-    obj.time_left = null
-    obj.timeout = null
-    obj.input_resolve = null
+    obj.player_id = 0;
+    obj.time_left = null;
+    obj.timeout = null;
+    obj.input_resolve = null;
     for (let i = 0; i < 4; i++) {
-      obj.players[i] = new Hand()
-      obj.players[i].id = i
+      obj.players[i] = new Hand();
+      obj.players[i].id = i;
     }
     return obj;
   },
-  mounted(){
+  mounted() {
     this.start(window.socket);
   },
   methods: {
@@ -166,11 +178,9 @@ export default {
       var left = (this.time_left =
         Math.floor((timeout - new Date().getTime()) / 100) / 10);
       if (left < 0) {
-        this.time_left = null;
         resolve();
       }
       if (cancelObj.cancel) {
-        this.time_left = null;
         resolve();
       }
     },
@@ -182,6 +192,7 @@ export default {
           100
         );
       });
+      this.time_left = null;
       clearInterval(cancel);
       return null;
     },
@@ -211,6 +222,11 @@ export default {
       var res = AsyncConnection.receiveAsync();
       this.assign(res);
     },
+    async play_sound(id) {
+      var el = document.getElementById(id);
+      el.currentTime = 0;
+      el.play();
+    },
     async start(sock) {
       this.conn = new AsyncConnection(sock);
       this.conn.send(JSON.stringify({ stand_by: "" }));
@@ -221,7 +237,7 @@ export default {
         var pl = this.players[this.player_id];
         if (res.type === "reset") {
           delete res.type;
-          this.$store.commit("reset")
+          this.$store.commit("reset");
           this.yakulist = null;
           this.calculated_score = null;
           this.assign(res);
@@ -270,9 +286,9 @@ export default {
 
           let commands = res.commands_available;
           let skippable = true;
-          for(let v of commands){
-            if(v.type=="ron"){
-              skippable=false;
+          for (let v of commands) {
+            if (v.type == "ron") {
+              skippable = false;
               break;
             }
           }
@@ -286,12 +302,12 @@ export default {
             this.calculated_score = res.agari_info[0];
           }
           let input_res;
-          if(this.$store.state.skip_claim && skippable){
-            input_res = { type: "skip" }
-          }else{
+          if (this.$store.state.skip_claim && skippable) {
+            input_res = { type: "skip" };
+          } else {
             let timeout = res.timeout * 1000;
-            let cancelObj = { cancel: false };
-            utils.play_sound("puu79_a.wav");
+            var cancelObj = { cancel: false };
+            this.play_sound("sound1");
             input_res = await Promise.race([
               this.claim_input(cancelObj),
               this.timer(timeout, cancelObj)
@@ -323,7 +339,7 @@ export default {
           this.conn.send({ _m_id: res._m_id });
           this.result = null;
         } else if (res.type == "discard") {
-          utils.play_sound("clock04.wav");
+          await this.play_sound("sound2");
           this.players[res.pid].trash.push(res.tile);
         } else if (res.type == "your_turn") {
           // {"hand_tiles": [2, 4, 5, 6, 19, 22, 24, 34, 34, 38, 49, 52, 53], "draw": 22, "turn_commands_available": null, "_m_id": 4, "timeout": 1539603590.1542008}
@@ -334,15 +350,13 @@ export default {
               ? []
               : res.turn_commands_available;
           this.players[this.player_id].allow_discard = true;
-
           if (res.agari_info != null) {
             this.yakulist = res.agari_info[1];
             this.calculated_score = res.agari_info[0];
           }
-
           var timeout = res.timeout * 1000;
           var cancelObj = { cancel: false };
-          utils.play_sound("puu79_a.wav");
+          this.play_sound("sound1");
           var input_res = await Promise.race([
             this.turn_input(cancelObj),
             this.timer(timeout, cancelObj)

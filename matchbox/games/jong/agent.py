@@ -86,6 +86,12 @@ class RemotePlayer:
             raise Exception("No connection")
 
     @staticmethod
+    def validate_turn_command(command, hand_range, li):
+        if command.type == TurnCommand.DISCARD:
+            return command.pos in hand_range
+        return command in li
+
+    @staticmethod
     def validate_command(command, li):
         return command in li
 
@@ -98,11 +104,11 @@ class RemotePlayer:
         try:
             res = await self.conn.send_and_receive_reply(obj, timeout=game.timeout)
             res = TurnCommand.fromDict(res)
-            if not RemotePlayer.validate_command(res, obj["commands_available"]):
+            if not RemotePlayer.validate_turn_command(res, range(0 if pl.drew is None else -1, len(pl.hand)), obj["turn_commands_available"]):
                 raise Exception("validation error : %s" % res)
             return res
         except Exception as e:
-            traceback.format_exc()
+            traceback.print_exc()
             return TurnCommand(TurnCommand.DISCARD, -1)
 
     async def command_async(self, pl, game, commands):
@@ -116,7 +122,7 @@ class RemotePlayer:
         try:
             res = await self.conn.send_and_receive_reply(obj, timeout=game.timeout)
             res = Claim.fromDict(res)
-            if not RemotePlayer.validate_command(res, obj["commands_available"]):
+            if not RemotePlayer.validate_command(res,  obj["commands_available"]):
                 raise Exception("validation error : %s" % res)
             return res
         except Exception as e:
