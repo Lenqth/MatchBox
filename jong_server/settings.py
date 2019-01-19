@@ -1,3 +1,4 @@
+from os.path import dirname, abspath
 """
 Django settings for jong_server project.
 
@@ -10,7 +11,8 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/2.0/ref/settings/
 """
 
-import os,sys
+import os
+import sys
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -21,12 +23,11 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 ALLOWED_HOSTS = ["*"]
 
-from os.path import dirname,abspath
 DJANGO_ROOT = dirname(dirname(abspath(__file__)))
 PROJECT_ROOT = DJANGO_ROOT
 STATIC_ROOT = os.path.join(PROJECT_ROOT, './django_static/')
 STATICFILES_DIRS = (
-    os.path.join(PROJECT_ROOT, './dist/static'), 
+    os.path.join(PROJECT_ROOT, './dist/static'),
 )
 
 # Application definition
@@ -111,7 +112,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'ja-jp'
 
-TIME_ZONE = 'JST'
+TIME_ZONE = 'Asia/Tokyo'
 
 USE_I18N = True
 
