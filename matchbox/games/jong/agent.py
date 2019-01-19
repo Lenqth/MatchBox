@@ -50,16 +50,29 @@ class AIShanten:
         return "よわいAIちゃん"
 
     def select_discard(self, pl, game):
-        ary = list_to_array(pl.hand)
+        h = list(pl.hand)
+        if pl.drew is not None:
+            h.append(pl.drew)
+        ary = list_to_array(h)
         e = np.eye(64, dtype=np.int32)
         q = np.tile(ary, (len(pl.hand), 1)) - e[pl.hand]
         p = np.apply_along_axis(shanten, 1, q)
-        return np.argmin(p)
+        r = np.argmin(p)
+        if pl.drew is not None and r+1 == len(h):
+            return -1
+        return r
 
     async def turn_command_async(self, pl, game, commands):
-        return TurnCommand(TurnCommand.DISCARD, -1)
+        if len([1 for x in commands if x.type == TurnCommand.TSUMO]) > 0:
+            return TurnCommand(TurnCommand.TSUMO)
+        ps = self.select_discard(pl, game)
+        cmd = TurnCommand(TurnCommand.DISCARD, pos=ps)
+        print(cmd)
+        return cmd
 
     async def command_async(self, pl, game, commands):
+        if len([1 for x in commands if x.type == Claim.RON]) > 0:
+            return Claim(Claim.RON)
         return Claim(0)
 
     async def confirm(self, message):
@@ -109,7 +122,10 @@ class RemotePlayer:
             return res
         except Exception as e:
             traceback.print_exc()
-            return TurnCommand(TurnCommand.DISCARD, -1)
+            if pl.drew is not None:
+                return TurnCommand(TurnCommand.DISCARD, -1)
+            else:
+                return TurnCommand(TurnCommand.DISCARD, len(pl.hand)-1)
 
     async def command_async(self, pl, game, commands):
         obj = {"type": "claim_command", "hand_tiles": pl.hand,

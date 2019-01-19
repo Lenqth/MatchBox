@@ -60,7 +60,8 @@ class Game:
         t = []
         for i in range(4):
             pl = self.players[i]
-            t.append( pl.agent.send({"type":"discard","tile":tile,"pid":pid}) )
+            t.append(pl.agent.send(
+                {"type": "discard", "tile": tile, "pid": pid}))
         await Promise.all(t)
 
     async def send_apkong(self,pid,tile):
