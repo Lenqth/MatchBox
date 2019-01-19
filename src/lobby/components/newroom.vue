@@ -1,9 +1,8 @@
 <template>
-  <v-layout row justify-center >
+  <v-layout row justify-center>
     <v-dialog v-model="dialog" min-width="290">
       <v-card>
-        <v-card-title class="headline">部屋の作成</v-card-title>
-        ゲーム:
+        <v-card-title class="headline">部屋の作成</v-card-title>ゲーム:
         <select name="type" class="selection" v-model="__game_type" @change="getConfig()">
           <option
             v-for="(item,index) in game_type_option"
@@ -51,7 +50,7 @@ export default {
     game_type_option: option,
     detail_options: {},
     detail_options_selected: {},
-    "dialog":false
+    dialog: false
   }),
   methods: {
     open() {
@@ -67,7 +66,7 @@ export default {
       var host = location.host;
       // if (location.port == 8080) { host = location.hostname + ":8000"; }
       var response = await axios.get(
-        "http://" + host + "/jong/config/" + this.game_type
+        "http://" + host + "/api/config/" + this.game_type
       );
       console.log(response.data);
       this.detail_options = response.data;

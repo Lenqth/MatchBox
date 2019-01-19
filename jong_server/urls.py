@@ -16,17 +16,17 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import include, path
 from django.conf.urls import url
-from django.contrib.auth.views import login,logout
+from django.contrib.auth.views import login, logout
 import django.contrib.auth.views as auth_views
 
 urlpatterns = [
     path('superusers/', admin.site.urls),
-    path('jong/', include('matchbox.urls')),
-    path('login/',auth_views.LoginView.as_view(
+    path('api/', include('matchbox.urls')),
+    path('login/', auth_views.LoginView.as_view(
         template_name='accounts/login.html',
         extra_context={
             'next': '/jong/',
-        }) , name='login'),
+        }), name='login'),
     path('logout/', logout, name='logout'),
     path('accounts/', include('accounts.urls')),
 ]
