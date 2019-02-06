@@ -8,6 +8,8 @@ db.sqlite3
 migrations/
 /static/
 /django_static/
+local_settings.py
+
 
 build/
 !/build/

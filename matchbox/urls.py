@@ -19,7 +19,7 @@ from django.urls import path
 from .views import *
 
 urlpatterns = [
-    path('', WebPackIndex.as_view(), name='home'),
+    #    path('', WebPackIndex.as_view(), name='home'),
     path('login', LoginAjax.as_view(), name='login_ajax'),
     path('account', GetLoginStateAjax.as_view(), name='account_ajax'),
     path('logout', LogoutAjax.as_view(), name='logout_ajax'),

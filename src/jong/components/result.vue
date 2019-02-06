@@ -1,55 +1,64 @@
 <template>
-  <div v-if="result!=null" class="result-box">
-    <div v-if="result.player != -1" class="result-top">
-      {{result.player}} の {{ result.tsumo ? "ツモ" : "ロン" }}
-    </div>
-    <div v-else class="result-top">
-      流局
-    </div>    
-    <yakulist :yakus="result.yaku" />
-    <div class="score-box">
-      計 {{result.score}} 点
-			<button v-on:click="fire_ok()">OK</button>
-    </div>
-  </div>
+  <v-dialog v-model="show" width="30vw" @close="fire_ok()">
+    <v-card v-if="show" key="guard," style="overflow-x:hidden" > 
+      <v-card-title font-large v-if="value.player != -1" class="headline">
+        {{value.player}} の {{ value.tsumo ? "ツモ" : "ロン" }}
+      </v-card-title>
+      <v-card-title large v-else class="headline">
+        流局
+      </v-card-title>    
+      <v-card-text>
+        <yakulist :yakus="value.yaku" key='result-yaku' />
+      </v-card-text>
+      <v-card-actions>
+        <span class="headline">計 {{value.score}} 点</span>
+        <v-spacer/>
+        <v-btn justify-right small @click="close">OK</v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
 </template>
 <script>
 
-import Vue from 'vue'
+import Vue from 'vue' 
 import {get_wind_name, numtosrc} from '../components/jong_network.js'
 
 export default {
-  props: ['result'],
+  props: {
+    "value":{
+      default:null
+    },
+  },
   methods: {
     numtosrc,
     get_wind_name: get_wind_name,
 		fire_ok(){
 			this.$emit("ok","");
-		}
-  }
+    },
+    close(){
+      this.show=false;
+    }
+  },
+  computed:{
+    show:{
+      get(){
+        return (this.value != null)
+      },
+      set(v){
+        if(!v){
+          this.$emit("input",null)
+          this.fire_ok();
+        }
+      }
+    }
+  },
 }
 
 </script>
 <style scoped>
 
-.result-box{
-  border: solid 2px orange;
-  background: lightgray;
-  opacity: 0.9;
-  position: absolute;
-  width: 300px;
-  height: 400px;
-  left: 0;
-  right: 0;
-  top: 0;
-  bottom: 0;
-	margin:auto;
-  padding:8px;
-}
-
 .result-top{
 	font-size:20px;
-
 }
 
 .meld-select-enter-active{

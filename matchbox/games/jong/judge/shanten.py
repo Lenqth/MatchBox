@@ -182,5 +182,3 @@ def shanten(ary):
     #for i in range(10000):
     #    q += shanten(randomhand())
     #print( q / 10000.0 )
-#    import cProfile
-#    cProfile.run('[ shanten(randomhand()) for i in range(1000) ]')

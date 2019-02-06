@@ -1,21 +1,32 @@
 <template>
   <div>
-    <div class="room-root">
-      <div class="room-container" id="roomlist">
-        <roombox class="room-item" v-for="(item,index) in rlist" v-bind:room="item" :key="index" v-on:dblclick.native="joinRoom(item)"  />
-      </div>
-      <div class="footer">
-        <button v-on:click="openModal()">ルームを新規作成</button>
-        <button v-on:click="autoMatch()">おまかせマッチ</button>
-      </div>
-    </div>
-    <div v-if="dialogOpen" class="modal">
-      <newroom/>
-    </div>
-  </div>
+    <v-content>
+      <v-flex class="room-root" >
+        <transition-group name="roomtr">
+          <roombox class="room-item" v-for="(item,index) in rlist" :key="index+1" :room="item" @dblclick.native="joinRoom(item)"/>
+        </transition-group>
+      </v-flex>
+    </v-content>
+    <newroom ref="newroom_dialog"/>
+    <v-footer dark height="auto">
+      <v-card class="flex" flat tile>
+        <v-card-title class="teal">
+          <v-btn outline @click="openModal()">ルームを新規作成</v-btn>
+          <v-btn outline @click="autoMatch()">おまかせマッチ</v-btn>
+        </v-card-title>
+      </v-card>
+    </v-footer>
+   </div>
 </template>
 <script>
 import Vue from "vue";
+import Vuetify from 'vuetify'
+import {webSocket as RxWebSocket} from 'rxjs/webSocket'
+import * as operators from 'rxjs/operators';
+import {interval} from 'rxjs';
+
+
+Vue.use(Vuetify);
 
 import * as utils from "./components/utils.js";
 
@@ -25,6 +36,7 @@ Vue.component("newroom", newroomDialog);
 import roombox from "./components/roombox.vue";
 Vue.component("roombox", roombox);
 
+
 var audio1 = document.getElementById("sound1");
 
 var __vm = null;
@@ -32,27 +44,24 @@ var __vm = null;
 export default {
   name: "Lobby",
   data() {
-    return { rlist: [], dialogOpen: false };
+    return { rlist: [],
+     dialogOpen: false ,
+     socket : null,
+     polling : null
+     };
   },
   methods: {
     openModal() {
-      this.dialogOpen = true;
-    },
-    toggleModal() {
-      this.dialogOpen = !this.dialogOpen;
+      this.$refs.newroom_dialog.open();
     },
     autoMatch() {
       this.$router.push("/room");
     },
     async joinRoom(room){
-      console.log("nyan");
       var host = location.host;
-      if (location.port == 8080) {
-        host = location.hostname + ":8000";
-      }
       await new Promise( function(res,rej){
-        var socket = (window.socket = new WebSocket(
-          "ws://" + host + "/jong/room/join/" + room.room_id
+        var socket = (window.socket = new RxWebSocket(
+          "ws://" + host + "/ws/jong/room/join/" + room.room_id
         ));
         window.socket.addEventListener(
           "open",
@@ -62,29 +71,44 @@ export default {
           { once: true }
         ); } );
       this.$router.push("/room");
+    },
+    reconnect(){
+      this.disconnect()
+      var send_sock = new RxWebSocket("ws://" + location.host + "/ws/jong/lobby");
+      var sock = send_sock.pipe( 
+        operators.retryWhen( (x) => x.pipe( operators.mergeMap( (e,i) => {
+          if(i>3){
+            return throwError(e)
+          }
+          return timer(1000).pipe( operators.flatMap( async x =>{await this.reconnect();return x;} ) )
+        })))
+      ).subscribe(function(data) {
+        console.log("polling")
+        this.rlist = data.rooms;
+      });
+      this.socket = sock;
+      this.polling = interval(5000).pipe( operators.map( (x) => ({"type":"polling"}) )).subscribe( send_sock )
+    },
+    disconnect(){
+      if(this.socket){
+        this.socket.unsubscribe();
+        this.socket = null;
+      }
+      if(this.polling){
+        this.polling.unsubscribe();
+        this.polling = null;
+      }
     }
   },
-  beforeRouteEnter(route, redirect, next) {
-    next(vm => {
-      __vm = vm;
-      if (window.socket) {
-        window.socket.close();
-      }
-      new_socket(vm);
-    });
+  mounted(){
+    this.reconnect();
+  },
+  beforeRouteLeave (to, from, next) {
+    this.disconnect();
+    next()
   }
 };
 
-function new_socket(root) {
-  var host = location.host;
-  //if (location.port == 8080) {host = location.hostname + ":8000";}
-  var socket = (window.socket = new WebSocket("ws://" + host + "/jong/lobby"));
-  socket.onmessage = function(e) {
-    var o = JSON.parse(e.data);
-    console.log(o);
-    root.rlist = o.rooms;
-  };
-}
 </script>
 <style>
 .col1 {
@@ -107,27 +131,13 @@ function new_socket(root) {
   border: 2px black solid;
 }
 
-.room-item {
-  box-sizing: border-box;
-  flex-basis: 33.34%;
-  flex-shrink: 1;
+
+.roomtr-enter-active,.roomtr-leave-active {
+  transition: opacity .5s;
+}
+.roomtr-enter,.roomtr-leave-to{
+  opacity: 0;
 }
 
-@keyframes blinkborder {
-  0% {
-    border-color: rgba(255, 255, 255, 1);
-  }
-  100% {
-    border-color: rgba(255, 255, 255, 0.2);
-  }
-}
 
-.room-item:nth-child(2n) {
-  background-color: #eeeeee;
-  /*flex-basis: 100%;*/
-}
-.room-item:nth-child(2n + 1) {
-  background-color: #ccccdd;
-  /*flex-basis: 100%;*/
-}
 </style>

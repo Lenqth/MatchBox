@@ -1,36 +1,58 @@
 <template>
-  <div v-if="result!=null" class="result-box">
-    <div class="yaku-group">
-      <table class="ranking-table">
-        <thead class="ranking-thead">
-					<tr>
-            <td> 順位 </td>
-						<td class="row-yaku"> 名前 </td>
-						<td class="row-score"> 点数 </td>
-					</tr>
-				</thead>
-        <tbody class="ranking-tbody">
-          <tr v-for="(item,index) in result" :key="index" >
-            <td>{{1+index}}</td><td>{{item.name}}</td><td>{{item.point}}</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-    <div class="score-box">
-			<button v-on:click="fire_ok()">OK</button>
-    </div>
-  </div>
+  <v-dialog v-model="show" width="30vw">
+    <v-card v-if="show"> 
+      <v-card-text>
+        <table class="ranking-table">
+          <thead class="ranking-thead">
+            <tr>
+              <td> 順位 </td>
+              <td class="row-yaku"> 名前 </td>
+              <td class="row-score"> 点数 </td>
+            </tr>
+          </thead>
+          <tbody class="ranking-tbody">
+            <tr v-for="(item,index) in result" :key="index" >
+              <td>{{1+index}}</td><td>{{item.name}}</td><td>{{item.point}}</td>
+            </tr>
+          </tbody>
+        </table>
+      </v-card-text>
+      <v-card-actions>
+        <span class="headline">計 {{result.score}} 点</span>
+        <v-spacer/>
+        <v-btn justify-right small @click="fire_ok()">OK</v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
 </template>
 <script>
 
 import Vue from 'vue'
 
 export default {
-  props: ['result'],
+  props: {
+    "result":{
+      default:null
+    },
+  },
+  data(){
+    return {"show":false}
+  },
   methods: {
 		fire_ok(){
 			this.$emit("ok","");
 		}
+  },
+  watch:{
+    result(v){
+      this.show = (v != null)
+    },
+    show(v){
+      if(!v){
+        this.result = null;
+        this.fire_ok();
+      }
+    }
   }
 }
 

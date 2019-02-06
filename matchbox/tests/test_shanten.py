@@ -1,6 +1,6 @@
 import unittest
-from games.jong.judge.util import *
-from games.jong.judge.shanten import *
+from matchbox.games.jong.judge.util import *
+from matchbox.games.jong.judge.shanten import *
 
 #import cProfile
 #cProfile.run("""

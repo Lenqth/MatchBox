@@ -7,20 +7,25 @@ from pprint import pprint
 from .room import Room
 import asyncio
 
+
 class RoomListConsumer(AsyncWebsocketConsumer):
     async def connect(self):
+        print("lobby_enter")
         await self.accept()
         await self.channel_layer.group_add(
             "lobby_listener",
             self.channel_name
         )
-        await self.receive("")
+        await self.send_all_room()
 
     async def disconnect(self, close_code):
         await self.channel_layer.group_discard(
             "lobby_listener",
             self.channel_name
         )
+    
+    async def on_dict_changed():
+        pass
 
     # Receive message from WebSocket
     async def receive(self, text_data):
@@ -122,6 +127,6 @@ class ConfiguredMainConsumer(MainConsumer):
             return await sup.receive_async(text_data)
         else:
             config = json.loads(text_data)
-            result = await ( Room.new_room(config,self) )
+            result = await ( Room.join_new_room(self,config=config) )
             self.connect_configured = True
             print("configured!!")

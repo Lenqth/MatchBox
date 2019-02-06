@@ -1,9 +1,9 @@
 <template>
-  <div class="modal-mask">
-    <div class="modal-wrapper">
-      <div class="dialog-room">
-        <h2>部屋の作成</h2>ゲーム:
-        <select name="type" class="selection" v-model="__game_type" v-on:change="getConfig()">
+  <v-layout row justify-center>
+    <v-dialog v-model="dialog" min-width="290">
+      <v-card>
+        <v-card-title class="headline">部屋の作成</v-card-title>ゲーム:
+        <select name="type" class="selection" v-model="__game_type" @change="getConfig()">
           <option
             v-for="(item,index) in game_type_option"
             v-bind:value="item.id"
@@ -18,17 +18,19 @@
             v-bind:title="item.display_name"
             v-bind:items="item.value"
             v-bind:default="item.default"
-          ></selection>
+          />
         </div>
-        <div class="dialog-footer">
-          <button v-on:click="createRoom()">作成</button>
-        </div>
-        <div class="dialog-exit">
-          <button v-on:click="closeThis()">✕</button>
-        </div>
-      </div>
-    </div>
-  </div>
+        <v-card-actions>
+          <div class="dialog-footer">
+            <v-btn @click="createRoom()">作成</v-btn>
+          </div>
+          <div class="dialog-exit">
+            <v-btn @click="closeThis()">✕</v-btn>
+          </div>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+  </v-layout>
 </template>
 <script>
 import Vue from "vue";
@@ -47,11 +49,15 @@ export default {
     game_type: option[0].id,
     game_type_option: option,
     detail_options: {},
-    detail_options_selected: {}
+    detail_options_selected: {},
+    dialog: false
   }),
   methods: {
+    open() {
+      this.dialog = true;
+    },
     closeThis() {
-      this.$parent.dialogOpen = false;
+      this.dialog = false;
     },
     Changed(index, e) {
       this.detail_options_selected[index] = e;
@@ -60,7 +66,7 @@ export default {
       var host = location.host;
       // if (location.port == 8080) { host = location.hostname + ":8000"; }
       var response = await axios.get(
-        "http://" + host + "/jong/config/" + this.game_type
+        "http://" + host + "/api/config/" + this.game_type
       );
       console.log(response.data);
       this.detail_options = response.data;
@@ -97,11 +103,8 @@ export default {
 function new_socket_conf() {
   return new Promise((res, rej) => {
     var host = location.host;
-    if (location.port == 8080) {
-      host = location.hostname + ":8000";
-    }
     var socket = (window.socket = new WebSocket(
-      "ws://" + host + "/jong/room/configured"
+      "ws://" + host + "/ws/jong/room/configured"
     ));
     window.socket.addEventListener(
       "open",

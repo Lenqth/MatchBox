@@ -3,6 +3,7 @@ import Router from 'vue-router'
 import Lobby from '@/lobby/lobby'
 import LoaderJong from '@/jong/jong'
 import MatchRoom from '@/matchroom/matchroom'
+import Sandbox from '@/sandbox/sandbox'
 
 const LoaderD7 = () => import(/* webpackChunkName: "group-d7" */ '@/destiny7/destiny7')
 const LoaderQuarto = () => import(/* webpackChunkName: "group-quarto" */ '@/quarto/index')
@@ -35,6 +36,11 @@ export default new Router({
       path: '/quarto',
       name: 'QuartoLoader',
       component: LoaderQuarto
+    },
+    {
+      path: '/sandbox',
+      name: 'Sandbox',
+      component: Sandbox
     },
   ]
 })

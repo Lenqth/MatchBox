@@ -10,9 +10,10 @@ class Claim:
     MINKONG = 3
     RON = 4
     __TYPENAMES__ = ["SKIP","CHOW","PONG","KONG","RON"]
-    def __init__(self,type=0,pos=0):
+    def __init__(self,type=0,pos=0,tiles=[]):
         self.type = type
         self.pos = pos
+        self.tiles = tiles
 
     def __eq__(self,other):
         return (self.type==other.type) and (self.pos==other.pos)
@@ -46,9 +47,7 @@ class Claim:
         return cls(tid,pos)
 
     def toDict(self):
-        return { "type" :  self.__class__.__TYPENAMES__[self.type].lower() , "pos" : self.pos }
-
-
+        return { "type" :  self.__class__.__TYPENAMES__[self.type].lower() , "tiles":self.tiles, "pos" : self.pos }
 
 class TurnCommand:
     DISCARD = 1
@@ -56,9 +55,10 @@ class TurnCommand:
     CONCKONG = 3
     TSUMO = 4
     __TYPENAMES__ = ["","DISCARD","APKONG","CONCKONG","TSUMO"]
-    def __init__(self,type=0,pos=0,target=None):
+    def __init__(self,type=0,pos=0,tiles=[],target=None):
         self.type = type
         self.pos = pos
+        self.tiles = tiles
         self.target = target
 
     def __eq__(self,other):
@@ -72,7 +72,6 @@ class TurnCommand:
 
     def __repr__(self):
         return "TurnCommand( %s : %s)" % ( self.__class__.__TYPENAMES__[self.type],repr(self.pos))
-
 
     def toJSON(self):
         return self.toDict()
@@ -94,7 +93,7 @@ class TurnCommand:
         return cls(tid,pos)
 
     def toDict(self):
-        return { "type" : self.__class__.__TYPENAMES__[self.type].lower() , "pos" : self.pos , "target" : self.target }
+        return { "type" : self.__class__.__TYPENAMES__[self.type].lower() , "pos" : self.pos , "tiles":self.tiles, "target" : self.target }
 
 class Exposed:
     CHOW = 1

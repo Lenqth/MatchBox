@@ -1,3 +1,4 @@
+from os.path import dirname, abspath
 """
 Django settings for jong_server project.
 
@@ -10,7 +11,8 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/2.0/ref/settings/
 """
 
-import os,sys
+import os
+import sys
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -19,21 +21,13 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.0/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '******'
-
-# SECURITY WARNING: don't run with debug turned on in production!
-from os.path import dirname,abspath
-
-DEBUG = os.path.exists(os.path.join(dirname(abspath(__file__)),"./debug.log"))
-
-ALLOWED_HOSTS = ["***.***.***.***","localhost"]
+ALLOWED_HOSTS = ["*"]
 
 DJANGO_ROOT = dirname(dirname(abspath(__file__)))
 PROJECT_ROOT = DJANGO_ROOT
 STATIC_ROOT = os.path.join(PROJECT_ROOT, './django_static/')
 STATICFILES_DIRS = (
-    os.path.join(PROJECT_ROOT, './dist/static'), 
+    os.path.join(PROJECT_ROOT, './dist/static'),
 )
 
 # Application definition
@@ -116,9 +110,9 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/2.0/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'ja-jp'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Tokyo'
 
 USE_I18N = True
 
@@ -147,6 +141,10 @@ CHANNEL_LAYERS = {
         "CONFIG": {
             "hosts": [("localhost", 6379)],
         },
-        #"ROUTING": "jongroom.channel_routing.channel_routing",
     },
 }
+
+try:
+    from .local_settings import *
+except ImportError:
+    pass

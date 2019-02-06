@@ -39,16 +39,24 @@ class RoomException(Exception):
     pass
 
 class Room:
+    from .games.common.store import ObservableList,ObservableDict
 
     rooms = {}
-
     token_to_room_id = {}
 
     @classmethod
-    async def random_match(cls,channel,token=None):
+    async def join_new_room(cls,channel,config=None):
+        room = cls(config=config)
+        await room.on_room_created(room.id)
+        print("room created [{0}]".format(room.id))
+        cls.rooms[room.id] = room 
+        return await room.connect(channel)
+
+    @classmethod
+    async def random_match(cls,channel,token=None,*args,**kwargs):
         room_id = None
         res = None
-        if token != None :
+        if token != None : #resume mode
             try:
                 room_id = token_to_room_id[token]
                 res = await cls.rooms[room_id].connect(channel,token)
@@ -58,27 +66,12 @@ class Room:
                 return res
         for room in cls.rooms.values():
             try:
-                res = await room.connect(channel,token)
+                res = await room.connect(channel)
             except RoomException as e:
                 continue
             else:
                 return res
-        room = cls()
-        await room.on_room_created(room.name)
-        print("room created [{0}]".format(room.name))
-        cls.rooms[room.name] = room
-        res = await room.connect(channel)
-        return res
-
-    @classmethod
-    async def new_room(cls,config,channel):
-        room = cls(config=config)
-        await room.on_room_created(room.name)
-        print("room created [{0}]".format(room.name))
-        cls.rooms[room.name] = room
-        res = await room.connect(channel)
-        return res
-
+        return await cls.join_new_room(channel,*args,**kwargs)
 
     @property
     def room_size(self):
@@ -100,7 +93,8 @@ class Room:
             return "募集中"
 
     def __init__(self,config=None):
-        self.name = secrets.token_hex(16)
+        self.id = secrets.token_hex(16)
+        self.name = "未設定"
         if config == None :
             config = default_config("jong")
 
@@ -116,6 +110,17 @@ class Room:
         for (i,pl) in enumerate( self.players ) :
             if pl["token"] is not None :
                 res.append( {"position":i,"token":pl["token"],"ready":pl["ready"]} )
+        return res
+
+    def config_list(self):
+        game = self.config["game_type"]      
+        res = []  
+        cf = import_game(game).config()
+        for (k,v) in cf.items():
+            if k in self.config:
+                res.append( { "id":k ,"display_name":v["display_name"] , "value":self.config[k] } )
+            else:
+                res.append( { "id":k ,"display_name":v["display_name"] , "value":v["default"] } )
         return res
 
 
@@ -137,10 +142,10 @@ class Room:
         await self.destroy_room()
 
     async def destroy_room(self):
-        roomname = self.name
-        del self.__class__.rooms[self.name]
-        await self.on_room_destroyed(roomname)
-        print("room destroyed [{0}]".format(roomname))
+        roomid = self.id
+        del self.__class__.rooms[roomid]
+        await self.on_room_destroyed(roomid)
+        print("room destroyed [{1}:{0}]".format(roomid,self.name))
 
     def get_pos_from_token(self,token):
         for (i,pl) in enumerate(self.players):
@@ -190,7 +195,7 @@ class Room:
 
     async def room_broadcast(self,obj):
         await channel_layer.group_send(
-            'chat_%s' % self.name,
+            'chat_%s' % self.id,
             {
                 'type': 'chat_broadcast',
                 'obj' : obj
@@ -216,27 +221,32 @@ class Room:
             i+=1
         if i >= self.room_size :
             raise RoomException("room capacity over")
-        token = self.name + secrets.token_hex(16)
+        token = self.id + secrets.token_hex(16)
         self.players[i]["connection"] = channel
         self.players[i]["token"] = token
         channel.room = self
         channel.token = token
         channel.room_pos = i
-        channel.room_name = self.name
-        channel.room_group_name = 'chat_%s' % self.name
+        channel.room_name = self.id
+        channel.room_group_name = 'chat_%s' % self.id
         await channel.channel_layer.group_add(
             channel.room_group_name,
             channel.channel_name
         )
         await self.on_room_join(token,i)
         await channel.send(text_data=json.dumps({
-            'roomname' : self.name ,
+            'roomname' : self.id ,
             'token' : token ,
             'position' : i ,
             'roomsize' : self.room_size ,
             'room':self.getplayers() ,
             'message': "welcome!",
         }))
+        cfgs = self.config_list()
+        for x in cfgs:
+            await channel.send(text_data=json.dumps({
+                'message': " %s : %s " % (x["display_name"],x["value"]) ,
+            }))
         return True
         # return {"room":self,"token":token,"pos":i,"roomsize":self.room_size,"message":"welcome!"}
 

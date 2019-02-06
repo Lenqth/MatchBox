@@ -1,9 +1,10 @@
 <template>
-  <div>
+  <v-toolbar>
     <div class="navbar">
       <div class="login-disp">
         <div v-if="username != null">{{username}}</div>
-        <div v-else>ログインしていません
+        <div v-else>
+          ログインしていません
           <button v-on:click="loginModal=true">(login)</button>
         </div>
       </div>
@@ -11,10 +12,12 @@
     <div class="modal-mask" v-if="loginModal===true">
       <div class="modal-wrapper">
         <div class="dialog-login">
-          <p>username:
+          <p>
+            username:
             <input type="text" v-model="username">
           </p>
-          <p>password:
+          <p>
+            password:
             <input type="password" v-model="password">
           </p>
           <p>
@@ -23,10 +26,12 @@
         </div>
       </div>
     </div>
-  </div>
+  </v-toolbar>
 </template>
 <script>
 import Vue from "vue";
+import Vuetify from "vuetify";
+Vue.use(Vuetify);
 import axios from "axios";
 axios.defaults.xsrfCookieName = "csrftoken";
 axios.defaults.xsrfHeaderName = "X-CSRFToken";
@@ -48,14 +53,14 @@ export default {
     },
     async state() {
       var host = this.get_host();
-      var response = await axios.get("http://" + host + "/jong/account");
+      var response = await axios.get("http://" + host + "/api/account");
       console.log(response);
       this.username = response.data.username;
     },
     async login(u, p) {
       var host = this.get_host();
       var response = await axios.post(
-        "http://" + host + "/jong/login",
+        "http://" + host + "/api/login",
         {
           username: u,
           password: p
@@ -68,7 +73,7 @@ export default {
     },
     async logout() {
       var host = this.get_host();
-      var response = await axios.post("http://" + host + "/jong/logout");
+      var response = await axios.post("http://" + host + "/api/logout");
     }
   }
 };

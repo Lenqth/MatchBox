@@ -17,8 +17,18 @@ module.exports = {
   ],
 
   resolve: {
+    extensions:['.ts','.js'],
     alias: {
       'vue': path.resolve('../node_modules/vue/dist/vue.js'),
     }
   },
+  module: {
+      rules: [
+          {
+              // 拡張子が.tsで終わるファイルに対して、TypeScriptコンパイラを適用する
+              test:/\.ts$/,
+              loader:'ts-loader'
+          }
+      ]
+  }
 }

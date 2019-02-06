@@ -1,7 +1,7 @@
 
 import * as utils from './utils.js'
 
-class AsyncConnection {
+export class AsyncConnection {
   constructor (sock) {
     this.socket = sock
     var bf = this.buffer = []
@@ -30,189 +30,11 @@ AsyncConnection.prototype.send = function (obj) {
 AsyncConnection.prototype.receiveAsync = function () {
   if (this.buffer.length > 0) { return this.buffer.shift() }
   var th = this
-  return new Promise(function (resolve, reject) {
+  return new Promise(function (resolve) {
     th.callbacks.push(resolve)
   })
 }
-
-export class Deck {
-  constructor () {
-    this.players = new Array(4)
-    this.turn = 0
-    this.nakimode = -1
-    this.subturn = -1
-    this.last_target = null
-    this.deck_left = 0
-    this.message = '*'
-    this.prev_wind = 0
-    this.seat_wind = 0
-    this.yakulist = null
-    this.open = false
-    this.calculated_score = ''
-    this.meld_selection = {type: '', tiles: []}
-    this.result = null // { player : "" , score : 0 , yaku : [] };
-    this.final_result = null;
-
-    this.player_id = 0
-
-    this.time_left = null
-    this.timeout = null
-
-    for (let i = 0; i < 4; i++) {
-      this.players[i] = new Hand()
-      this.players[i].id = i
-    }
-  }
-}
-
-Deck.prototype.start = async function (sock) {
-  this.conn = new AsyncConnection(sock)
-  this.conn.send(JSON.stringify({'stand_by': ''}))
-  var res = null
-  this.open = false
-  while (true) {
-    res = await this.conn.receiveAsync()
-    console.log(res)
-    var pl = this.players[this.player_id]
-    if (res.type === 'reset') {
-      delete res.type
-      this.assign(res)
-      this.open = false
-      this.meld_selection = {type: '', tiles: []}
-      this.players[this.player_id].commands_available = []
-    } if (res.type === 'agari') {
-      this.result = { player: '', score: 0, tsumo: false, yaku: [] }
-      this.result.player = relative_player_format(this.player_id, res.pid)
-      this.result.score = res.yaku[0]
-      this.result.yaku = res.yaku[1]
-      this.result.tsumo = res.tsumo
-    } if (res.type === 'gameover') {
-      this.result = { player: '', score: 0, tsumo: false, yaku: [] }
-      this.result.player = -1
-      this.result.score = 0
-      this.result.yaku = []
-      this.open = true
-    } if (res.type === 'final_result' ) {
-      this.final_result = res.dat;
-    } if (res.type === 'open_hand') {
-      var hands = res.hand
-      for (let i = 0; i < 4; i++) {
-        let p = hands[i]
-        this.players[i].hand = p.hand
-        this.players[i].drawed = p.drew
-        this.open = true
-      }
-    } if (res.type === 'deck_left') {
-      this.deck_left = res.deck_left
-    } if (res.type === 'claim_command') {
-      // {"commands_available": [{"type": 1, "pos": [[1], [2]]}], "_m_id": 7, "timeout": 1539616054.5650032}
-      var tg_pl = res.target.player, tg_apkong = res.target.apkong, tg_tile = res.target.tile
-      this.players[this.player_id].hand = res.hand_tiles
-      this.players[this.player_id].drawed = null
-      this.players[tg_pl].target = tg_apkong ? 'apkong' : 'trash'
-      this.claim_target = tg_tile
-
-      var commands = res.commands_available
-      this.players[this.player_id].commands_available = [ {type: 'skip'} ].concat(res.commands_available)
-      this.players[this.player_id].command_types_available = new Set(this.players[this.player_id].commands_available.map(x => x.type))
-      this.players[this.player_id].allow_discard = false
-
-      if(res.agari_info != null) {
-        this.yakulist = res.agari_info[1];
-        this.calculated_score = res.agari_info[0]
-      }
-
-      var timeout = res.timeout * 1000
-      var cancelObj = {cancel: false}
-      utils.play_sound('puu79_a.wav')
-      var input_res = await Promise.race([claim_input(cancelObj), timer(timeout, cancelObj)])
-      cancelObj.cancel = true
-      if (input_res != null) {
-        input_res._m_id = res._m_id
-        this.conn.send(input_res)
-      }
-      this.players[tg_pl].target = null
-    } else if (res.type === 'expose') {
-      this.players[res.pid].exposed.push(res.obj)
-    } else if (res.type === 'apkong') {
-      var ex = this.players[res.pid].exposed
-      for (var v of ex) {
-        if (v.type == 'pong' && v.tiles[0] == res.tile) {
-          v.tiles.push(res.tile)
-          v.type = 'apkong'
-          break
-        }
-      }
-    } else if (res.type == "confirm" ) {
-      await new Promise( (res,rej) => this.listener_ok = res )
-      this.conn.send( {"_m_id" : res._m_id} )
-      this.result = null;
-    } else if (res.type == 'discard') {
-      utils.play_sound('clock04.wav')
-      this.players[res.pid].trash.push(res.tile)
-    } else if (res.type == 'your_turn') {
-      // {"hand_tiles": [2, 4, 5, 6, 19, 22, 24, 34, 34, 38, 49, 52, 53], "draw": 22, "turn_commands_available": null, "_m_id": 4, "timeout": 1539603590.1542008}
-      this.players[this.player_id].hand = res.hand_tiles
-      this.players[this.player_id].drawed = res.draw
-      this.players[this.player_id].commands_available = res.turn_commands_available == null ? [] : res.turn_commands_available
-      this.players[this.player_id].command_types_available = new Set(this.players[this.player_id].commands_available.map(x => x.type))
-      this.players[this.player_id].allow_discard = true
-
-      if(res.agari_info != null) {
-        this.yakulist = res.agari_info[1];
-        this.calculated_score = res.agari_info[0]
-      }
-      
-      var timeout = res.timeout * 1000
-      var cancelObj = {cancel: false}
-      utils.play_sound('puu79_a.wav')
-      var input_res = await Promise.race([turn_input(cancelObj), timer(timeout, cancelObj)])
-      cancelObj.cancel = true
-      if (input_res != null) {
-        input_res._m_id = res._m_id
-        this.conn.send(input_res)
-      } else {
-        pl.trash_tile(-1)
-      }
-
-      // await turn_input(this.player_id);
-    }
-  }
-}
-
-
-
-Deck.prototype.ok = function(){
-  if( this.listener_ok != null ){
-    this.listener_ok()
-    this.listener_ok = null;
-  }
-}
-
-Deck.prototype.sampleset = function () {
-  var smpl = {'deck_left': 136, 'player_id': 0, 'seat_wind': 0, 'prev_wind': 0, 'players': [{'hand': [2, 39, 55, 54, 54, 35, 6, 3, 24, 8, 9, 1, 18], 'drew': null, 'trash': [], 'exposed': [], 'flower': 0}, {'hand': [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 'trash': [], 'exposed': [], 'flower': 0}, {'hand': [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 'trash': [], 'exposed': [], 'flower': 0}, {'hand': [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 'trash': [], 'exposed': [], 'flower': 0}]}
-  this.assign(smpl)
-}
-
-Deck.prototype.assign = function (obj) {
-  for (var k in obj) {
-    if (k == 'players') {
-      for (var i = 0; i < 4; i++) {
-        this.players[i].assign(obj.players[i])
-      }
-    } else {
-      this[k] = obj[k]
-    }
-  }
-}
-
-Deck.prototype.resyncdata = async function (conn) {
-  this.conn = conn
-  AsyncConnection.send({'type': 'get_all'})
-  var res = AsyncConnection.receiveAsync()
-  this.assign(res)
-}
-
+var Deck = {};
 Deck.numtosrc_table =
                    ['back', 'man1', 'man2', 'man3', 'man4', 'man5', 'man6', 'man7', 'man8', 'man9', 'back', 'back', 'back', 'back', 'back', 'back',
                      '[16]', 'pin1', 'pin2', 'pin3', 'pin4', 'pin5', 'pin6', 'pin7', 'pin8', 'pin9', 'back', 'back', 'back', 'back', 'back', 'back',
@@ -220,7 +42,7 @@ Deck.numtosrc_table =
                      '[48]', 'ji1', 'ji2', 'ji3', 'ji4', 'ji5', 'ji6', 'ji7', '[38]', '[39]', 'back', 'back', 'back', 'back', 'back', 'back',
                      '[64]', 'hana', 'hana', 'hana', 'hana', 'hana', 'hana', 'hana', 'hana', 'all', 'back', 'back', 'back', 'back', 'back', 'back']
 
-class Hand {
+export class Hand {
   constructor () {
     this.score = 0;
     this.id = -1
@@ -237,7 +59,6 @@ class Hand {
 
     this.allow_discard = false
     this.commands_available = []
-    this.command_types_available = new Set()
 
     this.open = false
 
@@ -269,98 +90,8 @@ export function get_wind_name (id) {
   return _wind_name[id]
 }
 
-export function tile_click (x) {
-  var pl = deck.players[deck.player_id]
-  var pos = x
-  if (input_resolve != null && pl.allow_discard) {
-    input_resolve('discard', pos)
-  }
-}
-
-export async function click_meld_popup (pos) {
-  console.log('meld-select:' + pos.toString())
-  if (input_resolve != null) {
-    deck.meld_selection.tiles = []
-    input_resolve(deck.meld_selection.type, deck.meld_selection.pos[pos])
-  }
-}
-
-export function command (type) {
-  if (input_resolve == null) { return }
-  var pl = deck.players[deck.player_id]
-  var cmd = pl.commands_available
-  var fil = cmd.filter(x => (x.type == type))
-  if (fil.length == 0) { return }
-  if (fil.length == 1) {
-    input_resolve(type, fil[0].pos)
-  } else {
-    var selections = fil.map(x => x.pos)
-    var tiles = selections.map(x => x.map(y => y >= 0 ? pl.hand[y] : (y == -1 ? pl.drawed : deck.claim_target)))
-    deck.meld_selection = {}
-    deck.meld_selection.type = type
-    deck.meld_selection.tiles = tiles
-    deck.meld_selection.pos = selections
-  }
-}
 
 var input_resolve = null
-export async function claim_input () {
-  return new Promise(
-    function (resolve, reject) {
-      input_resolve = function (type, value) {
-        input_resolve = null
-        resolve({'type': type, 'pos': value})
-      }
-    }
-  )
-}
-
-export async function turn_input () {
-  return new Promise(
-    function (resolve, reject) {
-      input_resolve = function (type, value) {
-        var pl = deck.players[deck.player_id]
-        if (type == 'discard') {
-          if ((pl.drawed != null && value == -1) || (value >= 0 || value < pl.hand.length)) {
-            pl.trash_tile(value)
-            input_resolve = null
-            pl.allow_discard = false
-            resolve({'type': 'discard', 'pos': value})
-          }
-        } else {
-          input_resolve = null
-          pl.allow_discard = false
-          resolve({'type': type, 'pos': value})
-        }
-      }
-    }
-  )
-}
-
-export function timer_interval (resolve, timeout, cancelObj) {
-  var left = deck.time_left = Math.floor((timeout - (new Date()).getTime()) / 100) / 10
-  if (left < 0) {
-    console.log('!!timeout!!')
-    deck.time_left = null
-    resolve()
-  }
-  if (cancelObj.cancel) {
-    deck.time_left = null
-    resolve()
-  }
-}
-
-export async function timer (timeout, cancelObj) {
-  var cancel = null
-  await new Promise((resolve, reject) => { cancel = setInterval(() => timer_interval(resolve, timeout, cancelObj), 100) })
-  clearInterval(cancel)
-  return null
-}
-// timer( (new Date()).getTime() + 10000 );
-
-export function __last_target (t) {
-  return deck.last_target == t
-}
 
 function importAll (r) {
   return r.keys().map(r)

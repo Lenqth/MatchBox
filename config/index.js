@@ -7,11 +7,11 @@ const path = require("path");
 module.exports = {
   dev: {
     // Paths
-    assetsSubDirectory: "static",
+    assetsSubDirectory: "static/mtbx",
     assetsPublicPath: "/bundle/",
     proxyTable: {
-      "ws://*": {
-        target: "http://localhost:8000/",
+      "/ws/**": {
+        target: "ws://localhost:8000/",
         ws: true
       },
       "/jong/account": "http://localhost:8000/",
@@ -56,7 +56,7 @@ module.exports = {
     // Paths
     assetsRoot: path.resolve(__dirname, "../dist"),
     assetsSubDirectory: "static",
-    assetsPublicPath: "/",
+    assetsPublicPath: "/jong/",
 
     /**
      * Source Maps
