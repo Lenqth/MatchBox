@@ -158,6 +158,9 @@ class Game:
             await Promise.all(confirm_tasks)
         return self.total_score
 
+    def dump(self):
+        pass
+
     async def one_game(self):
         self.log = []
         self.is_done = False
@@ -197,7 +200,7 @@ class Game:
                 self.konged_tile = False
                 await self.send_discard(self.turn, { "id":tile , "tsumogiri":tsumogiri , "yoko":False , "claimed":False } )
             elif turn_command.type == TurnCommand.APKONG :
-                tile = turn_player.pop_from_hand( turn_command.pos )
+                tile , *_ = turn_player.pop_from_hand( turn_command.pos )
                 self.apkong = True
                 self.konged_tile = True
                 await self.send_apkong(self.turn,tile)
