@@ -1,9 +1,15 @@
 <template>
   <div>
     <v-content>
-      <v-flex class="room-root" >
+      <v-flex class="room-root">
         <transition-group name="roomtr">
-          <roombox class="room-item" v-for="(item,index) in rlist" :key="index+1" :room="item" @dblclick.native="joinRoom(item)"/>
+          <roombox
+            class="room-item"
+            v-for="(item,index) in rlist"
+            :key="index+1"
+            :room="item"
+            @dblclick.native="joinRoom(item)"
+          />
         </transition-group>
       </v-flex>
     </v-content>
@@ -16,15 +22,14 @@
         </v-card-title>
       </v-card>
     </v-footer>
-   </div>
+  </div>
 </template>
 <script>
 import Vue from "vue";
-import Vuetify from 'vuetify'
-import {webSocket as RxWebSocket} from 'rxjs/webSocket'
-import * as operators from 'rxjs/operators';
-import {interval} from 'rxjs';
-
+import Vuetify from "vuetify";
+import { webSocket as RxWebSocket } from "rxjs/webSocket";
+import * as operators from "rxjs/operators";
+import { interval } from "rxjs";
 
 Vue.use(Vuetify);
 
@@ -36,7 +41,6 @@ Vue.component("newroom", newroomDialog);
 import roombox from "./components/roombox.vue";
 Vue.component("roombox", roombox);
 
-
 var audio1 = document.getElementById("sound1");
 
 var __vm = null;
@@ -44,11 +48,7 @@ var __vm = null;
 export default {
   name: "Lobby",
   data() {
-    return { rlist: [],
-     dialogOpen: false ,
-     socket : null,
-     polling : null
-     };
+    return { rlist: [], dialogOpen: false, socket: null, polling: null };
   },
   methods: {
     openModal() {
@@ -57,58 +57,64 @@ export default {
     autoMatch() {
       this.$router.push("/room");
     },
-    async joinRoom(room){
+    joinRoom(room) {
       var host = location.host;
-      await new Promise( function(res,rej){
-        var socket = (window.socket = new RxWebSocket(
-          "ws://" + host + "/ws/jong/room/join/" + room.room_id
-        ));
-        window.socket.addEventListener(
-          "open",
-          () => {
-            res(socket);
-          },
-          { once: true }
-        ); } );
+      var _this = this;
+      var socket = (window.socket = new RxWebSocket(
+        "ws://" + host + "/ws/jong/room/join/" + room.room_id
+      ));
+      _this.$store.commit("connection/new_conn", socket);
       this.$router.push("/room");
     },
-    reconnect(){
-      this.disconnect()
-      var send_sock = new RxWebSocket("ws://" + location.host + "/ws/jong/lobby");
-      var sock = send_sock.pipe( 
-        operators.retryWhen( (x) => x.pipe( operators.mergeMap( (e,i) => {
-          if(i>3){
-            return throwError(e)
-          }
-          return timer(1000).pipe( operators.flatMap( async x =>{await this.reconnect();return x;} ) )
-        })))
-      ).subscribe(function(data) {
-        console.log("polling")
-        this.rlist = data.rooms;
-      });
+    reconnect() {
+      this.disconnect();
+      var send_sock = new RxWebSocket(
+        "ws://" + location.host + "/ws/jong/lobby"
+      );
+      var _this = this;
+      var sock = send_sock
+        .pipe(
+          operators.retryWhen(x =>
+            x.pipe(
+              operators.mergeMap((e, i) => {
+                if (i > 3) {
+                  return throwError(e);
+                }
+                return timer(1000).pipe(
+                  operators.flatMap(async x => {
+                    await _this.reconnect();
+                    return x;
+                  })
+                );
+              })
+            )
+          )
+        )
+        .subscribe(function(data) {
+          //console.log("polling")
+          //console.log(data)
+          _this.rlist = data.rooms;
+        });
       this.socket = sock;
-      this.polling = interval(5000).pipe( operators.map( (x) => ({"type":"polling"}) )).subscribe( send_sock )
+      this.polling = interval(5000)
+        .pipe(operators.map(x => ({ type: "polling" })))
+        .subscribe(send_sock);
     },
-    disconnect(){
-      if(this.socket){
-        this.socket.unsubscribe();
-        this.socket = null;
-      }
-      if(this.polling){
+    disconnect() {
+      if (this.polling) {
         this.polling.unsubscribe();
         this.polling = null;
       }
     }
   },
-  mounted(){
+  mounted() {
     this.reconnect();
   },
-  beforeRouteLeave (to, from, next) {
+  beforeRouteLeave(to, from, next) {
     this.disconnect();
-    next()
+    next();
   }
 };
-
 </script>
 <style>
 .col1 {
@@ -119,7 +125,7 @@ export default {
   height: 40%;
 }
 
-.room-root{
+.room-root {
   margin: 25px;
 }
 
@@ -131,13 +137,12 @@ export default {
   border: 2px black solid;
 }
 
-
-.roomtr-enter-active,.roomtr-leave-active {
-  transition: opacity .5s;
+.roomtr-enter-active,
+.roomtr-leave-active {
+  transition: opacity 0.5s;
 }
-.roomtr-enter,.roomtr-leave-to{
+.roomtr-enter,
+.roomtr-leave-to {
   opacity: 0;
 }
-
-
 </style>

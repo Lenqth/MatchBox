@@ -8,9 +8,37 @@ export const lobby = {
   namespaced: true
 };
 
+export const connection = {
+  namespaced: true,
+  state: {
+    socket: null
+  },
+  actions:{
+    join_room(){
+
+    }
+  },
+  mutations : {
+    new_conn( state , sk ){
+      if(state.socket){
+        state.socket.unsubscribe();
+        state.socket = null
+      }
+      state.socket = sk;
+    },
+    disconnect( state ){
+      if(state.socket){
+        state.socket.unsubscribe();
+        state.socket = null
+      }
+    }
+  }
+};
+
 export const store = new Vuex.Store({
   modules: {
-    lobby
+    lobby,
+    connection,
   },
   state: {
     skip_claim: false
