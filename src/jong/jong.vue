@@ -57,7 +57,6 @@
 <script>
 import Vue from "vue";
 import {
-  AsyncConnection,
   Hand,
   get_wind_name,
   numtosrc,
@@ -218,7 +217,7 @@ export default {
     },
     async resyncdata(conn) {
       this.conn = conn;
-      AsyncConnection.send({ type: "get_all" });
+      this.$store.state.connection.socket.next({ type: "get_all" });
       var res = AsyncConnection.receiveAsync();
       this.assign(res);
     },
@@ -228,12 +227,11 @@ export default {
       el.play();
     },
     async start(sock) {
-      this.conn = new AsyncConnection(sock);
-      this.conn.send(JSON.stringify({ stand_by: "" }));
+      this.conn = this.$store.state.connection.socket;
+      this.conn.next( { stand_by: "" } );
       var res = null;
       this.open = false;
-      while (true) {
-        res = await this.conn.receiveAsync();
+      var proc = async ( res ) => {
         var pl = this.players[this.player_id];
         if (res.type === "reset") {
           delete res.type;
@@ -320,7 +318,7 @@ export default {
           cancelObj.cancel = true;
           if (input_res != null) {
             input_res._m_id = res._m_id;
-            this.conn.send(input_res);
+            this.conn.next(input_res);
           }
           this.players[tg_pl].target = null;
         } else if (res.type === "expose") {
@@ -336,7 +334,7 @@ export default {
           }
         } else if (res.type == "confirm") {
           await new Promise(resolve => (this.listener_ok = resolve));
-          this.conn.send({ _m_id: res._m_id });
+          this.conn.next({ _m_id: res._m_id });
           this.result = null;
         } else if (res.type == "discard") {
           await this.play_sound("sound2");
@@ -364,15 +362,17 @@ export default {
           cancelObj.cancel = true;
           if (input_res != null) {
             input_res._m_id = res._m_id;
-            this.conn.send(input_res);
+            this.conn.next(input_res);
           } else {
             pl.trash_tile(-1);
           }
 
           // await turn_input(this.player_id);
         }
-      }
+      };
+      this.conn.subscribe(proc)
     }
+
   },
   beforeRouteEnter(route, redirect, next) {
     next(vm => {

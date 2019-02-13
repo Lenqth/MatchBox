@@ -20,18 +20,13 @@ import Vue from "vue";
 import Vuetify from 'vuetify'
 Vue.use(Vuetify);
 
+import {webSocket as RxWebSocket} from 'rxjs/webSocket'
 import * as utils from "./components/utils.js";
 import memberbox from "./components/memberbox.vue";
 Vue.component("memberbox", memberbox);
 
 var audio1 = document.getElementById("sound1");
 
-
-function send(s) {
-  var obj = { message: s };
-  socket.send(JSON.stringify(obj));
-}
-var __vm = null;
 export default {
   name: "MatchRoom",
   data(){
@@ -43,107 +38,95 @@ export default {
   },
   methods: {
     send_ready() {
-      socket.send(JSON.stringify({ ready: this.player_slot[this.you].ready }));
+      socket.next( { ready: this.player_slot[this.you].ready } );
     },
     new_socket() {
       var host = location.host;
-      var socket = (window.socket = new WebSocket(
+      var socket = (window.socket = new RxWebSocket(
         "ws://" + host + "/ws/jong/room/auto"
       ));
-      socket.onmessage = this.onmessage;
-      socket.onerror = h_onerror;
-      socket.onclose = h_onclose;
+      socket.subscribe( this.onmessage , this.h_onerror , this.h_onclose );      
+      this.$store.commit("connection/new_conn",socket)
       return socket;
     },
-    onmessage(e) {
-      var o = JSON.parse(e.data);
-      if ("message" in o) {
+    onmessage(data) {
+      if ("message" in data) {
         //    utils.play_sound("../assets/puu79_a.wav");
-        var s1 = document.getElementById("sound1");
-        if (s1) {
-          s1.play();
-        }
-        this.add_message(o.message);
+        setTimeout( function(){ var s1 = document.getElementById("sound1");
+            if (s1) {
+              s1.play();
+            }
+          } , 100 );
+        this.add_message(data.message);
       }
-      if ("roomsize" in o) {
-        this.player_slot = new Array(o.roomsize).fill(0).map(function() {
+      if ("roomsize" in data) {
+        this.player_slot = new Array(data.roomsize).fill(0).map(function() {
           return { joined: false, ready: false, you: false, name: "none" };
         });
       }
-      if ("position" in o) {
-        this.player_slot[o.position].you = true;
-        this.you = o.position;
-        for (var [i, v] in o.room) {
+      if ("position" in data) {
+        this.player_slot[data.position].you = true;
+        this.you = data.position;
+        for (var [i, v] in data.room) {
           this.player_slot[i].joined = true;
         }
       }
-      if ("room" in o) {
-        for (var v of o.room) {
+      if ("room" in data) {
+        for (var v of data.room) {
           this.player_slot[v.position].joined = true;
           this.player_slot[v.position].ready = v.ready;
         }
       }
-      if ("joined" in o) {
-        var dat = o.joined;
+      if ("joined" in data) {
+        var dat = data.joined;
         this.player_slot[dat.position].joined = true;
         this.player_slot[dat.position].ready = dat.ready;
       }
-      if ("exited" in o) {
-        var dat = o.exited;
+      if ("exited" in data) {
+        var dat = data.exited;
         this.player_slot[dat.position].joined = false;
       }
-      if ("set_state" in o) {
-        var stt = o.set_state;
+      if ("set_state" in data) {
+        var stt = data.set_state;
         var pos = stt.pos;
         delete stt.pos;
         for (var key in stt) {
           this.player_slot[pos][key] = stt[key];
         }
       }
-      if ("start" in o) {
-        game_start(o.start);
+      if ("start" in data) {
+        this.game_start(data.start);
       }
     },
     add_message(x) {
       this.messages.push(x);
+    },
+    h_onerror(e) {
+      console.log("error:", e);
+    },
+    h_onclose(e) {
+      console.log("close:", e);
+      this.error_disp("connection closed. please reload later.");
+      for (var x of document.getElementsByClassName("group-content")) {
+        x.classList.remove("joined");
+        x.classList.remove("group-content-you");
+      }
+    },
+    game_start(arg) {
+      this.$router.push("/jong");
     }
   },
   beforeRouteEnter(route, redirect, next) {
     next(vm => {
-      __vm = vm;
-      if (!isRoomSocket(window.socket)) {
+      let sk = vm.$store.state.connection.socket ;
+      if ( sk == null ) {
         vm.new_socket();
       } else {
-        socket.onmessage = vm.onmessage;
-        socket.onerror = h_onerror;
-        socket.onclose = h_onclose;
+        sk.subscribe(vm.onmessage,vm.h_onerror,vm.h_onclose);
       }
     });
   }
 };
-function isRoomSocket(socket) {
-  if (!socket) return false;
-  if (socket.url.indexOf("room") >= 0) {
-    return true;
-  }
-  return false;
-}
-
-function h_onerror(e) {
-  console.log("error:", e);
-}
-function h_onclose(e) {
-  console.log("close:", e);
-  this.error_disp("connection closed. please reload later.");
-  for (var x of document.getElementsByClassName("group-content")) {
-    x.classList.remove("joined");
-    x.classList.remove("group-content-you");
-  }
-}
-
-function game_start(arg) {
-  __vm.$router.push("/jong");
-}
 </script>
 <style scoped>
 .room-root {

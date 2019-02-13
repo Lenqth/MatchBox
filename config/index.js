@@ -14,8 +14,7 @@ module.exports = {
         target: "ws://localhost:8000/",
         ws: true
       },
-      "/jong/account": "http://localhost:8000/",
-      "/jong/config/*": "http://localhost:8000/"
+      "/api/**": "http://localhost:8000/",
     },
 
     // Various Dev Server settings

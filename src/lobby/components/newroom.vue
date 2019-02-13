@@ -35,6 +35,7 @@
 <script>
 import Vue from "vue";
 import axios from "axios";
+import { webSocket as RxWebSocket } from "rxjs/webSocket";
 
 import SelectionControl from "./selection.vue";
 Vue.component("selection", SelectionControl);
@@ -77,11 +78,16 @@ export default {
       }
     },
     async createRoom() {
-      var socket = await new_socket_conf();
+      var host = location.host;
+      var _this = this;
+      var socket = (window.socket = new RxWebSocket(
+        "ws://" + host + "/ws/jong/room/configured"
+      ));
+      _this.$store.commit("connection/new_conn", socket);
       console.log("connected");
       var config = this.detail_options_selected;
       config.game_type = this.game_type;
-      socket.send(JSON.stringify(this.detail_options_selected));
+      socket.next(this.detail_options_selected);
       this.$router.push("/room");
     }
   },
@@ -100,21 +106,6 @@ export default {
   }
 };
 
-function new_socket_conf() {
-  return new Promise((res, rej) => {
-    var host = location.host;
-    var socket = (window.socket = new WebSocket(
-      "ws://" + host + "/ws/jong/room/configured"
-    ));
-    window.socket.addEventListener(
-      "open",
-      () => {
-        res(socket);
-      },
-      { once: true }
-    );
-  });
-}
 </script>
 <style>
 .dialog-room {
