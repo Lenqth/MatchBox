@@ -300,11 +300,11 @@ export default {
             this.calculated_score = res.agari_info[0];
           }
           let input_res;
+          var cancelObj = { cancel: false };
           if (this.$store.state.skip_claim && skippable) {
             input_res = { type: "skip" };
           } else {
             let timeout = res.timeout * 1000;
-            var cancelObj = { cancel: false };
             this.play_sound("sound1");
             input_res = await Promise.race([
               this.claim_input(cancelObj),
