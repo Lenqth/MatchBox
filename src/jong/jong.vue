@@ -323,8 +323,8 @@ export default {
           this.players[tg_pl].target = null;
         } else if (res.type === "expose") {
           this.players[res.pid].exposed.push(res.obj);
-          if( obj.discard_pos != null ){
-            let [d_pid,d_pos] = obj.discard_pos
+          if( res.obj.discard_pos != null ){ 
+            let [d_pid,d_pos] = res.obj.discard_pos
             this.players[d_pid].trash[d_pos].claimed = true
           }
         } else if (res.type === "apkong") {

@@ -240,7 +240,7 @@ class Game:
             claims=sorted(claims,reverse=True) # 優先順にする
             command_player_id = np.argmax(command) # 最上位の"鳴き"をしたプレイヤーid
             self.log.append(claims)
-            discard_pos = (turn,len(turn_player.trash)-1) # 対応するdiscardの位置
+            discard_pos = (self.turn,len(turn_player.trash)-1) # 対応するdiscardの位置
             if command[command_player_id].type > 0 : # 鳴き/ロンがあった場合
                 if command[command_player_id].type == Claim.RON :
                     self.players[command_player_id].drew = tile
@@ -264,6 +264,7 @@ class Game:
                     self.turn = command_player_id
                     self.konged_tile = True
                     turn_player.trash[-1]["claimed"] = True
+                    ex.discard_pos = discard_pos
                     await self.send_expose(command_player_id,ex)
                 elif command[command_player_id].type == Claim.PUNG :
                     command[command_player_id].discard_pos = discard_pos
@@ -275,6 +276,7 @@ class Game:
                     self.turn = command_player_id
                     self.skip_draw = True
                     turn_player.trash[-1]["claimed"] = True
+                    ex.discard_pos = discard_pos
                     await self.send_expose(command_player_id,ex)
                 elif command[command_player_id].type == Claim.CHOW :
                     command[command_player_id].discard_pos = discard_pos
@@ -287,6 +289,7 @@ class Game:
                     self.turn = command_player_id
                     self.skip_draw = True
                     turn_player.trash[-1]["claimed"] = True
+                    ex.discard_pos = discard_pos
                     await self.send_expose(command_player_id,ex)
 
             if self.apkong :
