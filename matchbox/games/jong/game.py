@@ -190,7 +190,7 @@ class Game:
             self.log.append(turn_command)
             self.apkong = False
             if turn_command.type == TurnCommand.DISCARD :
-                tsumogiri = turn_command.pos == -1
+                tsumogiri = ( turn_command.pos == -1 )
                 if turn_player.drew is None and tsumogiri :
                     tsumogiri = False
                     turn_command.pos = len(turn_player.hand)-1
@@ -233,14 +233,14 @@ class Game:
                 subturn_tasks[pi] = ( self.players[pi].subturn_async(self,tile,self.apkong) )
             subturn_tasks[self.turn] = pure_async( Claim(0) )
             command = await Promise.all(subturn_tasks)
-            command_player_id = np.argmax(command)
             claims = []
             for i in range(4):
                 if command[i].type > 0:
                     claims.append( (i,command[i]) )
-            claims=sorted(claims,reverse=True)
+            claims=sorted(claims,reverse=True) # 優先順にする
+            command_player_id = np.argmax(command) # 最上位の"鳴き"をしたプレイヤーid
             self.log.append(claims)
-
+            discard_pos = (turn,len(turn_player.trash)-1) # 対応するdiscardの位置
             if command[command_player_id].type > 0 : # 鳴き/ロンがあった場合
                 if command[command_player_id].type == Claim.RON :
                     self.players[command_player_id].drew = tile
@@ -254,6 +254,7 @@ class Game:
                     self.log.append( score_li )
                     return tuple(score_li)
                 elif command[command_player_id].type == Claim.MINKONG :
+                    command[command_player_id].discard_pos = discard_pos
                     a,b,c = filter( lambda x:x>=0 , command[command_player_id].pos  )
                     ct = self.players[command_player_id].hand.pop(c)
                     bt = self.players[command_player_id].hand.pop(b)
@@ -265,6 +266,7 @@ class Game:
                     turn_player.trash[-1]["claimed"] = True
                     await self.send_expose(command_player_id,ex)
                 elif command[command_player_id].type == Claim.PUNG :
+                    command[command_player_id].discard_pos = discard_pos
                     a,b = filter( lambda x:x>=0 , command[command_player_id].pos  )
                     bt = self.players[command_player_id].hand.pop(b)
                     at = self.players[command_player_id].hand.pop(a)
@@ -275,6 +277,7 @@ class Game:
                     turn_player.trash[-1]["claimed"] = True
                     await self.send_expose(command_player_id,ex)
                 elif command[command_player_id].type == Claim.CHOW :
+                    command[command_player_id].discard_pos = discard_pos
                     a,b = filter( lambda x:x>=0 , command[command_player_id].pos  )
                     bt = self.players[command_player_id].hand.pop(b)
                     at = self.players[command_player_id].hand.pop(a)
