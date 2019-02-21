@@ -160,7 +160,7 @@ def list_to_string(li):
     p = ""
     s = ""
     c = ""
-    cname = " ESWNHGR"
+    cname = " ESWNGHR"
     for x in li:
         if 1 <= x <= 9 :
             m = m + str(x)
@@ -188,7 +188,7 @@ def __parse_string_to_list_ex(s):
     buff = []
     mentu_buff = ""
     mode = 0
-    d = { "E":49 , "S" : 50 , "W":51 , "N":52,"H":53,"G":54,"R":55 }
+    d = { "E":49 , "S" : 50 , "W":51 , "N":52,"G":53,"H":54,"R":55 }
     kong_type_tbl = {"k":Mentu.MINKONG,"a":Mentu.APKONG,"c":Mentu.CONCKONG}
     for c in s:
         if mode == 0 : # normal

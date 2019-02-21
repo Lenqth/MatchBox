@@ -665,7 +665,10 @@ class ChineseScore:
         elif tileset.issubset( set( [ 6,7,8,9, 22,23,24,25 , 38,39,40,41 ] ) ) :
             yield ChineseScore.upp4
 
-        if tileset.issubset( set( [ 34,35,36,38,40,54 ] ) ) :
+        if tileset.issubset(set([ 16+1,16+2,16+3,16+4,16+5,16+8,16+9,32+2, 32+4, 32+5, 32+6, 32+8, 32+9, 54 ])):
+            yield ChineseScore.allsymm
+
+        if tileset.issubset( set( [ 34,35,36,38,40,53 ] ) ) :
             yield ChineseScore.allgreen
 
         if tileset.issubset( set( [ 49,50,51,52,53,54,55 ] ) ) :
