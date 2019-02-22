@@ -50,15 +50,16 @@ class AIShanten:
         return "よわいAIちゃん"
 
     def select_discard(self, pl, game):
+        from numpy import random
         h = list(pl.hand)
         if pl.drew is not None:
             h.append(pl.drew)
         ary = list_to_array(h)
         e = np.eye(64, dtype=np.int32)
-        q = np.tile(ary, (len(pl.hand), 1)) - e[pl.hand]
-        p = np.apply_along_axis(shanten, 1, q)
+        q = np.tile(ary, (len(h), 1)) - e[h]
+        p = np.apply_along_axis(shanten, 1, q) + random.rand(len(q)) / 2.0
         r = np.argmin(p)
-        if pl.drew is not None and r+1 == len(h):
+        if pl.drew is not None and (r+1) == len(h):
             return -1
         return r
 
