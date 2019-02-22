@@ -1,12 +1,21 @@
 <template>
   <div>
     <transition name="meld-select">
-      <div class="modal-mask" v-if="meld_selection != null && meld_selection.tiles.length > 0" v-on:click="close()">
+      <div
+        class="modal-mask"
+        v-if="meld_selection != null && meld_selection.tiles.length > 0"
+        v-on:click="close()"
+      >
         <div class="modal-wrapper">
           <div class="meld-select-box">
-            <div v-for="(grp,index) in meld_selection.tiles" class="exposed-group group-clickable" v-on:click="click_meld_popup(index);" :key="index" >
+            <div
+              v-for="(grp,index) in meld_selection.tiles"
+              class="exposed-group group-clickable"
+              v-on:click="click_meld_popup(index);"
+              :key="index"
+            >
               <div v-for="(item,jndex) in grp" class="exposed-item tile" :key="jndex">
-                <img v-bind:src="numtosrc(item)" >
+                <tile :id="item"/>
               </div>
             </div>
           </div>
@@ -16,63 +25,61 @@
   </div>
 </template>
 <script>
-
-import Vue from 'vue'
-import {get_wind_name, numtosrc, click_meld_popup} from './jong_network.js'
+import Vue from "vue";
+import { get_wind_name, numtosrc, click_meld_popup } from "./jong_network.js";
 
 export default {
-  props: ['meld_selection'],
+  props: ["meld_selection"],
   methods: {
     numtosrc,
     click_meld_popup: click_meld_popup,
-    close(){
-      this.$emit("cancel")
-    }    
+    close() {
+      this.$emit("cancel");
+    }
   }
-}
-
+};
 </script>
 <style scoped>
-.group-clickable:hover{
+.group-clickable:hover {
   background: orange;
 }
-.tile{
-	flex-wrap: nowrap;
-  margin:1px;
-  position:relative;
+.tile {
+  flex-wrap: nowrap;
+  margin: 1px;
+  position: relative;
 }
 
-.exposed-group{
-	flex-wrap: nowrap;
+.exposed-group {
+  flex-wrap: nowrap;
   border: 1px red dotted;
   display: flex;
-  margin:0px 4px;
+  margin: 0px 4px;
 }
 
-.meld-select-box{
+.meld-select-box {
   border: solid 2px orange;
   background: lightgray;
   width: 400px;
   height: 250px;
   opacity: 0.8;
   display: flex;
-  align-items : center;
-  padding:8px;
+  align-items: center;
+  padding: 8px;
   margin: 0px auto;
 }
 
-.meld-select-enter-active{
+.meld-select-enter-active {
   transition: top 0.6s 0s ease;
 }
-.meld-select-leave-active{
+.meld-select-leave-active {
   transition: top 0.6s 0s ease;
 }
 
-.meld-select-enter , .meld-select-leave-to{
+.meld-select-enter,
+.meld-select-leave-to {
   top: 500px !important;
-  display:none;
+  display: none;
 }
-
 
 .modal-mask {
   position: fixed;
@@ -90,5 +97,4 @@ export default {
   display: table-cell;
   vertical-align: middle;
 }
-
 </style>
