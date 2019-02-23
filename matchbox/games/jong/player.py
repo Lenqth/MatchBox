@@ -164,7 +164,7 @@ class Player:
         else:
             single = True
             position_list = [position]
-        res = []
+        res = [] # list[[int]]
         for x in position_list:
             if x == -1 :
                 assert(self.drew is not None)

@@ -300,11 +300,11 @@ export default {
             this.calculated_score = res.agari_info[0];
           }
           let input_res;
+          var cancelObj = { cancel: false };
           if (this.$store.state.skip_claim && skippable) {
             input_res = { type: "skip" };
           } else {
             let timeout = res.timeout * 1000;
-            var cancelObj = { cancel: false };
             this.play_sound("sound1");
             input_res = await Promise.race([
               this.claim_input(cancelObj),
@@ -323,6 +323,10 @@ export default {
           this.players[tg_pl].target = null;
         } else if (res.type === "expose") {
           this.players[res.pid].exposed.push(res.obj);
+          if( res.obj.discard_pos != null ){ 
+            let [d_pid,d_pos] = res.obj.discard_pos
+            this.players[d_pid].trash[d_pos].claimed = true
+          }
         } else if (res.type === "apkong") {
           var ex = this.players[res.pid].exposed;
           for (var v of ex) {

@@ -53,14 +53,14 @@ else:
             return None
         return np.dot( ary , FIVES )
 
-_colorwise_parts_memory = np.full( (5**9*2) , None , dtype=np.object )
+_colorwise_parts_memory = np.full( (5**9*2,6,2) , -1 , dtype=np.int16 )
 def _colorwise_parts_cached(ary,is_number=True):
     idx = __to_number(ary)
     isn = 1 if is_number else 0
     if idx == None:
         return _colorwise_parts(ary,is_number=is_number)
     r = _colorwise_parts_memory[ (idx << 1) | isn ]
-    if r is None :
+    if r[0,0] == -1 :
         #print("CACHE MISS : {0} {1} ({2})".format(ary,isn,idx))
         v = _colorwise_parts(ary,is_number=is_number)
         _colorwise_parts_memory[(idx << 1) | isn] = v
@@ -94,8 +94,9 @@ def _colorwise_parts(ary,is_number=True):
     def _colorwise_parts_internal(k,ty):
         nonlocal res,p3,p2,pair,left
         if k>9 or p3 + p2 >= 5 :
-            res[p3+p2][pair] = max( res[p3+p2][pair] , p3*2 + p2 )
-            res[p3+p2][0] = max( res[p3+p2][0] , p3*2 + p2 )
+            if pair > 0:
+                res[p3+p2,1] = max( res[p3+p2,1] , p3*2 + p2 )
+            res[p3+p2,0] = max( res[p3+p2,0] , p3*2 + p2 )
             return
         if left[k] > 0:
             if ty <= 0 and left[k] >= 2 :
@@ -103,7 +104,7 @@ def _colorwise_parts(ary,is_number=True):
                 p2 += 1
                 _pair = pair
                 pair = 1
-                _colorwise_parts_internal(k,0)
+                _colorwise_parts_internal(k,1)
                 pair = _pair
                 p2 -= 1
                 left[k] += 2
@@ -141,7 +142,6 @@ def _colorwise_parts(ary,is_number=True):
 
 
 
-TMP_FOR_SHANTENEXP = np.full( (4,5,2), -1 , dtype=np.int16)
 def shanten_exp(ary,expect=4,atama=True):
     res = [
         _colorwise_parts_cached(ary[0:16]),
@@ -149,8 +149,9 @@ def shanten_exp(ary,expect=4,atama=True):
         _colorwise_parts_cached(ary[32:48]),
         _colorwise_parts_cached(ary[48:64],is_number=False)
     ]
-    TMP_FOR_SHANTENEXP.fill(-1)
+    TMP_FOR_SHANTENEXP = np.full((4, 5, 2), -1, dtype=np.int16)
     def shanten_exp_int(k,m,p):
+        nonlocal TMP_FOR_SHANTENEXP
         if k<0 or (m|p)==0 :
             return 0
         if TMP_FOR_SHANTENEXP[k,m,p] != -1:

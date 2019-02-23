@@ -105,6 +105,7 @@ class Exposed:
     def __init__(self,type,head):
         self.type = type
         self.head = head
+        self.discard_pos = None
 
     def __repr__(self):
         if self.type == Exposed.CHOW :
@@ -131,7 +132,10 @@ class Exposed:
             return (self.head,self.head,self.head,self.head)
 
     def toDict(self):
-        return {"type":self.__class__.__TYPENAMES__[self.type] , "tiles":self.get_tiles() }
+        res = {"type":self.__class__.__TYPENAMES__[self.type] , "tiles":self.get_tiles() }
+        if self.discard_pos is not None :
+            res["discard_pos"] = self.discard_pos
+        return res
 
 
     def mentu_id(self):
