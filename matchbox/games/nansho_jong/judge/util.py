@@ -4,6 +4,12 @@ import numpy as np
 import functools
 import itertools
 
+next_tile = np.zeros(64)
+next_tile[1:1+9] = np.roll(range(1, 1+9), 1)
+next_tile[17:17+9] = np.roll(range(17, 17+9), 1)
+next_tile[33:33+9] = np.roll(range(33, 33+9), 1)
+next_tile[49:49+4] = np.roll(range(49, 49+4), 1)
+next_tile[49+4:49+7] = np.roll(range(49+4, 49+7), -1)
 
 class Mentu:
     CHOW = 1
@@ -160,7 +166,7 @@ def list_to_string(li):
     p = ""
     s = ""
     c = ""
-    cname = " ESWNGHR"
+    cname = " ESWNHGR"
     for x in li:
         if 1 <= x <= 9 :
             m = m + str(x)
@@ -188,7 +194,7 @@ def __parse_string_to_list_ex(s):
     buff = []
     mentu_buff = ""
     mode = 0
-    d = { "E":49 , "S" : 50 , "W":51 , "N":52,"G":53,"H":54,"R":55 }
+    d = { "E":49 , "S" : 50 , "W":51 , "N":52,"H":53,"G":54,"R":55 }
     kong_type_tbl = {"k":Mentu.MINKONG,"a":Mentu.APKONG,"c":Mentu.CONCKONG}
     for c in s:
         if mode == 0 : # normal

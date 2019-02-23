@@ -13,23 +13,21 @@ export const connection = {
   state: {
     socket: null
   },
-  actions:{
-    join_room(){
-
-    }
+  actions: {
+    join_room() {}
   },
-  mutations : {
-    new_conn( state , sk ){
-      if(state.socket){
+  mutations: {
+    new_conn(state, sk) {
+      if (state.socket) {
         state.socket.unsubscribe();
-        state.socket = null
+        state.socket = null;
       }
       state.socket = sk;
     },
-    disconnect( state ){
-      if(state.socket){
+    disconnect(state) {
+      if (state.socket) {
         state.socket.unsubscribe();
-        state.socket = null
+        state.socket = null;
       }
     }
   }
@@ -38,12 +36,16 @@ export const connection = {
 export const store = new Vuex.Store({
   modules: {
     lobby,
-    connection,
+    connection
   },
   state: {
-    skip_claim: false
+    skip_claim: false,
+    hover_tile_id: null
   },
   mutations: {
+    hover_tile(state, value = null) {
+      state.hover_tile_id = value;
+    },
     skip_claim(state, value = "toggle") {
       if (value == "toggle") {
         state.skip_claim = !state.skip_claim;

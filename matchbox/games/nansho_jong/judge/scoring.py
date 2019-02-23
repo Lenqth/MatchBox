@@ -61,10 +61,37 @@ def override_transitive(cls):
                     x.override = q
                     f = True
     
-                    
-                
+class NanshoScore:
+    
 
+    @classmethod
+    def get_yakus(cls):
+        res = []
+        li = list(filter(lambda x: len(x) > 0 and x[0] != "_", dir(cls)))
+        for x in li:
+            q = getattr(cls, x)
+            if isinstance(q, Yaku):
+                res.append(q)
+        return res
 
+    @classmethod
+    def judge(cls, tiles, exposed, env, agari_tile=None):
+        
+        # 基本点の条件
+
+        # 天和 (親が配牌でロン)
+        # 地和 (親の第一捨牌をロン)
+
+        # 七星十三爛 ( 字牌7種類入り(ワイルドで化けているのは認めない , 4p ) )
+        # 十三爛 (十四不塔 , 2p )
+
+        # 小七対 (4枚使いありの七対子 , 2p )
+
+        # 大七対 (対々和 , 2p )
+        # 平和 (4面子1雀頭ならほんとうになんでもいい , 1p )
+
+        # 倍加
+        
     
 
 
@@ -72,10 +99,7 @@ tricolor = list(itertools.permutations([0,1,2]))
 
 class ChineseScore:
     # mentu array format
-    #
     # mentu[chow:0,pong:1][color:man,pin,sou,ji][number:1~9]
-    #
-    #
     #
     @classmethod
     def get_yakus(cls):
@@ -665,10 +689,7 @@ class ChineseScore:
         elif tileset.issubset( set( [ 6,7,8,9, 22,23,24,25 , 38,39,40,41 ] ) ) :
             yield ChineseScore.upp4
 
-        if tileset.issubset(set([ 16+1,16+2,16+3,16+4,16+5,16+8,16+9,32+2, 32+4, 32+5, 32+6, 32+8, 32+9, 54 ])):
-            yield ChineseScore.allsymm
-
-        if tileset.issubset( set( [ 34,35,36,38,40,53 ] ) ) :
+        if tileset.issubset( set( [ 34,35,36,38,40,54 ] ) ) :
             yield ChineseScore.allgreen
 
         if tileset.issubset( set( [ 49,50,51,52,53,54,55 ] ) ) :
