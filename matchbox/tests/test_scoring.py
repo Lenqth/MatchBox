@@ -66,7 +66,8 @@ class TestScore(unittest.TestCase):
 
     def test_chow_same(self):
         self.assertYaku( "*123p *123m *123s 234s4p 4p!" , ["三色三同順","小于五","自摸","単調将","平和"] ) 
-        self.assertYaku( "*123p *123p 1223344p 4p!" , ["一色三同順","小于五","清一色","四帰一","四帰一","自摸","平和"] ) 
+        self.assertYaku("*123p *123p 1223344p 4p!",
+                        ["一色三同順", "小于五", "清一色", "四帰一", "四帰一", "推不倒", "自摸", "平和"])
         self.assertYaku( "*123p *123p *123s *123m W W" , ["三色三同順","一般高","全求人","全帯么"] ) 
 
 
@@ -98,7 +99,9 @@ class TestScore(unittest.TestCase):
         self.assertYaku( "22255m 345p 34s *GGG 2s!"  ,[ '箭刻', '自摸' ] ) # ? 
         self.assertYaku( "*123s *567s 88s 55789p 5p"  ,[ '無字', '缺一門' ] ) # ?
         self.assertYaku( "7m 258p 369s ESWNGR 1m!"  ,[ '不求人', '全不靠' ] ) # ?
-        self.assertYaku( "*1111s 22233444s 11p 3s!"  ,[  ] ) # ?
+        self.assertYaku("*123p 345p 222s 45s HH 6s ", ['推不倒'])  # ?
+        self.assertYaku(" 222s 333s 444s 888s GG ", ['一色三節高', '単調将', '四暗刻', '緑一色'] )  # ?
+
                 
 
                 
