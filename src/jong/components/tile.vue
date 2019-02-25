@@ -71,11 +71,7 @@ export default {
   z-index: 1;
 }
 .tile.tsumogiri {
-  border: 1.2px blue solid;
-  overflow: hidden;
-}
-.tile.tsumogiri img {
-  margin: -1.2px;
+  outline: 1px blue solid;
 }
 
 .claimed img {

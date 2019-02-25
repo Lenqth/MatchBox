@@ -7,7 +7,7 @@
       :yoko="item.yoko"
       :tsumogiri="item.tsumogiri"
       :claimed="item.claimed"
-      :target="target && ( index + 1 == trash.length )"
+      :targeted="target && ( index + 1 == trash.length )"
       :key="index"
     />
   </div>
@@ -30,14 +30,7 @@ export default {
   float: left;
   display: block;
   position: relative;
-}
-.discarded-item img {
-  width: 22px;
-  height: 30px;
-  display: block;
-  border: 1px transparent solid;
-}
-.discarded-item {
+  margin: 1px;
   zoom: 0.8;
 }
 </style>
