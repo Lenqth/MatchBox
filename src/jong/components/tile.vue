@@ -5,7 +5,7 @@
     @mouseenter="onEnter"
     @mouseleave="onLeave"
   >
-    <div v-if="highlighted" class="mini-marker"/>
+    <!-- <div v-if="highlighted" class="mini-marker"/> -->
     <img v-bind:src="numtosrc(id)">
     <spinning-target v-if="targeted"/>
   </div>
