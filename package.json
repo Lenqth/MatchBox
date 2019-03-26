@@ -16,6 +16,7 @@
   },
   "dependencies": {
     "http-proxy": "^1.17.0",
+    "material-design-icons-iconfont": "^4.0.5",
     "node-sass": "^4.11.0",
     "sass-loader": "^7.1.0",
     "scss-loader": "0.0.1",

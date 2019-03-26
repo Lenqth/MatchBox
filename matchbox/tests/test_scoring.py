@@ -101,6 +101,7 @@ class TestScore(unittest.TestCase):
         self.assertYaku( "7m 258p 369s ESWNGR 1m!"  ,[ '不求人', '全不靠' ] ) # ?
         self.assertYaku("*123p 345p 222s 45s HH 6s ", ['推不倒'])  # ?
         self.assertYaku(" 222s 333s 444s 888s GG ", ['一色三節高', '単調将', '四暗刻', '緑一色'] )  # ?
+        self.assertYaku("*2222mk *2222pk 1122244s 1s!", [] )  # ?
 
                 
 

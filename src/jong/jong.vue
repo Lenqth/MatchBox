@@ -50,7 +50,7 @@
       </transition>
     </div>
     <result-dialog v-model="result" @ok="ok()"/>
-    <final-result-dialog :result="final_result" @ok="ok()"/>
+    <final-result-dialog :result="final_result" @ok="back_to_lobby()"/>
   </div>
 </template>
 
@@ -375,8 +375,10 @@ export default {
         }
       };
       this.conn.subscribe(proc)
+    },
+    back_to_lobby(){
+      this.$router.push("/");
     }
-
   },
   beforeRouteEnter(route, redirect, next) {
     next(vm => {

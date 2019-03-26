@@ -3,6 +3,9 @@
     <audio id="sound1" preload="auto">
       <source src="@/assets/sounds/puu79_a.wav" type="audio/wav">
     </audio>
+    <v-alert type="error" dismissible :value="error!=null" transition="alert-transition" @input="error = null" >
+      {{error}}
+    </v-alert>
     <v-layout row>
       <v-container>
         <transition-group name="message-card">
@@ -33,7 +36,8 @@ export default {
     return {
       player_slot: [], 
       messages : [],
-      you : -1
+      you : -1,
+      error:null
     }
   },
   methods: {
@@ -103,10 +107,11 @@ export default {
     },
     h_onerror(e) {
       console.log("error:", e);
+      this.error = "connection closed..."
     },
     h_onclose(e) {
       console.log("close:", e);
-      this.error_disp("connection closed. please reload later.");
+      this.error = "connection closed..."
       for (var x of document.getElementsByClassName("group-content")) {
         x.classList.remove("joined");
         x.classList.remove("group-content-you");
@@ -151,5 +156,16 @@ export default {
   opacity: 0;
 }
 
+.alert-transition-enter-active,.alert-transition-leave-active {
+  transition: all .3s ease;
+}
+.alert-transition-enter,.alert-transition-leave-to{
+  transform: scale(0);    
+  opacity: 0;
+}
+.alert-transition-enter-to,.alert-transition-leave{
+  transform: scale(1.0);  
+  opacity: 1;
+}
 
 </style>

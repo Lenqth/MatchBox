@@ -6,6 +6,7 @@ import Vuex from "vuex";
 Vue.use(Vuetify);
 Vue.use(Vuex);
 import "vuetify/dist/vuetify.min.css";
+import 'material-design-icons-iconfont/dist/material-design-icons.css'
 Vue.config.productionTip = false;
 
 import App from "./App";

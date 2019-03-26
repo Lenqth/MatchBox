@@ -108,6 +108,7 @@ export default {
     }
   },
   mounted() {
+    this.$store.commit("connection/disconnect")
     this.reconnect();
   },
   beforeRouteLeave(to, from, next) {
