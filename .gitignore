@@ -10,9 +10,8 @@ migrations/
 /django_static/
 local_settings.py
 
-
+/assets/
 build/
-!/build/
 
 .DS_Store
 node_modules/
