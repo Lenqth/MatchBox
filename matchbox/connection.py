@@ -103,7 +103,8 @@ class GameConnection:
         return res
 
     async def send_and_receive_reply(self, obj, timeout=30):
-        sobj = json.loads(json.dumps(obj, cls=myJSONEncoder))
+        import copy
+        sobj = copy.copy(obj)
         self._m_id += 1
         sobj["_m_id"] = self._m_id
         m_id = sobj["_m_id"]

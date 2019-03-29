@@ -38,9 +38,11 @@ class AITsumogiri:
     async def message(self, message):
         pass
 
-    async def send(self, obj):
+    async def send(self, method , obj):
         pass
 
+    async def send_and_receive_reply(self, method , obj , timeout = 3000):
+        pass
 
 class AIShanten:
     def __init__(self):
@@ -82,9 +84,11 @@ class AIShanten:
     async def message(self, message):
         pass
 
-    async def send(self, obj):
+    async def send(self, method , obj):
         pass
 
+    async def send_and_receive_reply(self, method , obj , timeout = 3000):
+        pass
 
 class RemotePlayer:
 
@@ -110,13 +114,13 @@ class RemotePlayer:
         return command in li
 
     async def turn_command_async(self, pl, game, commands):
-        obj = {"type": "your_turn", "hand_tiles": pl.hand,
+        obj = {"hand_tiles": pl.hand,
                "draw": pl.drew, "turn_commands_available": commands}
         if pl.agari_infos is not None:
             obj["agari_info"] = pl.agari_infos
 
         try:
-            res = await self.conn.send_and_receive_reply(obj, timeout=game.timeout)
+            res = await self.send_and_receive_reply("your_turn",obj, timeout=game.timeout)
             res = TurnCommand.fromDict(res)
             if not RemotePlayer.validate_turn_command(res, range(0 if pl.drew is None else -1, len(pl.hand)), obj["turn_commands_available"]):
                 raise Exception("validation error : %s" % res)
@@ -129,7 +133,7 @@ class RemotePlayer:
                 return TurnCommand(TurnCommand.DISCARD, len(pl.hand)-1)
 
     async def command_async(self, pl, game, commands):
-        obj = {"type": "claim_command", "hand_tiles": pl.hand,
+        obj = {"hand_tiles": pl.hand,
                "target": {"player": game.turn,
                           "apkong": game.apkong,
                           "tile": game.target_tile},
@@ -137,9 +141,9 @@ class RemotePlayer:
         if pl.agari_infos is not None:
             obj["agari_info"] = pl.agari_infos
         try:
-            res = await self.conn.send_and_receive_reply(obj, timeout=game.timeout)
+            res = await self.send_and_receive_reply(obj, timeout=game.timeout)
             res = Claim.fromDict(res)
-            if not RemotePlayer.validate_command(res,  obj["commands_available"]):
+            if not RemotePlayer.validate_command("claim_command" , res,  obj["commands_available"]):
                 raise Exception("validation error : %s" % res)
             return res
         except Exception as e:
@@ -147,16 +151,19 @@ class RemotePlayer:
             return Claim(0)
 
     async def confirm(self, message):
-        obj = {"type": "confirm", "message": message}
+        obj = { "message": message}
         try:
-            await self.conn.send_and_receive_reply(obj, timeout=3000)
+            await self.send_and_receive_reply("confirm" , obj, timeout=3000)
         except Exception as e:
             traceback.format_exc()
             return
 
     async def message(self, message):
-        obj = {"type": "message", "message": message}
-        await self.conn.send(obj)
+        obj = { "message": message}
+        await self.conn.send("message",obj)
 
-    async def send(self, obj):
-        await self.conn.send(obj)
+    async def send(self, method , obj):
+        await self.conn.send( { "method" : method , "params" : obj } )
+
+    async def send_and_receive_reply(self, method , obj , timeout = 3000):
+        return await self.conn.send_and_receive_reply({ "method" : method , "params" : obj } , timeout=timeout)

@@ -29,7 +29,7 @@ import Vue from "vue";
 import Vuetify from "vuetify";
 import { webSocket as RxWebSocket } from "rxjs/webSocket";
 import * as operators from "rxjs/operators";
-import { interval } from "rxjs";
+import { timer,interval } from "rxjs";
 
 Vue.use(Vuetify);
 

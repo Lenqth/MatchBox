@@ -28,54 +28,52 @@ class Game:
     async def send_final_result(self):
         dat = [ {"name" : pl.agent.get_name() , "point" :  self.total_score[pl.id] } for pl in self.players ]
         dat = sorted( dat , key = lambda x:x["point"] ,reverse = True )
-        obj = { "type" : "final_result" , "dat" : dat }
+        obj = { "dat" : dat }
         for i in range(4):
-            await self.players[i].agent.send( obj )
+            await self.players[i].agent.send( "final_result",obj )
 
     async def send_deck_left(self):
         obj = {
-            "type" : "deck_left",
             "deck_left" : self.lefttile()
             }
         t = []
         for i in range(4):
             pl = self.players[i]
-            t.append( pl.agent.send( obj ) )
+            t.append( pl.agent.send( "deck_left",obj ) )
         await Promise.all(t)
 
     async def send_all_state(self,pid):
         pls = [ self.players[i].get_data(self,pid) for i in range(4) ]
         obj = {
-            "type" : "reset",
             "deck_left" : self.lefttile(),
             "player_id" : pid ,
             "seat_wind" : self.get_seat_wind(pid) ,
             "prev_wind" : self.prevalent_wind ,
             "players" : pls
         }
-        await self.players[pid].agent.send(obj)
+        await self.players[pid].agent.send("reset",obj)
 
 
     async def send_discard(self,pid,tile):
         t = []
         for i in range(4):
             pl = self.players[i]
-            t.append(pl.agent.send(
-                {"type": "discard", "tile": tile, "pid": pid}))
+            t.append(pl.agent.send("discard",
+                {  "tile": tile, "pid": pid}))
         await Promise.all(t)
 
     async def send_apkong(self,pid,tile):
         t = []
         for i in range(4):
             pl = self.players[i]
-            t.append( await pl.agent.send({"type":"apkong","tile":tile,"pid":pid}) )
+            t.append( await pl.agent.send("apkong",{"tile":tile,"pid":pid}) )
         await Promise.all(t)
 
     async def send_expose(self,pid,obj):
         t = []
         for i in range(4):
             pl = self.players[i]
-            t.append( await pl.agent.send({"type":"expose","obj":obj.toDict(),"pid":pid}) )
+            t.append( await pl.agent.send("expose",{"obj":obj.toDict(),"pid":pid}) )
         await Promise.all(t)
 
     async def send_agari(self,pid,tsumo,kousei,yaku):
@@ -83,16 +81,16 @@ class Game:
         t = []
         for i in range(4):
             pl = self.players[i]
-            t.append( await pl.agent.send( {"type":"agari","tsumo":tsumo,"kousei":kousei,"yaku":yaku,"pid":pid}) )
-            t.append( await pl.agent.send( {"type":"open_hand","hand":[{"hand":self.players[i].hand,"drew":self.players[i].drew} for i in range(4)]}) )
+            t.append( await pl.agent.send( "agari",{"tsumo":tsumo,"kousei":kousei,"yaku":yaku,"pid":pid}) )
+            t.append( await pl.agent.send( "open_hand",{"hand":[{"hand":self.players[i].hand,"drew":self.players[i].drew} for i in range(4)]}) )
         await Promise.all(t)
 
     async def send_ryukyoku(self):
         t = []
         for i in range(4):
             pl = self.players[i]
-            t.append( await pl.agent.send( {"type":"gameover"}) )
-            t.append( await pl.agent.send( {"type":"open_hand","hand":[{"hand":self.players[i].hand,"drew":self.players[i].drew} for i in range(4)]}) )
+            t.append( await pl.agent.send( "gameover",{}) )
+            t.append( await pl.agent.send( "open_hand",{"hand":[{"hand":self.players[i].hand,"drew":self.players[i].drew} for i in range(4)]}) )
         await Promise.all(t)
 
     def get_config(self,name):
@@ -169,7 +167,7 @@ class Game:
             p.hand.sort()
         self.skip_draw = False
         await Promise.all( [self.send_all_state(i) for i in range(4)] )
-        self.turn = ( 4 - self._seat_wind_offset ) % 4
+        self.turn = ( -self._seat_wind_offset ) % 4 # pythonでは余りは正
         while True:
             if self.skip_draw == False and self.players[self.turn].drew == None :
                 tm = self.draw()

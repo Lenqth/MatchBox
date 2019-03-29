@@ -110,6 +110,156 @@ export default {
     obj.time_left = null;
     obj.timeout = null;
     obj.input_resolve = null;
+    obj.rpc_methods = {
+      async reset(res){
+          this.$store.commit("reset");
+          this.yakulist = null;
+          this.calculated_score = null;
+          this.assign(res);
+          this.open = false;
+          this.meld_selection = { type: "", tiles: [] };
+          this.players[this.player_id].commands_available = [];
+      },
+      async agari(res){
+          this.result = { player: "", score: 0, tsumo: false, yaku: [] };
+          this.result.player = relative_player_format(this.player_id, res.pid);
+          this.result.score = res.yaku[0];
+          this.result.yaku = res.yaku[1];
+          this.result.tsumo = res.tsumo;
+      },
+      async gameover(res){
+          this.result = { player: "", score: 0, tsumo: false, yaku: [] };
+          this.result.player = -1;
+          this.result.score = 0;
+          this.result.yaku = [];
+          this.open = true;
+      },
+      async final_result(res){
+          this.final_result = res.dat;
+      },
+      async open_hand(res){
+          var hands = res.hand;
+          for (let i = 0; i < 4; i++) {
+            let p = hands[i];
+            this.players[i].hand = p.hand;
+            this.players[i].drawed = p.drew;
+            this.open = true;
+          }
+      },
+      async deck_left(res){
+        this.deck_left = res.deck_left;
+      },
+      async claim_command(res,_m_id,timeout){
+        // {"commands_available": [{"type": 1, "pos": [[1], [2]]}], "_m_id": 7, "timeout": 1539616054.5650032}
+        let tg_pl = res.target.player,
+          tg_apkong = res.target.apkong,
+          tg_tile = res.target.tile;
+        this.players[this.player_id].hand = res.hand_tiles;
+        this.players[this.player_id].drawed = null;
+        this.players[tg_pl].target = tg_apkong ? "apkong" : "trash";
+        this.claim_target = tg_tile;
+
+        let commands = res.commands_available;
+        let skippable = true;
+        for (let v of commands) {
+          if (v.type == "ron") {
+            skippable = false;
+            break;
+          }
+        }
+        this.players[this.player_id].commands_available = [
+          { type: "skip" }
+        ].concat(commands);
+        this.players[this.player_id].allow_discard = false;
+
+        if (res.agari_info != null) {
+          this.yakulist = res.agari_info[1];
+          this.calculated_score = res.agari_info[0];
+        }
+        let input_res;
+        var cancelObj = { cancel: false };
+        if (this.$store.state.skip_claim && skippable) {
+          input_res = { type: "skip" };
+        } else {
+          let timeout_ms = timeout * 1000;
+          this.play_sound("sound1");
+          input_res = await Promise.race([
+            this.claim_input(cancelObj),
+            this.timer(timeout_ms, cancelObj)
+          ]);
+        }
+        this.players[this.player_id].commands_available = [];
+        this.players[this.player_id].allow_discard = false;
+        this.yakulist = null;
+        this.calculated_score = null;
+        cancelObj.cancel = true;
+        if (input_res != null) {
+          input_res._m_id = _m_id;
+          this.conn.next(input_res);
+        }
+        this.players[tg_pl].target = null;        
+      },
+      async expose(res){
+          this.players[res.pid].exposed.push(res.obj);
+          if( res.obj.discard_pos != null ){ 
+            let [d_pid,d_pos] = res.obj.discard_pos
+            this.players[d_pid].trash[d_pos].claimed = true
+          }
+        
+      },
+      async apkong(res){
+        var ex = this.players[res.pid].exposed;
+        for (var v of ex) {
+          if (v.type == "pong" && v.tiles[0] == res.tile) {
+            v.tiles.push(res.tile);
+            v.type = "apkong";
+            break;
+          }
+        }        
+      },
+      async confirm(res,_m_id,timeout){
+          await new Promise(resolve => (this.listener_ok = resolve));
+          this.conn.next({ _m_id: _m_id });
+          this.result = null;
+        
+      },
+      async discard(params){
+          await this.play_sound("sound2");
+          this.players[params.pid].trash.push(params.tile);
+      },
+      async your_turn(params,_m_id,timeout){
+                  // {"hand_tiles": [2, 4, 5, 6, 19, 22, 24, 34, 34, 38, 49, 52, 53], "draw": 22, "turn_commands_available": null, "_m_id": 4, "timeout": 1539603590.1542008}
+          this.players[this.player_id].hand = params.hand_tiles;
+          this.players[this.player_id].drawed = params.draw;
+          this.players[this.player_id].commands_available =
+            params.turn_commands_available == null
+              ? []
+              : params.turn_commands_available;
+          this.players[this.player_id].allow_discard = true;
+          if (params.agari_info != null) {
+            this.yakulist = params.agari_info[1];
+            this.calculated_score = params.agari_info[0];
+          }
+          var timeout_ms = timeout * 1000;
+          var cancelObj = { cancel: false };
+          this.play_sound("sound1");
+          var input_res = await Promise.race([
+            this.turn_input(cancelObj),
+            this.timer(timeout_ms, cancelObj)
+          ]);
+          cancelObj.cancel = true;
+          if (input_res != null) {
+            input_res._m_id = _m_id;
+            console.log(input_res)
+            this.conn.next(input_res);
+          } else {
+            pl.trash_tile(-1);
+          }        
+      },
+      set_dora(params){
+
+      }
+    };
     for (let i = 0; i < 4; i++) {
       obj.players[i] = new Hand();
       obj.players[i].id = i;
@@ -117,7 +267,7 @@ export default {
     return obj;
   },
   mounted() {
-    this.start(window.socket);
+    this.start();
   },
   methods: {
     numtosrc,
@@ -226,155 +376,22 @@ export default {
       el.currentTime = 0;
       el.play();
     },
-    async start(sock) {
+    async start() {
       this.conn = this.$store.state.connection.socket;
-      this.conn.next( { stand_by: "" } );
       var res = null;
       this.open = false;
       var proc = async ( res ) => {
-        var pl = this.players[this.player_id];
-        if (res.type === "reset") {
-          delete res.type;
-          this.$store.commit("reset");
-          this.yakulist = null;
-          this.calculated_score = null;
-          this.assign(res);
-          this.open = false;
-          this.meld_selection = { type: "", tiles: [] };
-          this.players[this.player_id].commands_available = [];
-        }
-        if (res.type === "agari") {
-          this.result = { player: "", score: 0, tsumo: false, yaku: [] };
-          this.result.player = relative_player_format(this.player_id, res.pid);
-          this.result.score = res.yaku[0];
-          this.result.yaku = res.yaku[1];
-          this.result.tsumo = res.tsumo;
-        }
-        if (res.type === "gameover") {
-          this.result = { player: "", score: 0, tsumo: false, yaku: [] };
-          this.result.player = -1;
-          this.result.score = 0;
-          this.result.yaku = [];
-          this.open = true;
-        }
-        if (res.type === "final_result") {
-          this.final_result = res.dat;
-        }
-        if (res.type === "open_hand") {
-          var hands = res.hand;
-          for (let i = 0; i < 4; i++) {
-            let p = hands[i];
-            this.players[i].hand = p.hand;
-            this.players[i].drawed = p.drew;
-            this.open = true;
-          }
-        }
-        if (res.type === "deck_left") {
-          this.deck_left = res.deck_left;
-        }
-        if (res.type === "claim_command") {
-          // {"commands_available": [{"type": 1, "pos": [[1], [2]]}], "_m_id": 7, "timeout": 1539616054.5650032}
-          let tg_pl = res.target.player,
-            tg_apkong = res.target.apkong,
-            tg_tile = res.target.tile;
-          this.players[this.player_id].hand = res.hand_tiles;
-          this.players[this.player_id].drawed = null;
-          this.players[tg_pl].target = tg_apkong ? "apkong" : "trash";
-          this.claim_target = tg_tile;
-
-          let commands = res.commands_available;
-          let skippable = true;
-          for (let v of commands) {
-            if (v.type == "ron") {
-              skippable = false;
-              break;
-            }
-          }
-          this.players[this.player_id].commands_available = [
-            { type: "skip" }
-          ].concat(commands);
-          this.players[this.player_id].allow_discard = false;
-
-          if (res.agari_info != null) {
-            this.yakulist = res.agari_info[1];
-            this.calculated_score = res.agari_info[0];
-          }
-          let input_res;
-          var cancelObj = { cancel: false };
-          if (this.$store.state.skip_claim && skippable) {
-            input_res = { type: "skip" };
-          } else {
-            let timeout = res.timeout * 1000;
-            this.play_sound("sound1");
-            input_res = await Promise.race([
-              this.claim_input(cancelObj),
-              this.timer(timeout, cancelObj)
-            ]);
-          }
-          this.players[this.player_id].commands_available = [];
-          this.players[this.player_id].allow_discard = false;
-          this.yakulist = null;
-          this.calculated_score = null;
-          cancelObj.cancel = true;
-          if (input_res != null) {
-            input_res._m_id = res._m_id;
-            this.conn.next(input_res);
-          }
-          this.players[tg_pl].target = null;
-        } else if (res.type === "expose") {
-          this.players[res.pid].exposed.push(res.obj);
-          if( res.obj.discard_pos != null ){ 
-            let [d_pid,d_pos] = res.obj.discard_pos
-            this.players[d_pid].trash[d_pos].claimed = true
-          }
-        } else if (res.type === "apkong") {
-          var ex = this.players[res.pid].exposed;
-          for (var v of ex) {
-            if (v.type == "pong" && v.tiles[0] == res.tile) {
-              v.tiles.push(res.tile);
-              v.type = "apkong";
-              break;
-            }
-          }
-        } else if (res.type == "confirm") {
-          await new Promise(resolve => (this.listener_ok = resolve));
-          this.conn.next({ _m_id: res._m_id });
-          this.result = null;
-        } else if (res.type == "discard") {
-          await this.play_sound("sound2");
-          this.players[res.pid].trash.push(res.tile);
-        } else if (res.type == "your_turn") {
-          // {"hand_tiles": [2, 4, 5, 6, 19, 22, 24, 34, 34, 38, 49, 52, 53], "draw": 22, "turn_commands_available": null, "_m_id": 4, "timeout": 1539603590.1542008}
-          this.players[this.player_id].hand = res.hand_tiles;
-          this.players[this.player_id].drawed = res.draw;
-          this.players[this.player_id].commands_available =
-            res.turn_commands_available == null
-              ? []
-              : res.turn_commands_available;
-          this.players[this.player_id].allow_discard = true;
-          if (res.agari_info != null) {
-            this.yakulist = res.agari_info[1];
-            this.calculated_score = res.agari_info[0];
-          }
-          var timeout = res.timeout * 1000;
-          var cancelObj = { cancel: false };
-          this.play_sound("sound1");
-          var input_res = await Promise.race([
-            this.turn_input(cancelObj),
-            this.timer(timeout, cancelObj)
-          ]);
-          cancelObj.cancel = true;
-          if (input_res != null) {
-            input_res._m_id = res._m_id;
-            this.conn.next(input_res);
-          } else {
-            pl.trash_tile(-1);
-          }
-
-          // await turn_input(this.player_id);
+        console.log(res)
+        let mth = this.rpc_methods[res.method];
+        if(mth==null){
+          console.log(res.method) 
+          throw "unexpected method : " + res.method;
+        }else{
+          await mth.apply( this , [res.params,res._m_id,res.timeout] );
         }
       };
       this.conn.subscribe(proc)
+      this.conn.next( { stand_by: "" } );
     },
     back_to_lobby(){
       this.$router.push("/");

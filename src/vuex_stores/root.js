@@ -8,6 +8,19 @@ export const lobby = {
   namespaced: true
 };
 
+export const jong = {
+  namespaced: true,
+  state: {
+    
+  },
+  actions: {
+
+  },
+  mutations: {
+    
+  }
+}
+
 export const connection = {
   namespaced: true,
   state: {
