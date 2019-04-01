@@ -1,25 +1,15 @@
 import Vue from "vue";
 import Vuex from "vuex";
 Vue.use(Vuex);
-import { webSocket as RxWebSocket } from "rxjs/webSocket";
-import { retryWhen } from "rxjs/operators";
+//import { webSocket as RxWebSocket } from "rxjs/webSocket";
+//import { retryWhen } from "rxjs/operators";
+import jong from "./jong";
 
 export const lobby = {
   namespaced: true
 };
 
-export const jong = {
-  namespaced: true,
-  state: {
-    
-  },
-  actions: {
 
-  },
-  mutations: {
-    
-  }
-}
 
 export const connection = {
   namespaced: true,
@@ -49,7 +39,8 @@ export const connection = {
 export const store = new Vuex.Store({
   modules: {
     lobby,
-    connection
+    connection,
+    jong
   },
   state: {
     skip_claim: false,
