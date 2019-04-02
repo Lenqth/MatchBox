@@ -6,12 +6,12 @@ import Vuex from "vuex";
 Vue.use(Vuetify);
 Vue.use(Vuex);
 import "vuetify/dist/vuetify.min.css";
-import 'material-design-icons-iconfont/dist/material-design-icons.css'
+import "material-design-icons-iconfont/dist/material-design-icons.css";
 Vue.config.productionTip = false;
 
 import App from "./App";
 import router from "./router";
-import { store } from "./vuex_stores/root.js";
+import { store } from "./vuex_stores/root";
 
 /* eslint-disable no-new */
 new Vue({

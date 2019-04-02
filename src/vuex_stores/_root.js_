@@ -3,7 +3,7 @@ import Vuex from "vuex";
 Vue.use(Vuex);
 //import { webSocket as RxWebSocket } from "rxjs/webSocket";
 //import { retryWhen } from "rxjs/operators";
-import jong from "./jong";
+import {Jong} from "./jong";
 
 export const lobby = {
   namespaced: true
@@ -39,8 +39,7 @@ export const connection = {
 export const store = new Vuex.Store({
   modules: {
     lobby,
-    connection,
-    jong
+    connection
   },
   state: {
     skip_claim: false,

@@ -93,7 +93,6 @@ export default {
     let obj = {};
     obj.players = new Array(4);
     obj.turn = 0;
-    obj.nakimode = -1;
     obj.subturn = -1;
     obj.last_target = null;
     obj.deck_left = 0;
